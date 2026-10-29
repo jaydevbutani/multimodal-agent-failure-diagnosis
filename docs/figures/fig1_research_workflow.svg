@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 360" width="100%" height="auto" style="background:#ffffff; font-family:'Times New Roman',serif;">
+  <defs>
+    <linearGradient id="gradHeader" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="gradTab" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+    <linearGradient id="gradSeq" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed"/>
+      <stop offset="100%" stop-color="#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="gradFuse" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#be123c"/>
+    </linearGradient>
+    <linearGradient id="gradDiag" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#475569"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#be123c"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="500" y="28" font-size="16" font-weight="bold" text-anchor="middle" fill="#0f172a">Figure 1: End-to-End Heterogeneous Execution-Trace Diagnosis & Attribution Architecture</text>
+
+  <!-- Input Trial -->
+  <rect x="20" y="110" width="160" height="120" rx="8" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="20" y="110" width="160" height="32" rx="8" fill="url(#gradHeader)"/>
+  <text x="100" y="132" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">Agent Execution</text>
+  <text x="35" y="162" font-size="11" fill="#334155">• Turn Telemetry</text>
+  <text x="35" y="180" font-size="11" fill="#334155">• Tool Exit Codes</text>
+  <text x="35" y="198" font-size="11" fill="#334155">• Code Modification</text>
+  <text x="35" y="216" font-size="11" fill="#334155">• Action Trajectory</text>
+
+  <!-- Fork arrows -->
+  <path d="M 180 150 L 230 150 L 230 95 L 260 95" fill="none" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <path d="M 180 190 L 230 190 L 230 245 L 260 245" fill="none" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- Tabular Stream -->
+  <rect x="260" y="55" width="220" height="85" rx="8" fill="#f0f9ff" stroke="#bae6fd" stroke-width="1.5"/>
+  <rect x="260" y="55" width="220" height="26" rx="8" fill="url(#gradTab)"/>
+  <text x="370" y="73" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Structured Telemetry Stream</text>
+  <text x="272" y="98" font-size="11" fill="#0369a1">21 Scaled Telemetry Metrics + 67 One-Hot</text>
+  <text x="272" y="115" font-size="11" fill="#0f172a" font-weight="bold">Dense Tabular MLP Encoder [R^88 → R^64]</text>
+  <text x="272" y="130" font-size="10.5" fill="#475569">Linear(88→128) → BatchNorm → ReLU → Linear(64)</text>
+
+  <!-- Sequence Stream -->
+  <rect x="260" y="200" width="220" height="85" rx="8" fill="#f5f3ff" stroke="#ddd6fe" stroke-width="1.5"/>
+  <rect x="260" y="200" width="220" height="26" rx="8" fill="url(#gradSeq)"/>
+  <text x="370" y="218" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Tool Action Sequence Stream</text>
+  <text x="272" y="243" font-size="11" fill="#6d28d9">Tokenized Tool Sequence: [t_1, t_2, ..., t_50]</text>
+  <text x="272" y="260" font-size="11" fill="#0f172a" font-weight="bold">Bidirectional LSTM Encoder [R^50 → R^64]</text>
+  <text x="272" y="275" font-size="10.5" fill="#475569">Embedding(32) → BiLSTM(32) → Max-Pooling</text>
+
+  <!-- Connectors to Fusion -->
+  <path d="M 480 97 L 530 97 L 530 145 L 550 145" fill="none" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <path d="M 480 242 L 530 242 L 530 195 L 550 195" fill="none" stroke="#475569" stroke-width="1.8" marker-end="url(#arrow)"/>
+
+  <!-- Cross-Modal Gated Fusion -->
+  <rect x="550" y="115" width="200" height="110" rx="8" fill="#fff1f2" stroke="#fecdd3" stroke-width="1.5"/>
+  <rect x="550" y="115" width="200" height="28" rx="8" fill="url(#gradFuse)"/>
+  <text x="650" y="134" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Cross-Modal Gated Fusion</text>
+  <text x="560" y="160" font-size="11" fill="#be123c">Gating: α = σ(W_g · [h_tab ; h_seq])</text>
+  <text x="560" y="178" font-size="11" fill="#9f1239">Fused: h = α ⊙ h_tab + (1-α) ⊙ h_seq</text>
+  <text x="560" y="196" font-size="11" fill="#0f172a" font-weight="bold">Classification Head: Linear(64→32→1)</text>
+  <text x="560" y="214" font-size="10.5" fill="#475569">Failure Probability P(Failure | x, s)</text>
+
+  <!-- Connector to Diagnosis -->
+  <path d="M 750 170 L 790 170" fill="none" stroke="#be123c" stroke-width="2" marker-end="url(#arrowRed)"/>
+
+  <!-- Diagnostic Attribution Engine -->
+  <rect x="790" y="85" width="190" height="170" rx="8" fill="#f0fdf4" stroke="#bbf7d0" stroke-width="1.5"/>
+  <rect x="790" y="85" width="190" height="28" rx="8" fill="url(#gradDiag)"/>
+  <text x="885" y="104" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">Forensic Diagnosis Engine</text>
+  <text x="802" y="130" font-size="11" font-weight="bold" fill="#047857">1. Binary Status (τ = 0.46):</text>
+  <text x="815" y="146" font-size="10.5" fill="#15803d">HEALTHY / FAILURE DETECTED</text>
+  <text x="802" y="168" font-size="11" font-weight="bold" fill="#047857">2. Behavioral Attribution:</text>
+  <text x="815" y="184" font-size="10.5" fill="#334155">• Cyclic Retry Thrashing</text>
+  <text x="815" y="200" font-size="10.5" fill="#334155">• Environment Crash</text>
+  <text x="815" y="216" font-size="10.5" fill="#334155">• Excessive Churn / Exploration</text>
+  <text x="802" y="238" font-size="11" font-weight="bold" fill="#047857">3. Turn Localization (Turn k)</text>
+</svg>
