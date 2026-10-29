@@ -1,0 +1,1113 @@
+{% extends "base.html" %}
+
+{% block title %}Live Agent Simulation — Agent Health Intelligence{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <!-- Sub-Header / Breadcrumb Strip -->
+  <div class="px-6 py-3.5 bg-surface-container-low flex flex-wrap items-center justify-between gap-4 shadow-sm border-b border-surface-container">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant truncate">
+        <a href="/dashboard" class="hover:text-primary transition-colors">Home</a>
+        <span>/</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface truncate">Live Agent Simulation</span>
+      </div>
+      <span class="px-2.5 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium uppercase tracking-wider flex items-center gap-1.5 shadow-sm border border-surface-container" id="live-harness-badge">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#2f6f4e] animate-pulse"></span>
+        <span>Harness Ready</span>
+      </span>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="flex items-center gap-2.5">
+      <button class="px-3.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-headline-sm text-xs flex items-center gap-1.5 border border-surface-container shadow-2xs transition-all cursor-pointer" onclick="window.location.href='/history'">
+        <span class="material-symbols-outlined text-[16px]">history</span>
+        <span>Diagnostic History</span>
+      </button>
+      <button class="px-3.5 py-1.5 rounded-lg bg-secondary text-on-secondary font-headline-sm text-xs flex items-center gap-1.5 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer" onclick="window.location.href='/diagnose'">
+        <span class="material-symbols-outlined text-[16px]">account_tree</span>
+        <span>Open Trace Canvas</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Primary Content Container -->
+  <div class="p-4 lg:p-6 flex flex-col gap-6">
+
+    <!-- 0. PROMINENT DEMONSTRATION DISCLAIMER BANNER -->
+    <div class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 shadow-sm border border-secondary/30 flex items-start gap-3.5 bg-gradient-to-r from-secondary/5 via-surface-container-lowest to-surface-container-lowest">
+      <div class="p-2 rounded-xl bg-secondary/10 text-secondary shrink-0 mt-0.5">
+        <span class="material-symbols-outlined text-xl">science</span>
+      </div>
+      <div class="flex flex-col gap-1">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="font-headline-sm text-sm font-bold text-on-surface">Live Agent Telemetry Demonstration Harness</span>
+          <span class="px-2 py-0.5 rounded font-code-sm text-xs font-bold bg-secondary/15 text-secondary uppercase tracking-wider">Demonstration Only</span>
+        </div>
+        <p class="font-body-sm text-xs text-on-surface-variant leading-relaxed">
+          <strong>Demonstration scenarios — not used for model training or test evaluation.</strong>
+          This interactive test harness simulates autonomous agent execution against common production failure patterns. Telemetry is captured in real-time, extracted into multi-view behavioral features, and evaluated using the trained failure detection model.
+        </p>
+      </div>
+    </div>
+
+    <!-- 1. SCENARIO SELECTION MATRIX (7 Canonical Scenarios) -->
+    <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-surface-container pb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-xl">apps</span>
+          <h2 class="font-headline-md text-base sm:text-lg text-on-surface tracking-tight font-bold">Select Demonstration Scenario</h2>
+        </div>
+        <div class="flex items-center gap-2 font-code-sm text-xs text-on-surface-variant">
+          <span>Model: <strong>Multi-View Fusion</strong></span>
+          <span class="opacity-50">|</span>
+          <span>Decision Threshold: <strong>&tau;=0.46</strong></span>
+        </div>
+      </div>
+
+      <!-- 7 Scenario Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
+        <!-- Scenario 1: Nominal -->
+        <div class="scenario-card p-3.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2.5 border-secondary bg-surface-container" id="card-healthy" onclick="selectScenario('healthy')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">1. Nominal SWE Run</span>
+              <span class="px-1.5 py-0.5 rounded font-code-sm text-xs font-bold bg-[#2f6f4e]/20 text-[#2f6f4e]">HEALTHY</span>
+            </div>
+            <p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-2 leading-relaxed">
+              Standard autonomous software engineering task. Reads files, drafts bug patch, verifies green test suite.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-2 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 10 • Tools: 8</span>
+            <span class="text-[#2f6f4e] font-semibold">0 errors</span>
+          </div>
+        </div>
+
+        <!-- Scenario 2: Thrashing -->
+        <div class="scenario-card p-3.5 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2.5" id="card-thrashing_failure" onclick="selectScenario('thrashing_failure')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">2. Retry Thrashing</span>
+              <span class="px-1.5 py-0.5 rounded font-code-sm text-xs font-bold bg-error/20 text-error">FAILURE</span>
+            </div>
+            <p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-2 leading-relaxed">
+              Repeated bash execution loop. Identical commands retried 5 times consecutively without parameter alteration.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-2 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 8 • Retries: 5</span>
+            <span class="text-error font-semibold">4 errors</span>
+          </div>
+        </div>
+
+        <!-- Scenario 3: Environment Crash -->
+        <div class="scenario-card p-3.5 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2.5" id="card-environment_failure" onclick="selectScenario('environment_failure')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">3. Environment Crash</span>
+              <span class="px-1.5 py-0.5 rounded font-code-sm text-xs font-bold bg-error/20 text-error">FAILURE</span>
+            </div>
+            <p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-2 leading-relaxed">
+              Sandbox failure caused by missing environment dependencies, library mismatch, and missing docker socket.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-2 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 5 • Tools: 4</span>
+            <span class="text-error font-semibold">3 errors</span>
+          </div>
+        </div>
+
+        <!-- Scenario 4: High Code Churn -->
+        <div class="scenario-card p-3.5 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2.5" id="card-high_code_churn" onclick="selectScenario('high_code_churn')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">4. High Code Churn</span>
+              <span class="px-1.5 py-0.5 rounded font-code-sm text-xs font-bold bg-error/20 text-error">FAILURE</span>
+            </div>
+            <p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-2 leading-relaxed">
+              Uncontrolled patch oscillation. Modifies 140+ lines repeatedly across 8 edits without test convergence.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-2 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 14 • Edits: 8</span>
+            <span class="text-secondary font-semibold">2 errors</span>
+          </div>
+        </div>
+
+        <!-- Scenario 5: Over-Exploration -->
+        <div class="scenario-card p-3.5 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2.5" id="card-over_exploration" onclick="selectScenario('over_exploration')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">5. Over-Exploration</span>
+              <span class="px-1.5 py-0.5 rounded font-code-sm text-xs font-bold bg-[#fe8357]/20 text-[#6f2000]">RISK</span>
+            </div>
+            <p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-2 leading-relaxed">
+              Unbounded directory traversal. Inspects 18+ unrelated documentation files without drafting a single code edit.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-2 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 18 • Reads: 14</span>
+            <span class="text-[#fe8357] font-semibold">0 errors</span>
+          </div>
+        </div>
+
+        <!-- Scenario 6: Tool Instability -->
+        <div class="scenario-card p-3.5 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2.5" id="card-tool_execution_failure" onclick="selectScenario('tool_execution_failure')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">6. Tool Instability</span>
+              <span class="px-1.5 py-0.5 rounded font-code-sm text-xs font-bold bg-error/20 text-error">FAILURE</span>
+            </div>
+            <p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-2 leading-relaxed">
+              External language server and parser time out, returning truncated stdout and parse exceptions.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-2 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 6 • Tools: 5</span>
+            <span class="text-error font-semibold">3 errors</span>
+          </div>
+        </div>
+
+        <!-- Scenario 7: Compound Failure -->
+        <div class="scenario-card p-3.5 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2.5 sm:col-span-2 lg:col-span-1 xl:col-span-2" id="card-compound_failure" onclick="selectScenario('compound_failure')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">7. Compound Cascade Failure</span>
+              <span class="px-1.5 py-0.5 rounded font-code-sm text-xs font-bold bg-error/20 text-error">CASCADE</span>
+            </div>
+            <p class="font-body-sm text-[11px] text-on-surface-variant line-clamp-2 leading-relaxed">
+              Environment failure triggers frantic retry loops and broken edits, cascading across multiple tool subsystems.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-2 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 12 • Tools: 9 • Retries: 6</span>
+            <span class="text-error font-semibold">5 errors</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Simulation Action Bar -->
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-surface-container">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-base">radio_button_checked</span>
+          <span class="font-body-sm text-xs text-on-surface" id="scenario-summary-desc">
+            Selected: <strong>1. Nominal SWE Run</strong> (Healthy baseline)
+          </span>
+        </div>
+        <div class="flex items-center gap-2.5">
+          <button class="px-5 py-2.5 rounded-xl bg-secondary hover:bg-[#b8471c] active:scale-[0.98] text-white font-headline-sm text-xs font-semibold flex items-center gap-2 shadow-sm transition-all cursor-pointer" id="btn-run-simulation" onclick="startLiveSimulation()">
+            <span class="material-symbols-outlined text-base" id="run-btn-icon">play_arrow</span>
+            <span id="run-btn-label">Execute Live Simulation</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. STEP-BY-STEP SIMULATION PIPELINE PROGRESS -->
+    <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-surface-container flex flex-col gap-3" id="pipeline-tracker">
+      <div class="flex items-center justify-between">
+        <span class="font-headline-sm text-xs font-bold uppercase tracking-wider text-on-surface-variant">Execution &amp; Diagnosis Pipeline</span>
+        <span class="font-code-sm text-[11px] text-secondary font-semibold" id="pipeline-stage-label">Stage 1: Ready</span>
+      </div>
+
+      <!-- 6 Stage Step Indicators -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center text-[11px] font-code-sm">
+        <div class="p-2 rounded-lg bg-surface-container border border-surface-container flex flex-col items-center gap-1 transition-all" id="pipe-step-1">
+          <span class="material-symbols-outlined text-base text-secondary">checklist</span>
+          <span class="font-semibold text-on-surface">1. Scenario Set</span>
+        </div>
+        <div class="p-2 rounded-lg bg-surface-container-low border border-surface-container opacity-60 flex flex-col items-center gap-1 transition-all" id="pipe-step-2">
+          <span class="material-symbols-outlined text-base text-on-surface-variant">rocket_launch</span>
+          <span class="font-medium text-on-surface-variant">2. Agent Init</span>
+        </div>
+        <div class="p-2 rounded-lg bg-surface-container-low border border-surface-container opacity-60 flex flex-col items-center gap-1 transition-all" id="pipe-step-3">
+          <span class="material-symbols-outlined text-base text-on-surface-variant">construction</span>
+          <span class="font-medium text-on-surface-variant">3. Tool Calls</span>
+        </div>
+        <div class="p-2 rounded-lg bg-surface-container-low border border-surface-container opacity-60 flex flex-col items-center gap-1 transition-all" id="pipe-step-4">
+          <span class="material-symbols-outlined text-base text-on-surface-variant">query_stats</span>
+          <span class="font-medium text-on-surface-variant">4. Telemetry</span>
+        </div>
+        <div class="p-2 rounded-lg bg-surface-container-low border border-surface-container opacity-60 flex flex-col items-center gap-1 transition-all" id="pipe-step-5">
+          <span class="material-symbols-outlined text-base text-on-surface-variant">psychology</span>
+          <span class="font-medium text-on-surface-variant">5. ML Inference</span>
+        </div>
+        <div class="p-2 rounded-lg bg-surface-container-low border border-surface-container opacity-60 flex flex-col items-center gap-1 transition-all" id="pipe-step-6">
+          <span class="material-symbols-outlined text-base text-on-surface-variant">verified</span>
+          <span class="font-medium text-on-surface-variant">6. Diagnosis</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SPLIT WORKSPACE: STREAMING LOGS + LIVE TELEMETRY GRAPH + DIAGNOSIS RESULT -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+
+      <!-- LEFT COLUMN: Terminal Logs & Live Telemetry Graph (7 Cols) -->
+      <div class="xl:col-span-7 flex flex-col gap-6">
+
+        <!-- Live Terminal Stream -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-surface-container pb-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-lg">terminal</span>
+              <h3 class="font-headline-md text-sm text-on-surface font-bold tracking-tight">REAL-TIME EXECUTION LOGS</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="font-code-sm text-xs text-on-surface-variant" id="terminal-step-counter">Idle</span>
+              <span class="w-2 h-2 rounded-full bg-[#2f6f4e]" id="terminal-live-dot"></span>
+            </div>
+          </div>
+
+          <!-- Terminal Output Box -->
+          <div class="bg-[#120805] text-[#d8c2bb] p-4 rounded-xl font-code-sm text-xs min-h-[220px] max-h-[300px] overflow-y-auto flex flex-col gap-1.5 shadow-inner border border-[#2b1e1a]" id="live-terminal">
+            <div class="text-[#807471]">[00:00.000] Instrumentation harness initialized. Ready to execute live scenario.</div>
+          </div>
+
+          <!-- Execution Metrics Counters -->
+          <div class="grid grid-cols-4 gap-2 text-center pt-1 border-t border-surface-container">
+            <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container">
+              <span class="font-code-sm text-xs text-on-surface-variant uppercase block">Turns</span>
+              <span class="font-display-lg text-sm font-bold text-primary" id="stat-turns">--</span>
+            </div>
+            <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container">
+              <span class="font-code-sm text-xs text-on-surface-variant uppercase block">Tools</span>
+              <span class="font-display-lg text-sm font-bold text-primary" id="stat-tools">--</span>
+            </div>
+            <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container">
+              <span class="font-code-sm text-xs text-on-surface-variant uppercase block">Errors</span>
+              <span class="font-display-lg text-sm font-bold text-error" id="stat-errors">--</span>
+            </div>
+            <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container">
+              <span class="font-code-sm text-xs text-on-surface-variant uppercase block">Retries</span>
+              <span class="font-display-lg text-sm font-bold text-secondary" id="stat-retries">--</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIVE TELEMETRY GRAPH (Execution Step -> Telemetry Value) -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col gap-3">
+          <div class="flex items-center justify-between border-b border-surface-container pb-2 flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-lg">insights</span>
+              <h3 class="font-headline-md text-sm text-on-surface font-bold tracking-tight">LIVE TELEMETRY GRAPH</h3>
+            </div>
+            <!-- Metric Toggle Buttons -->
+            <div class="flex items-center bg-surface-container-low p-0.5 rounded-lg border border-surface-container font-code-sm text-xs">
+              <button class="px-2 py-0.5 rounded-md bg-surface-container-lowest font-bold text-primary shadow-xs cursor-pointer" id="btn-chart-latency" onclick="setLiveChartMetric('latency')">Latency</button>
+              <button class="px-2 py-0.5 text-on-surface-variant hover:text-primary cursor-pointer" id="btn-chart-errors" onclick="setLiveChartMetric('errors')">Errors</button>
+              <button class="px-2 py-0.5 text-on-surface-variant hover:text-primary cursor-pointer" id="btn-chart-tools" onclick="setLiveChartMetric('tools')">Tool Spans</button>
+            </div>
+          </div>
+
+          <!-- SVG Chart Container -->
+          <div class="w-full" id="live-chart-container">
+            <div class="p-8 text-center text-on-surface-variant font-code-sm text-xs bg-surface-container-low rounded-xl border border-surface-container">
+              Execute a simulation to generate live telemetry graphs.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: ML Diagnostic Evaluation Card (5 Cols) -->
+      <div class="xl:col-span-5 flex flex-col gap-3.5 bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container relative overflow-hidden" id="diagnosis-card">
+        <!-- Accent Line -->
+        <div class="absolute top-0 left-0 right-0 h-1 bg-[#2f6f4e]" id="diag-accent-line"></div>
+
+        <div class="flex items-center justify-between border-b border-surface-container pb-2">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-lg">biotech</span>
+            <h3 class="font-headline-md text-sm text-on-surface font-bold tracking-tight">ML DIAGNOSTIC RESULT</h3>
+          </div>
+          <span class="px-2.5 py-0.5 rounded font-code-sm text-xs font-bold uppercase bg-surface-container text-on-surface-variant" id="diag-badge">Pending</span>
+        </div>
+
+        <!-- 1. HEALTH STATUS & CONFIDENCE -->
+        <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-1" id="q1-status-box">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">1. Health Status</span>
+          <div class="flex items-baseline justify-between gap-2">
+            <span class="font-headline-lg text-xl sm:text-2xl font-bold tracking-tight text-[#2f6f4e]" id="q1-health-status">
+              Awaiting Simulation
+            </span>
+            <div class="flex items-center gap-1 font-body-sm text-xs text-on-surface-variant">
+              <span>Confidence:</span>
+              <span class="font-bold font-code-sm text-primary text-sm" id="q1-health-score">--%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. WHAT HAPPENED? (One short plain-English sentence) -->
+        <div class="flex flex-col gap-1">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">2. What Happened?</span>
+          <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container">
+            <p class="font-body-sm text-xs text-on-surface leading-relaxed" id="q2-what-happened">
+              Execute a scenario to capture agent telemetry and produce real-time multi-view diagnostic reasoning.
+            </p>
+          </div>
+        </div>
+
+        <!-- 3. WHAT WENT WRONG? (Failure Type + short explanation) -->
+        <div class="flex flex-col gap-1">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">3. What Went Wrong?</span>
+          <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container">
+            <span class="font-headline-sm text-sm font-bold text-primary block" id="q2-pattern">
+              Simulation Not Executed
+            </span>
+            <p class="font-body-sm text-xs text-on-surface-variant mt-1 leading-relaxed" id="q2-why">
+              Execute a demonstration scenario to run telemetry through the trained multi-view failure detector.
+            </p>
+          </div>
+        </div>
+
+        <!-- 4. WHERE DID IT HAPPEN? (Responsible Component + Step) -->
+        <div class="flex flex-col gap-1">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">4. Where Did It Happen?</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container">
+              <span class="font-code-sm text-xs uppercase text-on-surface-variant block font-medium">Responsible Component</span>
+              <span class="font-headline-sm text-xs font-bold text-primary block mt-0.5 truncate" id="q4-component">Execution Orchestrator</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-surface-container-low border border-surface-container">
+              <span class="font-code-sm text-xs uppercase text-on-surface-variant block font-medium">Suspicious Step</span>
+              <span class="font-code-sm text-xs font-bold text-secondary block mt-0.5 truncate" id="q4-step">Step localization: Not confidently localized</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. WHY DID THE MODEL DECIDE THIS? (Explainability: Top contributing features with values & explanations) -->
+        <div class="flex flex-col gap-1">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">5. Why Did The Model Decide This?</span>
+          <div class="p-3 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-1.5 text-xs font-body-sm">
+            <span class="font-code-sm text-xs uppercase tracking-wide text-on-surface-variant font-semibold">Features contributing most strongly to model prediction:</span>
+            <ul class="flex flex-col gap-1.5 text-on-surface text-xs" id="q3-evidence-list">
+              <li class="text-on-surface-variant font-code-sm text-xs">Awaiting simulation run...</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 6. RECOMMENDED ACTION -->
+        <div class="flex flex-col gap-1">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">6. Recommended Action</span>
+          <div class="p-3 rounded-xl bg-[#251813] text-white border border-[#463630]">
+            <ul class="flex flex-col gap-1 font-body-sm text-xs text-[#d8c2bb] leading-relaxed" id="q5-action-list">
+              <li>No remediation necessary for nominal run.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 7. DIAGNOSTIC PIPELINE FLOW -->
+        <div class="flex flex-col gap-1 pt-1 border-t border-surface-container">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">7. Pipeline Flow</span>
+          <div class="flex items-center justify-between p-2 rounded-lg bg-surface-container-low border border-surface-container font-code-sm text-xs text-center">
+            <span class="font-semibold text-on-surface">Live Trace</span>
+            <span class="text-on-surface-variant">→</span>
+            <span class="font-semibold text-on-surface">Features</span>
+            <span class="text-on-surface-variant">→</span>
+            <span class="font-semibold text-secondary">Multi-View Fusion</span>
+            <span class="text-on-surface-variant">→</span>
+            <span class="font-semibold text-primary">&tau;=0.46</span>
+            <span class="text-on-surface-variant">→</span>
+            <span class="font-bold text-on-surface">Diagnosis</span>
+          </div>
+          <div class="flex items-center justify-between text-[11px] font-code-sm text-on-surface-variant px-1">
+            <span>Model: <strong>Multi-View Fusion</strong></span>
+            <span>Decision threshold: <strong>0.46</strong></span>
+          </div>
+        </div>
+
+        <!-- ACTION BUTTONS: Explicit Save to History + Canvas Deep-Link -->
+        <div class="flex items-center gap-2 pt-1">
+          <!-- EXPLICIT SAVE BUTTON -->
+          <button class="flex-1 py-2 rounded-xl bg-secondary text-white font-headline-sm text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer" id="btn-save-history" onclick="saveSimulationToHistory()">
+            <span class="material-symbols-outlined text-sm" id="save-btn-icon">bookmark_add</span>
+            <span id="save-btn-label">Save to History</span>
+          </button>
+
+          <!-- DEEP LINK TO CANVAS -->
+          <button class="py-2 px-3.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-headline-sm text-xs font-semibold flex items-center justify-center gap-1.5 border border-surface-container transition-all cursor-pointer" onclick="openCanvasFromSimulation()" title="Open this trace in interactive Trace Canvas">
+            <span class="material-symbols-outlined text-sm text-secondary">account_tree</span>
+            <span>Open Trace &rarr;</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ==============================================================================
+// LIVE AGENT SIMULATION HARNESS — JAVASCRIPT CONTROLLER
+// ==============================================================================
+
+let selectedScenario = 'healthy';
+let isSimulating = false;
+let currentSimData = null;
+let currentChartMetric = 'latency';
+
+// Scenario Metadata & Descriptive Summaries
+const scenarioData = {
+  'healthy': {
+    title: '1. Nominal SWE Run',
+    expected_status: 'EXPECTED HEALTHY',
+    expected_type: 'Nominal Execution',
+    summary: 'Selected: <strong>1. Nominal SWE Run</strong> (Clean execution baseline)',
+    events: [
+      "[00:00.120] Agent received user objective: Resolve issue #402 in repo/auth.py",
+      "[00:00.350] Step 1: Agent dispatches tool 'read_file(repo/auth.py)'",
+      "[00:00.620] Step 2: Agent locates bug: incorrect session cookie attribute",
+      "[00:00.910] Step 3: Agent dispatches tool 'str_replace_editor(repo/auth.py)'",
+      "[00:01.200] Step 4: Agent dispatches tool 'bash(pytest tests/test_auth.py)'",
+      "[00:01.540] Step 5: Test results clean: 14 passed in 0.42s.",
+      "[00:01.780] Task completed nominal termination."
+    ]
+  },
+  'thrashing_failure': {
+    title: '2. Retry Thrashing',
+    expected_status: 'EXPECTED FAILURE',
+    expected_type: 'Cyclic Bash Retry Thrashing',
+    summary: 'Selected: <strong>2. Retry Thrashing</strong> (Cyclic bash failure loop)',
+    events: [
+      "[00:00.100] Agent received user objective: Build package wheel in container",
+      "[00:00.310] Step 1: Agent dispatches tool 'bash(python -m pip install -e .)'",
+      "[00:00.650] [STDERR] Command failed with exit code 1: Setup script exception",
+      "[00:00.890] Step 2: Agent retries tool 'bash(python -m pip install -e .)'",
+      "[00:01.120] [STDERR] Command failed with exit code 1: Same error",
+      "[00:01.400] Step 3: Agent retries identical command for 3rd time",
+      "[00:01.680] Step 4: Command retried for 4th time without altering environment",
+      "[00:01.950] Telemetry supervisor triggered: cyclic thrashing detected!"
+    ]
+  },
+  'environment_failure': {
+    title: '3. Environment Crash',
+    expected_status: 'EXPECTED FAILURE',
+    expected_type: 'Sandbox Runtime Crash',
+    summary: 'Selected: <strong>3. Environment Crash</strong> (Broken container runtime)',
+    events: [
+      "[00:00.080] Agent starting execution in isolated container sandbox",
+      "[00:00.250] Step 1: Agent dispatches tool 'bash(apt-get update)'",
+      "[00:00.510] [STDERR] Permission denied: docker socket not mounted",
+      "[00:00.780] Step 2: Agent dispatches tool 'bash(cat /var/log/syslog)'",
+      "[00:01.020] [STDERR] File not found: /var/log/syslog missing",
+      "[00:01.310] Step 3: Tool sandbox unrecoverable crash",
+      "[00:01.500] Supervisor flagged: Environment failure trapped"
+    ]
+  },
+  'high_code_churn': {
+    title: '4. High Code Churn',
+    expected_status: 'EXPECTED FAILURE',
+    expected_type: 'Code Modification Churn Loop',
+    summary: 'Selected: <strong>4. High Code Churn</strong> (Uncontrolled diff oscillations)',
+    events: [
+      "[00:00.110] Agent received task: refactor database migration engine",
+      "[00:00.320] Step 1: Agent edits schema.py (+60 lines)",
+      "[00:00.580] Step 2: Tests fail; agent overwrites schema.py (-40 lines)",
+      "[00:00.840] Step 3: Agent alters migration.py (+110 lines)",
+      "[00:01.100] Step 4: Agent reverts migration.py and rewrites base.py",
+      "[00:01.390] Step 5: Total lines modified: 240+ without test convergence",
+      "[00:01.650] Supervisor flagged: Churn entropy exceeds threshold"
+    ]
+  },
+  'over_exploration': {
+    title: '5. Over-Exploration',
+    expected_status: 'EXPECTED FAILURE',
+    expected_type: 'Information Over-Exploration',
+    summary: 'Selected: <strong>5. Over-Exploration</strong> (Context budget bleed)',
+    events: [
+      "[00:00.110] Agent received user objective: Find token validation bug",
+      "[00:00.320] Step 1: Agent dispatches 'list_dir(src)'",
+      "[00:00.580] Step 2: Agent dispatches 'read_file(docs/readme.md)'",
+      "[00:00.820] Step 3: Agent dispatches 'read_file(docs/architecture.png)'",
+      "[00:01.050] Step 4: Agent dispatches 'read_file(examples/demo1.py)'",
+      "[00:01.320] Step 5: Agent dispatches 'read_file(examples/demo2.py)'",
+      "[00:01.600] Step 6: 18 consecutive read operations dispatched with 0 edits",
+      "[00:01.890] Telemetry supervisor triggered: context budget exhaustion risk!"
+    ]
+  },
+  'tool_execution_failure': {
+    title: '6. Tool Instability',
+    expected_status: 'EXPECTED FAILURE',
+    expected_type: 'External Tool Invocation Failure',
+    summary: 'Selected: <strong>6. Tool Instability</strong> (Language server / tool timeout)',
+    events: [
+      "[00:00.090] Agent invoking LSP language server for semantic symbol lookup",
+      "[00:00.340] Step 1: LSP request dispatched 'find_references(SessionStore)'",
+      "[00:00.890] [WARN] Tool response delayed > 500ms",
+      "[00:01.400] Step 2: Language server timed out after 1000ms",
+      "[00:01.650] Step 3: Tool returned malformed JSON error payload",
+      "[00:01.900] Supervisor flagged: External tool execution instability"
+    ]
+  },
+  'compound_failure': {
+    title: '7. Compound Cascade Failure',
+    expected_status: 'EXPECTED FAILURE',
+    expected_type: 'Multi-Modal Cascading Breakdown',
+    summary: 'Selected: <strong>7. Compound Cascade Failure</strong> (Environment + Retry cascade)',
+    events: [
+      "[00:00.100] Agent initialized for multi-step container task",
+      "[00:00.300] Step 1: Tool execution fails due to missing shared library",
+      "[00:00.550] Step 2: Agent enters bash retry loop (attempt 1)",
+      "[00:00.800] Step 3: Agent enters bash retry loop (attempt 2)",
+      "[00:01.100] Step 4: Agent enters bash retry loop (attempt 3)",
+      "[00:01.400] Step 5: Agent attempts erratic file overwrite to bypass crash",
+      "[00:01.750] Step 6: Cascading multiple failure modes triggered"
+    ]
+  }
+};
+
+function selectScenario(scenario) {
+  if (isSimulating) return;
+  selectedScenario = scenario;
+
+  document.querySelectorAll('.scenario-card').forEach(card => {
+    card.classList.remove('border-secondary', 'bg-surface-container', 'shadow-sm');
+    card.classList.add('border-surface-container', 'bg-surface-container-low');
+  });
+
+  const activeCard = document.getElementById(`card-${scenario}`);
+  if (activeCard) {
+    activeCard.classList.remove('border-surface-container', 'bg-surface-container-low');
+    activeCard.classList.add('border-secondary', 'bg-surface-container', 'shadow-sm');
+  }
+
+  const sInfo = scenarioData[scenario] || scenarioData['healthy'];
+  document.getElementById('scenario-summary-desc').innerHTML = sInfo.summary;
+
+  // Update expected state strip
+  const expEl = document.getElementById('sim-expected-state');
+  const predEl = document.getElementById('sim-predicted-state');
+  const agreeBadge = document.getElementById('sim-agreement-badge');
+  const agreeText = document.getElementById('sim-agreement-text');
+  const agreeIcon = document.getElementById('sim-agreement-icon');
+
+  if (expEl) expEl.innerText = sInfo.expected_status || 'EXPECTED UNKNOWN';
+  if (predEl) {
+    predEl.innerText = 'AWAITING RUN';
+    predEl.className = 'font-code-sm text-xs font-bold text-on-surface-variant';
+  }
+  if (agreeBadge) {
+    agreeBadge.className = 'flex items-center gap-1 px-2.5 py-0.5 rounded font-code-sm text-xs font-bold bg-surface-container text-on-surface-variant border border-surface-container';
+  }
+  if (agreeText) agreeText.innerText = 'PENDING';
+  if (agreeIcon) agreeIcon.innerText = 'hourglass_empty';
+
+  // Reset Save Button when scenario changes
+  resetSaveButtonState();
+}
+
+// Update Pipeline Stage Visualizer
+function updatePipelineStage(stageNum, stageLabel) {
+  const pLabel = document.getElementById('pipeline-stage-label');
+  if (pLabel) pLabel.innerText = `Stage ${stageNum}: ${stageLabel}`;
+  for (let i = 1; i <= 6; i++) {
+    const el = document.getElementById(`pipe-step-${i}`);
+    if (!el) continue;
+    if (i < stageNum) {
+      el.className = 'p-2 rounded-lg bg-[#2f6f4e]/15 border border-[#2f6f4e]/40 flex flex-col items-center gap-1 transition-all';
+      el.querySelector('.material-symbols-outlined').className = 'material-symbols-outlined text-base text-[#2f6f4e]';
+    } else if (i === stageNum) {
+      el.className = 'p-2 rounded-lg bg-secondary/20 border-2 border-secondary flex flex-col items-center gap-1 transition-all shadow-xs';
+      el.querySelector('.material-symbols-outlined').className = 'material-symbols-outlined text-base text-secondary animate-bounce';
+    } else {
+      el.className = 'p-2 rounded-lg bg-surface-container-low border border-surface-container opacity-50 flex flex-col items-center gap-1 transition-all';
+      el.querySelector('.material-symbols-outlined').className = 'material-symbols-outlined text-base text-on-surface-variant';
+    }
+  }
+}
+
+// Execute Live Simulation Pipeline
+async function startLiveSimulation() {
+  if (isSimulating) return;
+  isSimulating = true;
+
+  const btn = document.getElementById('btn-run-simulation');
+  const btnLabel = document.getElementById('run-btn-label');
+  const btnIcon = document.getElementById('run-btn-icon');
+  const term = document.getElementById('live-terminal');
+  const counter = document.getElementById('terminal-step-counter');
+
+  btn.disabled = true;
+  btnLabel.textContent = 'Simulating Agent Run...';
+  btnIcon.textContent = 'sync';
+  btnIcon.classList.add('animate-spin');
+
+  // Reset save button state
+  resetSaveButtonState();
+
+  // Reset telemetry cards
+  document.getElementById('stat-turns').innerText = '...';
+  document.getElementById('stat-tools').innerText = '...';
+  document.getElementById('stat-errors').innerText = '...';
+  document.getElementById('stat-retries').innerText = '...';
+
+  // Set animated progress status in diagnosis card
+  document.getElementById('q1-health-status').innerText = 'Executing Agent Run...';
+  document.getElementById('q1-health-status').className = 'font-headline-lg text-lg sm:text-xl font-bold tracking-tight mt-0.5 text-secondary animate-pulse';
+  document.getElementById('q1-health-score').innerText = 'Evaluating...';
+  document.getElementById('q2-what-happened').innerText = 'Executing real-time telemetry instrumentation and streaming tool invocations...';
+  document.getElementById('q2-pattern').innerText = 'Collecting Telemetry Data...';
+  document.getElementById('q2-why').innerText = 'Extracting multi-view behavioral features across temporal and structural dimensions...';
+
+  // Stage 1: Scenario Selected
+  updatePipelineStage(1, 'Scenario Initialized');
+  term.innerHTML = `<div class="text-secondary">[START] Launching autonomous agent in sandbox container...</div>`;
+
+  const sInfo = scenarioData[selectedScenario] || scenarioData['healthy'];
+  const events = sInfo.events;
+  const isExpectedFailure = (selectedScenario !== 'healthy');
+
+  // Stage 2: Agent Bootstrapping
+  await new Promise(r => setTimeout(r, 200));
+  updatePipelineStage(2, 'Agent Initializing');
+
+  // Stage 3: Tool Calls Streaming with Real-Time Telemetry Graph Updates
+  updatePipelineStage(3, 'Streaming Tool Invocations');
+  const dynamicSteps = [];
+
+  for (let i = 0; i < events.length; i++) {
+    await new Promise(r => setTimeout(r, 160));
+    term.innerHTML += `<div>${events[i]}</div>`;
+    term.scrollTop = term.scrollHeight;
+    counter.textContent = `Turn ${i + 1}/${events.length}`;
+
+    // Incremental step added to telemetry graph
+    const isStepErr = (isExpectedFailure && i >= events.length - 2);
+    dynamicSteps.push({
+      step: i + 1,
+      tool: `turn_${i+1}`,
+      latency_ms: 110 + (i * 45) + (isStepErr ? 320 : 0),
+      is_error: isStepErr,
+      cumulative_errors: isStepErr ? (selectedScenario === 'healthy' ? 0 : 2) : 0
+    });
+    renderLiveChartProgress(dynamicSteps, isExpectedFailure);
+  }
+
+  // Stage 4: Telemetry Extraction
+  updatePipelineStage(4, 'Extracting Behavioral Telemetry');
+  await new Promise(r => setTimeout(r, 150));
+
+  // Stage 5: ML Model Inference (POST to backend, STRICT save=false)
+  updatePipelineStage(5, 'Multi-View Model Inference');
+  try {
+    const res = await fetch('/api/live-diagnosis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        scenario: selectedScenario,
+        model_choice: 'Proposed Multi-View Fusion Network',
+        threshold: 0.46,
+        save: false // STRICT: Never save automatically!
+      })
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      currentSimData = data;
+
+      // Stage 6: Diagnosis Ready
+      updatePipelineStage(6, 'Diagnosis Rendered');
+      renderSimulationResults(data);
+      term.innerHTML += `<div class="text-[#2f6f4e] mt-2 font-bold">[COMPLETE] Real ML Pipeline executed: Status ${data.ml_predicted_status || data.diagnosis.status} (${data.ml_confidence})</div>`;
+      showToast(`Simulation complete: ${data.ml_predicted_status || data.diagnosis.status}`, 'success');
+    } else {
+      showToast(data.error || 'Simulation inference failed.', 'error');
+    }
+  } catch (err) {
+    showToast('Simulation error: ' + err.message, 'error');
+  } finally {
+    isSimulating = false;
+    btn.disabled = false;
+    btnLabel.textContent = 'Execute Live Simulation';
+    btnIcon.textContent = 'play_arrow';
+    btnIcon.classList.remove('animate-spin');
+    counter.textContent = 'Finished';
+  }
+}
+
+// Render Results into UI (5-Question Output & Telemetry Graph)
+function renderSimulationResults(data) {
+  const diag = data.diagnosis || {};
+  const tel = data.telemetry || {};
+
+  // 1. Update Metrics Counters
+  document.getElementById('stat-turns').innerText = tel.total_turns !== undefined ? tel.total_turns : 0;
+  document.getElementById('stat-tools').innerText = tel.tool_calls_total !== undefined ? tel.tool_calls_total : 0;
+  document.getElementById('stat-errors').innerText = tel.error_count !== undefined ? tel.error_count : 0;
+  document.getElementById('stat-retries').innerText = tel.retry_count !== undefined ? tel.retry_count : 0;
+
+  // 2. Health Status & Confidence (Confidence below status in normal text)
+  const predStatus = data.ml_predicted_status || diag.status || 'NOMINAL';
+  const isFail = (predStatus === 'FAILURE DETECTED');
+  const probVal = Number(diag.failure_probability || 0);
+  const confText = data.ml_confidence || `${((isFail ? probVal : (1 - probVal)) * 100).toFixed(1)}%`;
+
+  const q1Status = document.getElementById('q1-health-status');
+  const q1Score = document.getElementById('q1-health-score');
+  const diagBadge = document.getElementById('diag-badge');
+  const accent = document.getElementById('diag-accent-line');
+
+  q1Status.innerText = predStatus;
+  q1Score.innerText = confText;
+
+  if (isFail) {
+    q1Status.className = 'font-headline-lg text-xl sm:text-2xl font-bold tracking-tight text-error';
+    diagBadge.className = 'px-2.5 py-0.5 rounded font-code-sm text-xs font-bold uppercase bg-error text-white';
+    diagBadge.innerText = 'FAILURE DETECTED';
+    accent.className = 'absolute top-0 left-0 right-0 h-1 bg-error';
+  } else {
+    q1Status.className = 'font-headline-lg text-xl sm:text-2xl font-bold tracking-tight text-[#2f6f4e]';
+    diagBadge.className = 'px-2.5 py-0.5 rounded font-code-sm text-xs font-bold uppercase bg-[#2f6f4e] text-white';
+    diagBadge.innerText = 'HEALTHY';
+    accent.className = 'absolute top-0 left-0 right-0 h-1 bg-[#2f6f4e]';
+  }
+
+  // 3. What Happened? (1 short plain-English sentence)
+  const whatHappened = data.what_happened || diag.what_happened || (isFail ? 
+    'The agent repeatedly executed the same command without making progress, indicating retry thrashing.' : 
+    'The agent completed the task normally with no abnormal execution behavior.');
+  document.getElementById('q2-what-happened').innerText = whatHappened;
+
+  // 4. What Went Wrong? (Failure type + short explanation)
+  const whatWrong = data.what_went_wrong || diag.what_went_wrong || diag.root_cause || (isFail ? 'Retry Thrashing' : 'Nominal Execution');
+  document.getElementById('q2-pattern').innerText = whatWrong;
+  document.getElementById('q2-why').innerText = diag.why || 'All execution telemetry within expected operational thresholds.';
+
+  // 5. Where Did It Happen? (Responsible Component + Step)
+  const respComp = data.responsible_component || diag.responsible_component || 'Execution Orchestrator';
+  let suspStep = data.suspicious_step || diag.suspicious_step;
+  if (!suspStep || suspStep.includes('None') || suspStep.includes('nominal')) {
+    suspStep = isFail ? 'Step localization: Not confidently localized' : 'Not applicable (nominal run)';
+  }
+  document.getElementById('q4-component').innerText = respComp;
+  document.getElementById('q4-step').innerText = suspStep;
+
+  // 6. Why Did The Model Decide This? (Top contributing features with numbers & explanations)
+  const evList = document.getElementById('q3-evidence-list');
+  evList.innerHTML = '';
+  const signals = data.contributing_signals || diag.contributing_signals || diag.signals || [];
+  if (signals.length === 0) {
+    evList.innerHTML = '<li class="text-on-surface-variant font-code-sm text-xs">• Derived behavioral features within calibrated nominal thresholds.</li>';
+  } else {
+    signals.slice(0, 4).forEach(s => {
+      evList.innerHTML += `
+        <li class="flex items-start gap-1.5 text-xs text-on-surface">
+          <span class="material-symbols-outlined text-secondary text-xs mt-0.5">insights</span>
+          <span>${s}</span>
+        </li>
+      `;
+    });
+  }
+
+  // 7. Recommended Action
+  const actionList = document.getElementById('q5-action-list');
+  actionList.innerHTML = '';
+  const resolutions = data.recommended_resolutions || diag.recommended_resolutions || (diag.recommended_action ? [diag.recommended_action] : ['No intervention required. Continue execution.']);
+  resolutions.forEach(r => {
+    actionList.innerHTML += `
+      <li class="flex items-start gap-1.5 text-xs">
+        <span class="material-symbols-outlined text-[#fe8357] text-xs mt-0.5">check</span>
+        <span>${r}</span>
+      </li>
+    `;
+  });
+
+  // 8. Render Final SVG Telemetry Graph
+  renderLiveChart();
+}
+
+// Switch Telemetry Chart Metric
+function setLiveChartMetric(metric) {
+  currentChartMetric = metric;
+  ['latency', 'errors', 'tools'].forEach(m => {
+    const btn = document.getElementById(`btn-chart-${m}`);
+    if (btn) {
+      if (m === metric) {
+        btn.className = 'px-2 py-0.5 rounded-md bg-surface-container-lowest font-bold text-primary shadow-xs cursor-pointer';
+      } else {
+        btn.className = 'px-2 py-0.5 text-on-surface-variant hover:text-primary cursor-pointer';
+      }
+    }
+  });
+  renderLiveChart();
+}
+
+// Render Real-Time Streaming Chart Progress
+function renderLiveChartProgress(steps, isFailed) {
+  const container = document.getElementById('live-chart-container');
+  if (!container || !steps || steps.length === 0) return;
+
+  const count = steps.length;
+  const svgWidth = 600;
+  const svgHeight = 150;
+  const padLeft = 40;
+  const padRight = 30;
+  const padTop = 20;
+  const padBottom = 30;
+  const plotWidth = svgWidth - padLeft - padRight;
+  const plotHeight = svgHeight - padTop - padBottom;
+
+  let values = [];
+  if (currentChartMetric === 'errors') {
+    values = steps.map(s => s.cumulative_errors || (s.is_error ? 1 : 0));
+  } else if (currentChartMetric === 'tools') {
+    values = steps.map((s, idx) => idx + 1);
+  } else {
+    values = steps.map(s => s.latency_ms || 120);
+  }
+
+  const maxVal = Math.max(1, ...values) * 1.15;
+  const minVal = 0;
+
+  const points = steps.map((s, idx) => {
+    const x = padLeft + (count <= 1 ? plotWidth / 2 : (idx / Math.max(1, count - 1)) * plotWidth);
+    const y = padTop + plotHeight - ((values[idx] - minVal) / (maxVal - minVal)) * plotHeight;
+    return { x, y, step: s, val: values[idx] };
+  });
+
+  let pathD = '';
+  points.forEach((pt, idx) => {
+    pathD += (idx === 0) ? `M ${pt.x} ${pt.y}` : ` L ${pt.x} ${pt.y}`;
+  });
+
+  let svgHtml = `
+    <div class="relative w-full overflow-hidden bg-surface-container-low rounded-xl border border-surface-container p-2">
+      <svg class="w-full h-38 select-none" viewBox="0 0 ${svgWidth} ${svgHeight}">
+        <line x1="${padLeft}" y1="${padTop}" x2="${svgWidth - padRight}" y2="${padTop}" stroke="#ece8df" stroke-width="1" stroke-dasharray="2,2" />
+        <line x1="${padLeft}" y1="${padTop + plotHeight/2}" x2="${svgWidth - padRight}" y2="${padTop + plotHeight/2}" stroke="#ece8df" stroke-width="1" stroke-dasharray="2,2" />
+        <line x1="${padLeft}" y1="${padTop + plotHeight}" x2="${svgWidth - padRight}" y2="${padTop + plotHeight}" stroke="#d2c3bf" stroke-width="1" />
+
+        <text x="${padLeft - 6}" y="${padTop + 4}" text-anchor="end" font-size="9" fill="#807471" font-family="JetBrains Mono">${Math.round(maxVal)}</text>
+        <text x="${padLeft - 6}" y="${padTop + plotHeight/2 + 3}" text-anchor="end" font-size="9" fill="#807471" font-family="JetBrains Mono">${Math.round(maxVal/2)}</text>
+        <text x="${padLeft - 6}" y="${padTop + plotHeight + 3}" text-anchor="end" font-size="9" fill="#807471" font-family="JetBrains Mono">0</text>
+
+        <polygon points="${padLeft},${padTop + plotHeight} ${points.map(p => `${p.x},${p.y}`).join(' ')} ${points[points.length-1].x},${padTop + plotHeight}" fill="${isFailed ? 'rgba(186,26,26,0.08)' : 'rgba(47,111,78,0.08)'}" />
+
+        <path d="${pathD}" fill="none" stroke="${isFailed ? '#a23e18' : '#2f6f4e'}" stroke-width="2.5" />
+  `;
+
+  points.forEach((pt) => {
+    const isErr = pt.step.is_error;
+    const r = isErr ? 5.5 : 3.5;
+    const fill = isErr ? '#ba1a1a' : '#271e1a';
+    const stroke = isErr ? '#ffffff' : '#fef9f0';
+
+    svgHtml += `
+      <circle cx="${pt.x}" cy="${pt.y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="1.5" />
+      <text x="${pt.x}" y="${padTop + plotHeight + 15}" text-anchor="middle" font-size="9" fill="#807471" font-family="JetBrains Mono">s${pt.step.step}</text>
+    `;
+  });
+
+  svgHtml += `
+      </svg>
+    </div>
+  `;
+
+  container.innerHTML = svgHtml;
+}
+
+// Render Final SVG Telemetry Graph
+function renderLiveChart() {
+  const container = document.getElementById('live-chart-container');
+  if (!container) return;
+
+  if (!currentSimData || !currentSimData.telemetry) {
+    container.innerHTML = `
+      <div class="p-8 text-center text-on-surface-variant font-code-sm text-xs bg-surface-container-low rounded-xl border border-surface-container">
+        Execute a simulation above to stream live telemetry trends.
+      </div>
+    `;
+    return;
+  }
+
+  const tel = currentSimData.telemetry;
+  const diag = currentSimData.diagnosis || {};
+  const isFailed = (diag.status === 'FAILURE DETECTED');
+
+  let steps = tel.step_events || [];
+  if (!steps || steps.length === 0) {
+    const total = tel.total_turns || 6;
+    for (let i = 1; i <= total; i++) {
+      steps.push({
+        step: i,
+        tool: `tool_turn_${i}`,
+        latency_ms: 80 + i * 35,
+        is_error: (isFailed && i >= total - 1),
+        cumulative_errors: (isFailed && i >= total - 1) ? 2 : 0
+      });
+    }
+  }
+
+  const count = steps.length;
+  // Target 240px clean height
+  const svgWidth = 620;
+  const svgHeight = 240;
+  const padLeft = 55;
+  const padRight = 35;
+  const padTop = 25;
+  const padBottom = 40;
+  const plotWidth = svgWidth - padLeft - padRight;
+  const plotHeight = svgHeight - padTop - padBottom;
+
+  let values = [];
+  let unit = 'ms';
+  if (currentChartMetric === 'errors') {
+    values = steps.map(s => s.cumulative_errors !== undefined ? s.cumulative_errors : (s.is_error ? 1 : 0));
+    unit = 'err';
+  } else if (currentChartMetric === 'tools') {
+    values = steps.map((s, idx) => idx + 1);
+    unit = 'tools';
+  } else {
+    values = steps.map(s => s.latency_ms || 120);
+    unit = 'ms';
+  }
+
+  const maxVal = Math.max(1, ...values) * 1.15;
+  const minVal = 0;
+
+  const points = steps.map((s, idx) => {
+    const x = padLeft + (count <= 1 ? plotWidth / 2 : (idx / Math.max(1, count - 1)) * plotWidth);
+    const y = padTop + plotHeight - ((values[idx] - minVal) / (maxVal - minVal)) * plotHeight;
+    return { x, y, step: s, val: values[idx] };
+  });
+
+  let pathD = '';
+  points.forEach((pt, idx) => {
+    pathD += (idx === 0) ? `M ${pt.x} ${pt.y}` : ` L ${pt.x} ${pt.y}`;
+  });
+
+  const abnormalPoint = points.find(p => p.step.is_error) || (isFailed ? points[points.length - 1] : null);
+
+  let svgHtml = `
+    <div class="relative w-full overflow-hidden bg-surface-container-low rounded-xl border border-surface-container p-3">
+      <svg class="w-full h-60 select-none" viewBox="0 0 ${svgWidth} ${svgHeight}">
+        <!-- Grid horizontal lines -->
+        <line x1="${padLeft}" y1="${padTop}" x2="${svgWidth - padRight}" y2="${padTop}" stroke="#ece8df" stroke-width="1" stroke-dasharray="2,2" />
+        <line x1="${padLeft}" y1="${padTop + plotHeight/2}" x2="${svgWidth - padRight}" y2="${padTop + plotHeight/2}" stroke="#ece8df" stroke-width="1" stroke-dasharray="2,2" />
+        <line x1="${padLeft}" y1="${padTop + plotHeight}" x2="${svgWidth - padRight}" y2="${padTop + plotHeight}" stroke="#d2c3bf" stroke-width="1" />
+
+        <!-- Y-Axis Ticks & Units -->
+        <text x="${padLeft - 8}" y="${padTop + 4}" text-anchor="end" font-size="11" fill="#807471" font-family="JetBrains Mono">${Math.round(maxVal)} ${unit}</text>
+        <text x="${padLeft - 8}" y="${padTop + plotHeight/2 + 4}" text-anchor="end" font-size="11" fill="#807471" font-family="JetBrains Mono">${Math.round(maxVal/2)}</text>
+        <text x="${padLeft - 8}" y="${padTop + plotHeight + 3}" text-anchor="end" font-size="11" fill="#807471" font-family="JetBrains Mono">0</text>
+
+        <!-- Area fill under line -->
+        <defs>
+          <linearGradient id="liveAreaGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${isFailed ? '#ba1a1a' : '#2f6f4e'}" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="${isFailed ? '#ba1a1a' : '#2f6f4e'}" stop-opacity="0.0"/>
+          </linearGradient>
+        </defs>
+        <path d="${pathD} L ${points[points.length-1].x} ${padTop + plotHeight} L ${points[0].x} ${padTop + plotHeight} Z" fill="url(#liveAreaGradient)" />
+
+        <!-- Main Trend Line -->
+        <path d="${pathD}" fill="none" stroke="${isFailed ? '#ba1a1a' : '#2f6f4e'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+
+        <!-- Step Data Points -->
+        ${points.map((p, idx) => `
+          <g class="cursor-pointer group">
+            <circle cx="${p.x}" cy="${p.y}" r="${p.step.is_error ? 5 : 3.5}" 
+                    fill="${p.step.is_error ? '#ba1a1a' : (isFailed ? '#ba1a1a' : '#2f6f4e')}" 
+                    stroke="#ffffff" stroke-width="1.5" />
+            <text x="${p.x}" y="${padTop + plotHeight + 18}" text-anchor="middle" font-size="11" fill="#4f4542" font-family="JetBrains Mono">S0${p.step.step || (idx+1)}</text>
+          </g>
+        `).join('')}
+
+        <!-- Abnormal / Suspicious Step Callout Marker -->
+        ${abnormalPoint ? `
+          <g transform="translate(${abnormalPoint.x}, ${abnormalPoint.y - 12})">
+            <rect x="-35" y="-20" width="70" height="18" rx="4" fill="#ba1a1a" />
+            <text x="0" y="-7" text-anchor="middle" font-size="10" fill="#ffffff" font-weight="bold" font-family="JetBrains Mono">
+              ${isFailed ? 'FLAGGED' : 'STEP 0' + (abnormalPoint.step.step || 1)}
+            </text>
+            <polygon points="-4,-2 4,-2 0,2" fill="#ba1a1a" />
+          </g>
+        ` : ''}
+      </svg>
+    </div>
+  `;
+
+  container.innerHTML = svgHtml;
+}
+
+// EXPLICIT SAVE TO HISTORY (STRICT: only saves on user click)
+async function saveSimulationToHistory() {
+  if (!currentSimData || !currentSimData.telemetry) {
+    showToast('Run a simulation first before saving.', 'info');
+    return;
+  }
+
+  const btn = document.getElementById('btn-save-history');
+  const lbl = document.getElementById('save-btn-label');
+  const icon = document.getElementById('save-btn-icon');
+
+  lbl.textContent = 'Saving...';
+  icon.textContent = 'sync';
+  icon.classList.add('animate-spin');
+
+  try {
+    const res = await fetch('/api/live-diagnosis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        scenario: selectedScenario,
+        model_choice: 'Proposed Multi-View Fusion Network',
+        threshold: 0.46,
+        save: true // Explicitly save!
+      })
+    });
+    const data = await res.json();
+
+    if (res.ok && data.success) {
+      lbl.textContent = `Saved (#${data.saved_record_id})`;
+      icon.textContent = 'check';
+      icon.classList.remove('animate-spin');
+      btn.disabled = true;
+      btn.classList.remove('bg-secondary');
+      btn.classList.add('bg-[#2f6f4e]');
+      showToast(`Record #${data.saved_record_id} saved to history!`, 'success');
+    } else {
+      showToast(data.error || 'Failed to save record.', 'error');
+      resetSaveButtonState();
+    }
+  } catch (err) {
+    showToast('Save error: ' + err.message, 'error');
+    resetSaveButtonState();
+  }
+}
+
+function resetSaveButtonState() {
+  const btn = document.getElementById('btn-save-history');
+  const lbl = document.getElementById('save-btn-label');
+  const icon = document.getElementById('save-btn-icon');
+  if (btn) {
+    btn.disabled = false;
+    btn.className = 'flex-1 py-2.5 rounded-xl bg-secondary text-white font-headline-sm text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer';
+  }
+  if (lbl) lbl.textContent = 'Save to History';
+  if (icon) {
+    icon.textContent = 'bookmark_add';
+    icon.classList.remove('animate-spin');
+  }
+}
+
+function openCanvasFromSimulation() {
+  if (currentSimData && currentSimData.trace_id) {
+    window.location.href = `/diagnose?trace_id=${encodeURIComponent(currentSimData.trace_id)}`;
+  } else {
+    window.location.href = `/diagnose?demo=${encodeURIComponent(selectedScenario)}`;
+  }
+}
+
+// Auto-run healthy baseline on page load
+document.addEventListener('DOMContentLoaded', () => {
+  selectScenario('healthy');
+});
+</script>
+{% endblock %}

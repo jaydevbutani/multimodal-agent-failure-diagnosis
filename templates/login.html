@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Agent Health Intelligence — Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+    }
+    ::-webkit-scrollbar { display: none; }
+    @keyframes spin-fast {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-fast {
+      animation: spin-fast 0.65s linear infinite;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#fef9f0",
+            "surface-dim": "#ded9d1",
+            "surface-bright": "#fef9f0",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f8f3ea",
+            "surface-container": "#f2ede4",
+            "surface-container-high": "#ece8df",
+            "surface-container-highest": "#e7e2d9",
+            "on-surface": "#1d1c16",
+            "on-surface-variant": "#4f4542",
+            "inverse-surface": "#32302a",
+            "inverse-on-surface": "#f5f0e7",
+            "outline": "#807471",
+            "outline-variant": "#d2c3bf",
+            "primary": "#120805",
+            "on-primary": "#ffffff",
+            "primary-container": "#2b1e1a",
+            "on-primary-container": "#98847e",
+            "secondary": "#a23e18",
+            "on-secondary": "#ffffff",
+            "secondary-container": "#fe8357",
+            "on-secondary-container": "#6f2000",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff",
+            "error-container": "#ffdad6",
+            "background": "#fef9f0",
+            "on-background": "#1d1c16"
+          },
+          fontFamily: {
+            "headline-md": ["Space Grotesk", "sans-serif"],
+            "headline-lg": ["Space Grotesk", "sans-serif"],
+            "headline-sm": ["Plus Jakarta Sans", "sans-serif"],
+            "body-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "body-md": ["Plus Jakarta Sans", "sans-serif"],
+            "body-sm": ["Plus Jakarta Sans", "sans-serif"],
+            "code-sm": ["JetBrains Mono", "monospace"],
+            "label-md": ["JetBrains Mono", "monospace"],
+            "label-sm": ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-background font-body-md text-on-surface min-h-screen flex flex-col justify-between">
+
+  <!-- Ambient Glow -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden">
+    <div class="absolute w-[500px] h-[500px] rounded-full bg-secondary-container/10 blur-3xl -top-20 -left-20"></div>
+    <div class="absolute w-[450px] h-[450px] rounded-full bg-secondary/10 blur-3xl -bottom-20 -right-20"></div>
+  </div>
+
+  <!-- Main Container -->
+  <main class="w-full max-w-xl mx-auto px-4 py-8 sm:py-12 flex-1 flex flex-col justify-center relative z-10">
+
+    <!-- Header & Brand Identity -->
+    <div class="flex flex-col items-center text-center mb-8">
+      <div class="w-14 h-14 rounded-2xl bg-[#251813] flex items-center justify-center shadow-lg mb-3 relative group">
+        <span class="material-symbols-outlined text-secondary-container text-2xl" style="font-variation-settings: 'FILL' 1;">
+          shield_with_heart
+        </span>
+      </div>
+      <div class="inline-flex items-center gap-2 mb-1.5">
+        <h1 class="font-headline-lg text-2xl sm:text-3xl font-bold text-on-surface tracking-tight">
+          Agent Health Intelligence
+        </h1>
+        <span class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-code-sm text-xs font-semibold">
+          v2.4
+        </span>
+      </div>
+      <p class="font-body-md text-sm sm:text-base text-on-surface-variant max-w-md">
+        Observability &amp; Multimodal Failure Diagnosis for Autonomous AI Agents
+      </p>
+    </div>
+
+    <!-- 1. Hero Instant Demo Card -->
+    <div class="w-full rounded-2xl overflow-hidden shadow-lg bg-[#2b1e1a] text-white mb-6 border border-[#463630]">
+      <div class="p-5 sm:p-6 bg-gradient-to-r from-[#2b1e1a] via-[#3a2924] to-[#2b1e1a] flex flex-col gap-2">
+        <div class="flex items-center justify-between">
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-secondary-container/20 text-[#ffb59c] font-code-sm text-xs uppercase tracking-wider font-semibold">
+            <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">bolt</span>
+            <span>Instant Sandbox Access</span>
+          </div>
+          <span class="font-code-sm text-xs text-[#d8c2bb]">One-Click Launch</span>
+        </div>
+        <h2 class="font-headline-md text-lg sm:text-xl font-bold text-white tracking-tight mt-1">
+          Explore as Platform Operator
+        </h2>
+        <p class="font-body-sm text-xs sm:text-sm text-[#d8c2bb] leading-relaxed">
+          Inspect deterministic agent failure telemetry, launch live benchmark runs, and view multi-view model predictions immediately.
+        </p>
+
+        <div class="mt-4 pt-3 border-t border-[#463630] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div class="flex items-center gap-2 text-xs font-code-sm text-[#ffdbcf]">
+            <span class="material-symbols-outlined text-sm text-secondary-container">account_circle</span>
+            <span>demo@agenthealth.ai</span>
+            <span class="text-[#807471]">•</span>
+            <span class="text-[#d8c2bb]">Demo@123</span>
+          </div>
+
+          <button class="px-4 py-2.5 rounded-xl bg-secondary hover:bg-[#b8471c] active:scale-[0.98] transition-all text-white font-headline-sm text-sm font-semibold flex items-center justify-center gap-2 shadow-md cursor-pointer" id="btn-demo-operator" onclick="handleDemoLogin()" type="button">
+            <span class="flex items-center gap-1.5" id="demo-btn-content">
+              <span>Try Demo as Operator</span>
+              <span class="material-symbols-outlined text-base">arrow_forward</span>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Authentication Container (Sign In / Create Account Tabs) -->
+    <div class="w-full bg-surface-container-lowest rounded-2xl shadow-md p-6 sm:p-8 flex flex-col border border-surface-container">
+
+      <!-- Navigation Tabs -->
+      <div class="flex items-center p-1 bg-surface-container-low rounded-xl mb-6 border border-surface-container">
+        <button class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-surface-container-lowest text-on-surface shadow-xs font-headline-sm text-sm font-semibold transition-all cursor-pointer" id="tab-btn-signin" onclick="switchAuthTab('signin')" type="button">
+          <span class="material-symbols-outlined text-secondary text-base" id="tab-icon-signin" style="font-variation-settings: 'FILL' 1;">login</span>
+          <span>Sign In</span>
+        </button>
+        <button class="flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-headline-sm text-sm font-semibold transition-all cursor-pointer" id="tab-btn-register" onclick="switchAuthTab('register')" type="button">
+          <span class="material-symbols-outlined text-base" id="tab-icon-register">person_add</span>
+          <span>Create Account</span>
+        </button>
+      </div>
+
+      <!-- Feedback Alert Banner -->
+      <div class="hidden mb-5 p-3.5 rounded-xl flex items-start gap-2.5 transition-all text-sm font-body-sm" id="auth-alert-box">
+        <span class="material-symbols-outlined text-lg shrink-0 mt-0.5" id="auth-alert-icon">info</span>
+        <div class="flex-1" id="auth-alert-message"></div>
+      </div>
+
+      <!-- FORM A: Sign In Form -->
+      <form class="flex flex-col gap-4" id="form-signin" onsubmit="handleSignInSubmit(event)">
+        <div class="flex flex-col gap-1.5">
+          <label class="font-headline-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold" for="signin-email">
+            Email or Username
+          </label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-lg pointer-events-none">mail</span>
+            <input class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-md text-sm placeholder:text-on-surface-variant/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-secondary/40 border border-surface-container transition-all" id="signin-email" name="identifier" placeholder="e.g. operator@company.com or demo" required="" type="text" autocomplete="username"/>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <label class="font-headline-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold" for="signin-password">
+              Password
+            </label>
+          </div>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-lg pointer-events-none">lock</span>
+            <input class="w-full pl-10 pr-11 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-md text-sm placeholder:text-on-surface-variant/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-secondary/40 border border-surface-container transition-all" id="signin-password" name="password" placeholder="••••••••••••" required="" type="password" autocomplete="current-password"/>
+            <button aria-label="Toggle password visibility" class="absolute right-3 text-on-surface-variant hover:text-on-surface p-1 rounded transition-colors cursor-pointer" onclick="togglePasswordVisibility('signin-password', 'signin-eye-icon')" type="button">
+              <span class="material-symbols-outlined text-lg leading-none" id="signin-eye-icon">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-1">
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input checked="" class="accent-secondary w-4 h-4 rounded cursor-pointer" id="signin-remember" type="checkbox"/>
+            <span class="font-body-sm text-xs text-on-surface-variant">Remember this device</span>
+          </label>
+          <span class="font-code-sm text-xs text-on-surface-variant flex items-center gap-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#2f6f4e]"></span>
+            <span>SQLite Auth Store</span>
+          </span>
+        </div>
+
+        <button class="w-full mt-2 py-3 px-4 rounded-xl bg-[#120805] hover:bg-[#251813] active:scale-[0.99] text-white font-headline-sm text-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer disabled:opacity-75 disabled:cursor-wait" id="signin-submit-btn" type="submit">
+          <span id="signin-submit-text">Sign In as Operator</span>
+          <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </button>
+      </form>
+
+      <!-- FORM B: Create Account Form (Hidden by default) -->
+      <form class="hidden flex flex-col gap-4" id="form-register" onsubmit="handleRegisterSubmit(event)">
+        <div class="flex flex-col gap-1.5">
+          <label class="font-headline-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold" for="register-fullname">
+            Full Name
+          </label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-lg pointer-events-none">badge</span>
+            <input class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-md text-sm placeholder:text-on-surface-variant/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-secondary/40 border border-surface-container transition-all" id="register-fullname" name="full_name" placeholder="e.g. Alex Morgan" required="" type="text" autocomplete="name"/>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="font-headline-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold" for="register-email">
+            Email Address
+          </label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-lg pointer-events-none">mail</span>
+            <input class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-md text-sm placeholder:text-on-surface-variant/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-secondary/40 border border-surface-container transition-all" id="register-email" name="email" placeholder="e.g. alex@company.com" required="" type="email" autocomplete="email"/>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="font-headline-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold" for="register-password">
+            Password (min. 6 characters)
+          </label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-lg pointer-events-none">lock</span>
+            <input class="w-full pl-10 pr-11 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-md text-sm placeholder:text-on-surface-variant/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-secondary/40 border border-surface-container transition-all" id="register-password" minlength="6" name="password" placeholder="••••••••••••" required="" type="password" autocomplete="new-password"/>
+            <button aria-label="Toggle password visibility" class="absolute right-3 text-on-surface-variant hover:text-on-surface p-1 rounded transition-colors cursor-pointer" onclick="togglePasswordVisibility('register-password', 'register-eye-icon-1')" type="button">
+              <span class="material-symbols-outlined text-lg leading-none" id="register-eye-icon-1">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label class="font-headline-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold" for="register-confirm-password">
+            Confirm Password
+          </label>
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3.5 text-on-surface-variant text-lg pointer-events-none">verified_user</span>
+            <input class="w-full pl-10 pr-11 py-2.5 rounded-xl bg-surface-container-low text-on-surface font-body-md text-sm placeholder:text-on-surface-variant/50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-secondary/40 border border-surface-container transition-all" id="register-confirm-password" minlength="6" name="confirm_password" placeholder="••••••••••••" required="" type="password" autocomplete="new-password"/>
+            <button aria-label="Toggle password visibility" class="absolute right-3 text-on-surface-variant hover:text-on-surface p-1 rounded transition-colors cursor-pointer" onclick="togglePasswordVisibility('register-confirm-password', 'register-eye-icon-2')" type="button">
+              <span class="material-symbols-outlined text-lg leading-none" id="register-eye-icon-2">visibility</span>
+            </button>
+          </div>
+        </div>
+
+        <button class="w-full mt-2 py-3 px-4 rounded-xl bg-secondary hover:bg-[#b8471c] active:scale-[0.99] text-white font-headline-sm text-sm font-semibold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer disabled:opacity-75 disabled:cursor-wait" id="register-submit-btn" type="submit">
+          <span id="register-submit-text">Create Operator Account</span>
+          <span class="material-symbols-outlined text-base">person_add</span>
+        </button>
+      </form>
+
+    </div>
+
+    <!-- Footer Security Strip -->
+    <div class="w-full flex items-center justify-between text-xs font-code-sm text-on-surface-variant mt-6 px-2">
+      <span class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full bg-[#2f6f4e]"></span>
+        <span>Secure Local SQLite Store</span>
+      </span>
+      <span>PBKDF2 SHA-256 Hashing</span>
+    </div>
+
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="w-full py-4 text-center text-xs font-body-sm text-on-surface-variant border-t border-surface-container">
+    <span>Agent Health Intelligence • Multimodal Failure Diagnosis Platform</span>
+  </footer>
+
+  <script>
+    let activeTab = 'signin';
+    let isSubmitting = false;
+
+    function switchAuthTab(tab) {
+      if (isSubmitting) return;
+      activeTab = tab;
+      
+      const btnSignIn = document.getElementById('tab-btn-signin');
+      const btnRegister = document.getElementById('tab-btn-register');
+      const iconSignIn = document.getElementById('tab-icon-signin');
+      const iconRegister = document.getElementById('tab-icon-register');
+      const formSignIn = document.getElementById('form-signin');
+      const formRegister = document.getElementById('form-register');
+      const alertBox = document.getElementById('auth-alert-box');
+
+      // Clear alerts
+      alertBox.className = 'hidden';
+
+      if (tab === 'signin') {
+        btnSignIn.className = 'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-surface-container-lowest text-on-surface shadow-xs font-headline-sm text-sm font-semibold transition-all cursor-pointer';
+        btnRegister.className = 'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-headline-sm text-sm font-semibold transition-all cursor-pointer';
+        iconSignIn.style.fontVariationSettings = "'FILL' 1";
+        iconSignIn.className = 'material-symbols-outlined text-secondary text-base';
+        iconRegister.style.fontVariationSettings = "'FILL' 0";
+        iconRegister.className = 'material-symbols-outlined text-base';
+        
+        formSignIn.classList.remove('hidden');
+        formRegister.classList.add('hidden');
+        document.getElementById('signin-email').focus();
+      } else {
+        btnRegister.className = 'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg bg-surface-container-lowest text-on-surface shadow-xs font-headline-sm text-sm font-semibold transition-all cursor-pointer';
+        btnSignIn.className = 'flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-headline-sm text-sm font-semibold transition-all cursor-pointer';
+        iconRegister.style.fontVariationSettings = "'FILL' 1";
+        iconRegister.className = 'material-symbols-outlined text-secondary text-base';
+        iconSignIn.style.fontVariationSettings = "'FILL' 0";
+        iconSignIn.className = 'material-symbols-outlined text-base';
+        
+        formRegister.classList.remove('hidden');
+        formSignIn.classList.add('hidden');
+        document.getElementById('register-fullname').focus();
+      }
+    }
+
+    function togglePasswordVisibility(inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = 'visibility_off';
+      } else {
+        input.type = 'password';
+        icon.textContent = 'visibility';
+      }
+    }
+
+    function showAlert(msg, type = 'error') {
+      const box = document.getElementById('auth-alert-box');
+      const icon = document.getElementById('auth-alert-icon');
+      const text = document.getElementById('auth-alert-message');
+
+      box.classList.remove('hidden');
+      text.textContent = msg;
+
+      if (type === 'success') {
+        box.className = 'mb-5 p-3.5 rounded-xl flex items-start gap-2.5 transition-all text-sm font-body-sm bg-[#e8f5e9] text-[#1b5e20] border border-[#a5d6a7]';
+        icon.textContent = 'check_circle';
+      } else if (type === 'info') {
+        box.className = 'mb-5 p-3.5 rounded-xl flex items-start gap-2.5 transition-all text-sm font-body-sm bg-surface-container-high text-on-surface border border-surface-container';
+        icon.textContent = 'sync';
+      } else {
+        box.className = 'mb-5 p-3.5 rounded-xl flex items-start gap-2.5 transition-all text-sm font-body-sm bg-error-container text-on-error-container border border-error/30';
+        icon.textContent = 'error';
+      }
+    }
+
+    // 1. One-Click Demo Operator Login
+    async function handleDemoLogin() {
+      if (isSubmitting) return;
+      isSubmitting = true;
+
+      const btn = document.getElementById('btn-demo-operator');
+      const content = document.getElementById('demo-btn-content');
+      btn.disabled = true;
+      content.innerHTML = `<span class="material-symbols-outlined text-base animate-spin-fast">progress_activity</span><span>Authenticating Demo...</span>`;
+
+      try {
+        const response = await fetch('/api/auth/demo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          content.innerHTML = `<span class="material-symbols-outlined text-base">check</span><span>Authenticated</span>`;
+          showAlert(`Welcome, ${data.username}! Entering Dashboard...`, 'success');
+          setTimeout(() => {
+            window.location.href = data.redirect || '/dashboard';
+          }, 300);
+        } else {
+          showAlert(data.error || 'Failed to authenticate demo operator.', 'error');
+          isSubmitting = false;
+          btn.disabled = false;
+          content.innerHTML = `<span>Try Demo as Operator</span><span class="material-symbols-outlined text-base">arrow_forward</span>`;
+        }
+      } catch (err) {
+        showAlert('Network connection error: ' + err.message, 'error');
+        isSubmitting = false;
+        btn.disabled = false;
+        content.innerHTML = `<span>Try Demo as Operator</span><span class="material-symbols-outlined text-base">arrow_forward</span>`;
+      }
+    }
+
+    // 2. Custom Sign In Submit
+    async function handleSignInSubmit(event) {
+      event.preventDefault();
+      if (isSubmitting) return;
+      isSubmitting = true;
+
+      const email = document.getElementById('signin-email').value.trim();
+      const password = document.getElementById('signin-password').value;
+      const btn = document.getElementById('signin-submit-btn');
+      const btnText = document.getElementById('signin-submit-text');
+
+      btn.disabled = true;
+      btnText.textContent = 'Authenticating...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ identifier: email, password: password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          btnText.textContent = 'Success! Redirecting...';
+          showAlert(`Welcome back, ${data.username}! Redirecting to Dashboard...`, 'success');
+          setTimeout(() => {
+            window.location.href = data.redirect || '/dashboard';
+          }, 300);
+        } else {
+          showAlert(data.error || 'Invalid email or password.', 'error');
+          isSubmitting = false;
+          btn.disabled = false;
+          btnText.textContent = 'Sign In as Operator';
+        }
+      } catch (err) {
+        showAlert('Network error: ' + err.message, 'error');
+        isSubmitting = false;
+        btn.disabled = false;
+        btnText.textContent = 'Sign In as Operator';
+      }
+    }
+
+    // 3. Create Account Submit
+    async function handleRegisterSubmit(event) {
+      event.preventDefault();
+      if (isSubmitting) return;
+
+      const fullName = document.getElementById('register-fullname').value.trim();
+      const email = document.getElementById('register-email').value.trim();
+      const password = document.getElementById('register-password').value;
+      const confirmPassword = document.getElementById('register-confirm-password').value;
+      const btn = document.getElementById('register-submit-btn');
+      const btnText = document.getElementById('register-submit-text');
+
+      if (password !== confirmPassword) {
+        showAlert('Passwords do not match. Please verify both password fields.', 'error');
+        return;
+      }
+
+      isSubmitting = true;
+      btn.disabled = true;
+      btnText.textContent = 'Creating Account...';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            full_name: fullName,
+            email: email,
+            password: password,
+            confirm_password: confirmPassword
+          })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+          // Switch to sign in tab and pre-fill email
+          switchAuthTab('signin');
+          document.getElementById('signin-email').value = email;
+          document.getElementById('signin-password').value = '';
+          document.getElementById('signin-password').focus();
+          showAlert('Account created successfully! Please sign in with your password.', 'success');
+          
+          // Clear registration form
+          document.getElementById('register-fullname').value = '';
+          document.getElementById('register-email').value = '';
+          document.getElementById('register-password').value = '';
+          document.getElementById('register-confirm-password').value = '';
+        } else {
+          showAlert(data.error || 'Failed to create account.', 'error');
+        }
+      } catch (err) {
+        showAlert('Network error: ' + err.message, 'error');
+      } finally {
+        isSubmitting = false;
+        btn.disabled = false;
+        btnText.textContent = 'Create Operator Account';
+      }
+    }
+  </script>
+</body>
+</html>

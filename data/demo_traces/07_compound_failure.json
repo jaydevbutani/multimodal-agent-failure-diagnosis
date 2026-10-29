@@ -1,0 +1,20 @@
+{
+  "trace_id": "DEMO-07-COMPOUND-FAILURE",
+  "task_id": "task_cascading_env_and_churn",
+  "model": "claude-haiku-4-5-20251001",
+  "agent_name": "openhands",
+  "benchmark": "synthetic_demo",
+  "total_turns": 110,
+  "tool_calls_total": 35,
+  "search_tool_calls": 5,
+  "edit_tool_calls": 6,
+  "unique_files_read": 6,
+  "unique_files_edited": 2,
+  "error_count": 20,
+  "retry_count": 12,
+  "patch_size_lines": 620,
+  "duration_seconds": 680.0,
+  "rate_limited": false,
+  "exception_crashed": true,
+  "tool_call_sequence": ["read_file", "execute_bash", "execute_bash", "rewrite_file", "execute_bash", "execute_bash", "execute_bash", "rewrite_file", "execute_bash"]
+}

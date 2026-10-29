@@ -1,0 +1,16 @@
+Rank,Feature,Importance,Type
+1,DERIVED_edit_churn,0.08711,DERIVED FEATURE
+2,DERIVED_tool_intensity,0.07252,DERIVED FEATURE
+3,DERIVED_log_patch_size,0.07246,DERIVED FEATURE
+4,tool_calls_total,0.06546,Original Telemetry
+5,DERIVED_tool_entropy,0.06496,DERIVED FEATURE
+6,patch_size_lines,0.06387,Original Telemetry
+7,total_turns,0.06306,Original Telemetry
+8,edit_tool_calls,0.05094,Original Telemetry
+9,unique_files_edited,0.04624,Original Telemetry
+10,DERIVED_log_duration,0.04453,DERIVED FEATURE
+11,DERIVED_error_rate,0.04196,DERIVED FEATURE
+12,DERIVED_time_per_turn,0.04107,DERIVED FEATURE
+13,error_count,0.0361,Original Telemetry
+14,search_tool_calls,0.021,Original Telemetry
+15,agent_name_claude-code,0.01854,Original Telemetry

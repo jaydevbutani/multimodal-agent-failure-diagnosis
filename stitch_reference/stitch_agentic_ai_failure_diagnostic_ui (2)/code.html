@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"inverse-primary":"#d8c2bb","on-error-container":"#93000a","error-container":"#ffdad6","tertiary-fixed":"#ffddb5","inverse-surface":"#32302a","primary-fixed":"#f5ddd7","on-secondary-fixed":"#390c00","surface":"#fef9f0","surface-container-lowest":"#ffffff","primary-container":"#382d27","surface-container-high":"#ece8df","on-secondary-fixed-variant":"#822801","on-secondary-container":"#6f2000","surface-variant":"#e7e2d9","background":"#fef9f0","surface-bright":"#fef9f0","on-primary-container":"#b8a49e","on-tertiary-fixed-variant":"#643f00","on-surface-variant":"#4f4542","error":"#ba1a1a","secondary":"#a23e18","surface-container-highest":"#e7e2d9","on-primary-fixed":"#251915","tertiary":"#130800","on-error":"#ffffff","surface-container-low":"#f8f3ea","on-primary":"#ffffff","surface-tint":"#6c5b55","on-background":"#1d1c16","primary":"#271e1a","on-secondary":"#ffffff","primary-fixed-dim":"#d8c2bb","on-tertiary":"#ffffff","surface-dim":"#ded9d1","on-surface":"#1d1c16","surface-container":"#f2ede4","on-tertiary-fixed":"#2a1800","secondary-fixed-dim":"#ffb59c","tertiary-container":"#311d00","outline":"#807471","secondary-container":"#fe8357","outline-variant":"#d2c3bf","secondary-fixed":"#ffdbcf","inverse-on-surface":"#f5f0e7","on-tertiary-container":"#b67d27","on-primary-fixed-variant":"#53433e"},borderRadius:{"DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem"},spacing:{"margin-panel":"0.75rem","margin":"1.25rem","space-sm":"0.5rem","space-xl":"1.75rem","space-lg":"1.25rem","space-2xl":"2.5rem","space-xs":"0.25rem","gutter":"1rem","gutter-compact":"0.5rem","space-md":"0.75rem"},fontFamily:{"headline-sm":["Plus Jakarta Sans"],"headline-md":["Space Grotesk"],"display-lg":["Space Grotesk"],"headline-lg":["Space Grotesk"],"body-lg":["Plus Jakarta Sans"],"body-sm":["Plus Jakarta Sans"],"label-md":["JetBrains Mono"],"label-sm":["JetBrains Mono"],"body-md":["Plus Jakarta Sans"],"code-sm":["JetBrains Mono"]},fontSize:{"headline-sm":["15px",{lineHeight:"20px",letterSpacing:"0.01em",fontWeight:"600"}],"headline-md":["18px",{lineHeight:"24px",letterSpacing:"0.02em",fontWeight:"600"}],"display-lg":["36px",{lineHeight:"44px",letterSpacing:"-0.02em",fontWeight:"600"}],"headline-lg":["26px",{lineHeight:"34px",letterSpacing:"-0.015em",fontWeight:"600"}],"body-lg":["15px",{lineHeight:"22px",fontWeight:"400"}],"body-sm":["12px",{lineHeight:"16px",fontWeight:"400"}],"label-md":["12px",{lineHeight:"16px",letterSpacing:"0.04em",fontWeight:"500"}],"label-sm":["10px",{lineHeight:"14px",letterSpacing:"0.06em",fontWeight:"500"}],"body-md":["13px",{lineHeight:"19px",fontWeight:"400"}],"code-sm":["11px",{lineHeight:"17px",fontWeight:"400"}]}}}}</script></head><body class="bg-background font-body-md text-body-md text-on-surface"><header class="fixed top-0 left-0 right-0 h-14 bg-[#342a25] border-b border-[#473932] z-50 shadow-[0_1px_8px_rgba(40,30,25,0.2)]"><div class="h-14 w-full px-4 flex items-center justify-between gap-4"><div class="flex items-center gap-3 min-w-0"><div class="flex items-center justify-center w-8 h-8 rounded bg-secondary text-on-secondary shrink-0 shadow-sm"><span class="material-symbols-outlined text-[18px]">shield</span></div><div class="flex items-center gap-2 truncate"><span class="font-headline-md text-headline-md text-inverse-on-surface truncate tracking-tight">Agent Health Intelligence</span><span class="hidden xl:inline text-[#c4b3ad] font-code-sm text-code-sm truncate">— Multimodal Failure Diagnosis &amp; Root-Cause Attribution</span></div></div><div class="flex items-center gap-3 shrink-0"><div class="hidden md:flex items-center gap-2 px-2.5 py-1 rounded bg-[#2a211d] text-secondary-fixed border border-[#443630]"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="font-label-sm text-label-sm tracking-wide uppercase">Fault Inspection Active</span></div><div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#2a211d] border border-[#443630] text-inverse-on-surface hover:bg-[#3d312b] cursor-pointer transition-colors"><span class="material-symbols-outlined text-[#c4b3ad] text-[16px]">domain</span><span class="font-label-md text-label-md text-inverse-on-surface">Cluster: us-east-prod</span><span class="material-symbols-outlined text-[#c4b3ad] text-[16px]">expand_more</span></div><div class="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded bg-[#2a211d] border border-[#443630] text-[#c4b3ad] cursor-pointer hover:border-outline-variant"><span class="material-symbols-outlined text-[16px]">search</span><span class="font-label-sm text-label-sm text-[#c4b3ad]">Cmd + K</span></div><button class="flex items-center justify-center w-8 h-8 rounded text-inverse-on-surface hover:bg-[#2a211d] transition-colors relative"><span class="material-symbols-outlined text-[20px]">notifications</span><span class="absolute top-1.5 right-1.5 w-2 h-2 bg-secondary rounded-full"></span></button><div class="w-8 h-8 rounded-full bg-[#2a211d] border border-[#443630] flex items-center justify-center shrink-0 cursor-pointer hover:border-secondary transition-colors"><span class="material-symbols-outlined text-[#f5ddd7] text-[18px]">person</span></div></div></div></header><aside class="fixed left-0 top-14 bottom-0 w-64 bg-[#342a25] border-r border-[#473932] z-40 flex flex-col justify-between py-4 shadow-[1px_0_12px_rgba(40,30,25,0.15)]"><div class="flex flex-col gap-4"><div class="px-4 flex items-center justify-between"><span class="font-label-sm text-label-sm uppercase tracking-wider text-[#c4b3ad]">Telemetry Navigation</span><span class="material-symbols-outlined text-[#c4b3ad] text-[16px]">tune</span></div><nav class="flex flex-col gap-1 px-2" id="sidebar-nav"><a class="nav-item flex items-center gap-3 px-3 py-2 text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary transition-all duration-150 font-body-md text-body-md rounded" data-path="dashboard" href="javascript:void(0)" onclick="switchSidebarTab(this)"><span class="material-symbols-outlined text-[18px]">space_dashboard</span><span>Dashboard</span></a><a aria-current="page" class="nav-item flex items-center gap-3 px-3 py-2 transition-all duration-150 bg-secondary text-on-secondary font-headline-sm text-headline-sm rounded border-l-2 border-secondary-container shadow-sm" data-path="trace-canvas" href="javascript:void(0)" onclick="switchSidebarTab(this)"><span class="material-symbols-outlined text-[18px]">account_tree</span><span>Trace Canvas</span></a><a class="nav-item flex items-center gap-3 px-3 py-2 text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary transition-all duration-150 font-body-md text-body-md rounded" data-path="telemetry-metrics" href="javascript:void(0)" onclick="switchSidebarTab(this)"><span class="material-symbols-outlined text-[18px]">query_stats</span><span>Telemetry &amp; Metrics</span></a><a class="nav-item flex items-center gap-3 px-3 py-2 text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary transition-all duration-150 font-body-md text-body-md rounded" data-path="reasoning-forensics" href="javascript:void(0)" onclick="switchSidebarTab(this)"><span class="material-symbols-outlined text-[18px]">psychology</span><span>Reasoning &amp; Forensics</span></a><a class="nav-item flex items-center gap-3 px-3 py-2 text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary transition-all duration-150 font-body-md text-body-md rounded" data-path="incident-history" href="javascript:void(0)" onclick="switchSidebarTab(this)"><span class="material-symbols-outlined text-[18px]">history</span><span>Incident History</span></a><a class="nav-item flex items-center gap-3 px-3 py-2 text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary transition-all duration-150 font-body-md text-body-md rounded" data-path="model-registry" href="javascript:void(0)" onclick="switchSidebarTab(this)"><span class="material-symbols-outlined text-[18px]">dataset</span><span>Model Registry</span></a></nav></div><div class="px-2 flex flex-col gap-1"><a class="nav-item flex items-center gap-3 px-3 py-2 text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary transition-colors font-body-md text-body-md rounded" data-path="settings" href="javascript:void(0)" onclick="switchSidebarTab(this)"><span class="material-symbols-outlined text-[18px]">settings</span><span>Settings</span></a><button class="flex items-center justify-between w-full px-3 py-2 text-[#c4b3ad] hover:bg-[#2a211d] hover:text-inverse-on-surface transition-colors font-label-sm text-label-sm rounded uppercase"><span class="flex items-center gap-3"><span class="material-symbols-outlined text-[18px]">dock_to_right</span><span>Collapse Pane</span></span><span class="font-code-sm text-code-sm">[</span></button></div></aside><div class="pl-64"><main class="relative pt-14 w-full bg-background min-h-screen"><div class="flex flex-col w-full">
+<!-- Notification Toast Container -->
+<div class="fixed top-16 right-6 z-50 flex flex-col gap-2 pointer-events-none" id="toast-container"></div>
+<!-- Sub-Header / Telemetry Context Strip -->
+<div class="px-6 py-3.5 bg-surface-container-low flex flex-wrap items-center justify-between gap-4 shadow-sm border-b border-surface-container">
+<div class="flex items-center gap-3 min-w-0">
+<div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant truncate">
+<span class="hover:text-primary cursor-pointer transition-colors">Home</span>
+<span>/</span>
+<span class="hover:text-primary cursor-pointer transition-colors">Traces</span>
+<span>/</span>
+<span class="font-headline-sm text-headline-sm text-on-surface" id="active-breadcrumb-page">Agent Execution Trace #8492-Failed</span>
+</div>
+<span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-error-container text-on-error-container font-medium uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition-all" id="trace-status-badge">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-ping" id="trace-status-dot"></span>
+<span id="trace-status-text">Terminated with Error</span>
+</span>
+<span class="hidden md:inline-flex px-2 py-0.5 rounded font-code-sm text-code-sm bg-surface-container text-on-surface-variant">
+        Trace-ID: 7f0a99c2-e2bc-4a9f
+      </span>
+</div>
+<div class="flex items-center gap-2.5">
+<div class="flex items-center bg-surface-container rounded p-0.5 shadow-inner" id="view-toggle-group">
+<button class="px-2.5 py-1 rounded bg-surface-container-lowest text-primary font-label-sm text-label-sm shadow-sm flex items-center gap-1.5 transition-all" id="btn-forensic-view" onclick="setViewMode('forensic')">
+<span class="material-symbols-outlined text-[14px]">insights</span>
+          Forensic View
+        </button>
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-primary font-label-sm text-label-sm transition-colors flex items-center gap-1.5" id="btn-raw-view" onclick="setViewMode('raw')">
+<span class="material-symbols-outlined text-[14px]">raw_on</span>
+          Raw JSON
+        </button>
+</div>
+<button class="px-3 py-1.5 rounded bg-secondary text-on-secondary font-headline-sm text-headline-sm flex items-center gap-1.5 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer" id="rerun-btn" onclick="triggerRerunTrace()">
+<span class="material-symbols-outlined text-[16px]" id="rerun-icon">replay</span>
+<span id="rerun-label">Re-run Trace in Sandbox</span>
+</button>
+<button class="p-1.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant transition-colors" onclick="showToast('Export Diagnostics ready. Trace packet exported.', 'info')" title="Export Diagnostics">
+<span class="material-symbols-outlined text-[18px]">share</span>
+</button>
+</div>
+</div>
+<!-- Primary Analytics Canvas Grid -->
+<div class="p-4 lg:p-6 grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+<!-- LEFT COLUMN: Trace Graph + Temporal Telemetry (8 Cols) -->
+<div class="xl:col-span-8 flex flex-col gap-5 min-w-0">
+<!-- SECTION 1: Interactive Agent Trace Canvas (DAG) -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-4 relative overflow-hidden" id="canvas-card">
+<!-- Canvas Toolbar Header -->
+<div class="flex flex-wrap items-center justify-between gap-3 z-10">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[22px]">schema</span>
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">AGENT TRACE CANVAS</h2>
+<span class="font-code-sm text-code-sm text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded" id="graph-node-count-badge">6 Nodes • 8 Edge Transitions</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center bg-surface-container-low rounded p-1" id="graph-mode-pills">
+<button class="px-2.5 py-1 rounded bg-primary text-on-primary font-label-sm text-label-sm transition-all" onclick="selectGraphSubTab(this, 'flow')">Execution Flow</button>
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-all" onclick="selectGraphSubTab(this, 'memory')">Memory Tree</button>
+<button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-all" onclick="selectGraphSubTab(this, 'subagent')">Sub-Agent Call</button>
+</div>
+<button class="p-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors" onclick="recenterGraph()" title="Recenter Graph">
+<span class="material-symbols-outlined text-[18px]">fit_screen</span>
+</button>
+<button class="p-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors" id="btn-zoom-canvas" onclick="toggleCanvasZoom()" title="Zoom In">
+<span class="material-symbols-outlined text-[18px]" id="zoom-icon">zoom_in</span>
+</button>
+</div>
+</div>
+<!-- Visual DAG Graph Container -->
+<div id="visual-dag-container">
+<!-- DAG Canvas Surface -->
+<div class="relative w-full h-[370px] bg-surface-container-low rounded-lg overflow-hidden flex items-center justify-center transition-all duration-300" id="dag-surface">
+<!-- Subtle Grid Texture -->
+<div class="absolute inset-0 opacity-40 bg-[radial-gradient(#807471_1px,transparent_1px)] [background-size:16px_16px]"></div>
+<!-- SVG DAG Overlay connecting nodes -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="flowGrad" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" stop-color="#807471" stop-opacity="0.4"></stop>
+<stop offset="100%" stop-color="#a23e18" stop-opacity="0.8"></stop>
+</lineargradient>
+<lineargradient id="failureGrad" x1="0%" x2="100%" y1="0%" y2="0%">
+<stop offset="0%" stop-color="#fe8357"></stop>
+<stop offset="100%" stop-color="#ba1a1a"></stop>
+</lineargradient>
+<filter height="140%" id="crimsonHalo" width="140%" x="-20%" y="-20%">
+<fedropshadow dx="0" dy="0" flood-color="#ba1a1a" flood-opacity="0.35" stddeviation="6"></fedropshadow>
+</filter>
+</defs>
+<!-- Path: Agent Input -> Agent Execution -->
+<path d="M 95 185 C 130 185, 140 185, 175 185" fill="none" stroke="#807471" stroke-dasharray="3,3" stroke-width="2"></path>
+<!-- Path: Agent Execution -> Branch API Call -->
+<path d="M 235 185 C 275 185, 275 125, 320 125" fill="none" stroke="#807471" stroke-width="2"></path>
+<!-- Path: Agent Execution -> Branch Model Inference -->
+<path d="M 235 185 C 275 185, 275 245, 320 245" fill="none" stroke="#807471" stroke-width="2"></path>
+<!-- Path: Branch API Call -> Agent Monitor -->
+<path d="M 380 125 C 420 125, 420 185, 460 185" fill="none" stroke="#807471" stroke-width="2"></path>
+<!-- Path: Branch Model -> Agent Monitor -->
+<path d="M 380 245 C 420 245, 420 185, 460 185" fill="none" stroke="#807471" stroke-width="2"></path>
+<!-- Path: Agent Monitor -> Failure Node (Crimson/Coral Pulsing Stroke) -->
+<path class="animate-pulse" d="M 520 185 C 555 185, 565 185, 600 185" fill="none" stroke="url(#failureGrad)" stroke-dasharray="6,4" stroke-width="3"></path>
+<!-- Path: Branch Model -> Secondary Tool Log -->
+<path d="M 380 250 C 430 270, 440 295, 480 305" fill="none" stroke="#807471" stroke-dasharray="4,4" stroke-width="1.5"></path>
+</svg>
+<!-- Graph Node 1: Input -->
+<div class="dag-node absolute left-6 top-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer p-1 rounded-lg transition-transform" data-node="input" onclick="selectDagNode('input')">
+<div class="node-ring w-14 h-14 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-md group-hover:scale-105 transition-all ring-offset-2 ring-0">
+<span class="material-symbols-outlined text-[24px]">input</span>
+</div>
+<span class="mt-2 font-headline-sm text-headline-sm text-on-surface">Agent Input</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">payload: 1.4kb</span>
+</div>
+<!-- Graph Node 2: Agent Execution Core -->
+<div class="dag-node absolute left-40 top-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer p-1 rounded-lg transition-transform" data-node="orchestrator" onclick="selectDagNode('orchestrator')">
+<div class="node-ring w-14 h-14 rounded-full bg-surface-container-lowest text-primary shadow-md flex items-center justify-center group-hover:scale-105 transition-all ring-offset-2 ring-0">
+<span class="material-symbols-outlined text-[26px]">smart_toy</span>
+</div>
+<span class="mt-2 font-headline-sm text-headline-sm text-on-surface">Orchestrator</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">24.2ms • ok</span>
+</div>
+<!-- Graph Node 3: API Call: ck.v1 -->
+<div class="dag-node absolute left-[300px] top-[95px] flex flex-col items-center group cursor-pointer p-1 rounded-lg transition-transform" data-node="apicall" onclick="selectDagNode('apicall')">
+<div class="node-ring w-14 h-14 rounded-full bg-surface-container-high text-on-surface shadow-md flex items-center justify-center group-hover:scale-105 transition-all ring-offset-2 ring-0">
+<span class="material-symbols-outlined text-[22px]">api</span>
+</div>
+<span class="mt-1.5 font-headline-sm text-headline-sm text-on-surface">API Call: ck.v1</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">HTTP 200 (auth)</span>
+</div>
+<!-- Graph Node 4: Model Inference -->
+<div class="dag-node absolute left-[300px] top-[215px] flex flex-col items-center group cursor-pointer p-1 rounded-lg transition-transform" data-node="inference" onclick="selectDagNode('inference')">
+<div class="node-ring w-14 h-14 rounded-full bg-surface-container-high text-on-surface shadow-md flex items-center justify-center group-hover:scale-105 transition-all ring-offset-2 ring-0">
+<span class="material-symbols-outlined text-[22px]">psychology</span>
+</div>
+<span class="mt-1.5 font-headline-sm text-headline-sm text-on-surface">Model Inference</span>
+<span class="font-code-sm text-code-sm text-on-surface-variant">1,240 tokens</span>
+</div>
+<!-- Graph Node 5: Agent Monitor -->
+<div class="dag-node absolute left-[450px] top-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer p-1 rounded-lg transition-transform" data-node="supervisor" onclick="selectDagNode('supervisor')">
+<div class="node-ring w-14 h-14 rounded-full bg-surface-container-lowest text-secondary shadow-md flex items-center justify-center group-hover:scale-105 transition-all ring-offset-2 ring-0">
+<span class="material-symbols-outlined text-[24px]">visibility</span>
+</div>
+<span class="mt-2 font-headline-sm text-headline-sm text-on-surface">State Supervisor</span>
+<span class="font-code-sm text-code-sm text-secondary font-medium">dispatch_tool</span>
+</div>
+<!-- Graph Node 6: FAILING NODE (Crimson/Coral Pulsing DB Tool Exception) -->
+<div class="dag-node absolute right-8 top-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer p-1 rounded-lg transition-transform active-selected-node" data-node="dbtool" onclick="selectDagNode('dbtool')">
+<div class="relative">
+<div class="node-ring w-16 h-16 rounded-full bg-error text-on-error flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform animate-pulse ring-2 ring-secondary ring-offset-2">
+<span class="material-symbols-outlined text-[30px]">error</span>
+</div>
+<span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-sm text-label-sm font-bold shadow">!</span>
+</div>
+<span class="mt-2 font-headline-sm text-headline-sm text-error font-bold" id="dag-fail-node-title">API Exception: DB_Tool</span>
+<span class="font-code-sm text-code-sm bg-error-container text-on-error-container px-2 py-0.5 rounded shadow-sm mt-0.5 font-medium" id="dag-fail-node-sub">Error 504: Gateway Timeout</span>
+</div>
+<!-- Sub Node Tool Sandbox -->
+<div class="absolute left-[475px] top-[275px] flex items-center gap-2 bg-surface-container-lowest px-3 py-1.5 rounded-lg shadow-sm border border-surface-container cursor-pointer hover:border-secondary transition-colors" onclick="selectDagNode('postgres_cache')">
+<span class="material-symbols-outlined text-[16px] text-tertiary-fixed-dim">database</span>
+<span class="font-code-sm text-code-sm text-on-surface font-medium">Postgres Cache: HIT</span>
+</div>
+<!-- Node Detail Inspector Overlay (Docked inside Canvas top-right) -->
+<div class="absolute top-3 right-3 w-60 bg-surface-container-lowest/95 backdrop-blur-md rounded-lg p-3 shadow-md flex flex-col gap-2 border border-surface-container" id="inspector-card">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium" id="inspector-header-label">Step Details</span>
+<span class="px-1.5 py-0.2 rounded bg-tertiary-fixed text-on-tertiary-fixed font-code-sm text-code-sm" id="inspector-step-badge">Step 04</span>
+</div>
+<div class="flex flex-col gap-0.5">
+<span class="font-headline-sm text-headline-sm text-on-surface" id="inspector-title">Direct DB Callout</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant" id="inspector-target">Target: PostgresReplicaUS</p>
+</div>
+<div class="grid grid-cols-2 gap-2 pt-1">
+<div class="bg-surface-container-low p-1.5 rounded">
+<span class="block font-label-sm text-label-sm text-on-surface-variant">Telemetry Pkts</span>
+<span class="font-headline-sm text-headline-sm text-on-surface" id="inspector-packets">230 items</span>
+</div>
+<div class="bg-surface-container-low p-1.5 rounded">
+<span class="block font-label-sm text-label-sm text-on-surface-variant">Execution Ms</span>
+<span class="font-headline-sm text-headline-sm text-error" id="inspector-time">2,410 ms</span>
+</div>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant text-[11px] font-code-sm pt-0.5">
+<span id="inspector-status-desc">Cache: Stale (Invalid)</span>
+<span class="text-secondary font-medium hover:underline cursor-pointer" onclick="inspectDumpModal()">Inspect Dump</span>
+</div>
+</div>
+</div>
+<!-- Canvas Footer Status Tags -->
+<div class="flex flex-wrap items-center justify-between gap-2 pt-1 font-body-sm text-body-sm text-on-surface-variant">
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors" onclick="selectDagNode('input')"><span class="w-2.5 h-2.5 rounded-full bg-secondary"></span> Execution Root</span>
+<span class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors" onclick="selectDagNode('inference')"><span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest"></span> Model Context Call</span>
+<span class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors" onclick="selectDagNode('dbtool')"><span class="w-2.5 h-2.5 rounded-full bg-error"></span> Unhandled Trapped Panic</span>
+</div>
+<div class="font-code-sm text-code-sm" id="canvas-status-footer">Graph Runtime: 2.84s • Max Depth: 4</div>
+</div>
+</div>
+<!-- Raw JSON View Container (Toggled via button) -->
+<div class="hidden bg-[#271e1a] text-[#f5f0e7] rounded-lg p-4 font-code-sm text-code-sm overflow-x-auto shadow-inner h-[400px] leading-relaxed relative" id="raw-json-container">
+<div class="flex justify-between items-center mb-3 pb-2 border-b border-[#473932]">
+<span class="text-tertiary-fixed-dim uppercase tracking-wider font-label-sm text-label-sm">trace_payload_v2.json [Raw Inspector]</span>
+<button class="text-secondary-fixed hover:underline flex items-center gap-1 font-label-sm text-label-sm" onclick="copyTraceCode()">
+<span class="material-symbols-outlined text-[14px]">content_copy</span> Copy Raw
+    </button>
+</div>
+<pre class="text-[#f5ddd7] overflow-auto h-[330px]"><code>{
+  "trace_id": "7f0a99c2-e2bc-4a9f-8492",
+  "status": "FATAL_TERMINATION",
+  "agent_id": "orchestrator_prod_v2",
+  "cluster": "us-east-prod",
+  "execution_duration_ms": 2840,
+  "nodes": [
+    { "id": "input_01", "name": "Agent Input", "bytes": 1420, "status": "OK" },
+    { "id": "orchestrator_main", "latency_ms": 24.2, "status": "OK" },
+    { "id": "auth_token_ck", "endpoint": "/auth/v1/exchange", "http_status": 200 },
+    { "id": "llm_call", "model": "claude-3-sonnet", "tokens": 1240, "latency_ms": 1020 },
+    { "id": "supervisor_gate", "policy": "safe_dispatch", "status": "HALTED" },
+    {
+      "id": "db_tool_call",
+      "tool": "DB_Tool",
+      "target": "PostgresReplicaUS",
+      "latency_ms": 2410,
+      "error": {
+        "code": 504,
+        "message": "Gateway Timeout: Downstream socket dropped during bearer handshake",
+        "hallucinated_param": "auth_token_v2",
+        "expected_param": "bearer_auth"
+      }
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<!-- SECTION 2: Temporal Telemetry & Metrics (Dual Swimlanes) -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-4">
+<div class="flex flex-wrap items-center justify-between gap-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[22px]">show_chart</span>
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">TEMPORAL TELEMETRY &amp; METRICS</h2>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm select-none">
+<button class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-low text-primary border border-secondary/30 transition-all filter-toggle active" id="filter-latency" onclick="toggleMetricFilter(this, 'latency')">
+<span class="w-2 h-2 rounded-full bg-secondary"></span> Latency (ms)
+              </button>
+<button class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-low text-primary border border-tertiary-fixed-dim/40 transition-all filter-toggle active" id="filter-memory" onclick="toggleMetricFilter(this, 'memory')">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span> Memory Heap (MB)
+              </button>
+<button class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-low text-primary border border-error/40 transition-all filter-toggle active" id="filter-fault" onclick="toggleMetricFilter(this, 'fault')">
+<span class="w-2 h-2 rounded-full bg-error"></span> Fault Marker
+              </button>
+</div>
+<div class="flex items-center bg-surface-container-low rounded p-0.5" id="telemetry-zoom-btns">
+<button class="px-2 py-0.5 rounded bg-surface-container text-primary font-label-sm text-label-sm transition-all" id="zoom-1x" onclick="setTelemetryZoom(this, '1x')">1x</button>
+<button class="px-2 py-0.5 text-on-surface-variant hover:text-primary font-label-sm text-label-sm transition-all" id="zoom-5x" onclick="setTelemetryZoom(this, '5x')">5x</button>
+</div>
+</div>
+</div>
+<!-- Dual Metric Area Chart Sparkline -->
+<div class="bg-surface-container-low rounded-lg p-3 relative flex flex-col gap-1 transition-all" id="chart-viewport">
+<div class="flex items-center justify-between font-code-sm text-code-sm text-on-surface-variant px-1" id="chart-timeline-labels">
+<span>0ms</span>
+<span>+600ms</span>
+<span>+1200ms</span>
+<span>+1800ms</span>
+<span class="text-error font-medium" id="chart-spike-label">+2400ms [SPIKE: 504 Timeout]</span>
+<span>+3000ms</span>
+</div>
+<div class="relative w-full h-32 overflow-hidden" id="chart-svg-wrap">
+<!-- Inline Area Chart SVG -->
+<svg class="w-full h-full transition-transform duration-300" id="metrics-svg" preserveaspectratio="none" viewbox="0 0 800 120">
+<!-- Memory Baseline Fill -->
+<path class="transition-opacity duration-200" d="M 0 100 Q 150 95, 300 85 T 600 70 L 630 65 L 630 120 L 0 120 Z" fill="#fcba5f" fill-opacity="0.25" id="chart-mem-fill"></path>
+<!-- Memory Curve -->
+<path class="transition-opacity duration-200" d="M 0 100 Q 150 95, 300 85 T 600 70 L 630 65" fill="none" id="chart-mem-line" stroke="#fcba5f" stroke-width="2"></path>
+<!-- Latency Area Gradient Fill -->
+<defs>
+<lineargradient id="latencyGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#a23e18" stop-opacity="0.45"></stop>
+<stop offset="100%" stop-color="#a23e18" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<path class="transition-opacity duration-200" d="M 0 110 L 80 102 L 140 104 L 210 65 L 290 85 L 360 40 L 440 70 L 520 50 L 590 85 L 620 10 L 625 15 L 630 115 L 800 115 L 800 120 L 0 120 Z" fill="url(#latencyGradient)" id="chart-latency-fill"></path>
+<path class="transition-opacity duration-200" d="M 0 110 L 80 102 L 140 104 L 210 65 L 290 85 L 360 40 L 440 70 L 520 50 L 590 85 L 620 10 L 625 15 L 630 115 L 800 115" fill="none" id="chart-latency-line" stroke="#a23e18" stroke-width="2.5"></path>
+<!-- Failure Vertical Callout Pin -->
+<g class="transition-opacity duration-200" id="chart-fault-marker">
+<line stroke="#ba1a1a" stroke-dasharray="2,2" stroke-width="2" x1="620" x2="620" y1="0" y2="120"></line>
+<circle cx="620" cy="12" fill="#ba1a1a" r="4.5"></circle>
+</g>
+</svg>
+<!-- Marker Tooltip -->
+<div class="absolute left-[73%] top-2 bg-error text-on-error font-code-sm text-code-sm px-2 py-1 rounded shadow-md pointer-events-none flex items-center gap-1" id="chart-spike-tooltip">
+<span class="material-symbols-outlined text-[12px]">warning</span>
+              Spike: 2,410ms (Threshold: 500ms)
+            </div>
+</div>
+</div>
+<!-- Multi-Track Trace Waterfall / Swimlanes -->
+<div class="flex flex-col gap-2 pt-2">
+<div class="flex items-center justify-between font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant border-b border-surface-container pb-1">
+<span>Execution Tracks &amp; Tool Spans</span>
+<span>Duration Breakdown</span>
+</div>
+<!-- Swimlane Row 1: Agent Core Orchestration -->
+<div class="grid grid-cols-12 gap-2 items-center bg-surface-container-low p-2 rounded hover:bg-surface-container cursor-pointer transition-colors" onclick="selectDagNode('orchestrator')">
+<div class="col-span-3 flex items-center gap-2 truncate">
+<span class="material-symbols-outlined text-secondary text-[16px]">smart_toy</span>
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">Agent.MainLoop</span>
+</div>
+<div class="col-span-7 relative h-5 bg-surface-container rounded overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-full bg-secondary-container rounded opacity-80 flex items-center px-2">
+<span class="font-code-sm text-code-sm text-on-secondary-container truncate font-medium">orchestrate: 2,840ms total</span>
+</div>
+</div>
+<div class="col-span-2 text-right font-code-sm text-code-sm text-on-surface-variant">2,840 ms</div>
+</div>
+<!-- Swimlane Row 2: Model Inference Call -->
+<div class="grid grid-cols-12 gap-2 items-center bg-surface-container-low p-2 rounded hover:bg-surface-container cursor-pointer transition-colors" onclick="selectDagNode('inference')">
+<div class="col-span-3 flex items-center gap-2 truncate pl-3">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[16px]">psychology</span>
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">LLM.Inference</span>
+</div>
+<div class="col-span-7 relative h-5 bg-surface-container rounded overflow-hidden">
+<div class="absolute left-[12%] top-0 bottom-0 w-[38%] bg-tertiary-fixed-dim rounded flex items-center px-2">
+<span class="font-code-sm text-code-sm text-on-tertiary-fixed truncate font-medium">claude-3-sonnet • 1,020ms</span>
+</div>
+</div>
+<div class="col-span-2 text-right font-code-sm text-code-sm text-on-surface-variant">1,020 ms</div>
+</div>
+<!-- Swimlane Row 3: API Auth Dispatch -->
+<div class="grid grid-cols-12 gap-2 items-center bg-surface-container-low p-2 rounded hover:bg-surface-container cursor-pointer transition-colors" onclick="selectDagNode('apicall')">
+<div class="col-span-3 flex items-center gap-2 truncate pl-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">key</span>
+<span class="font-headline-sm text-headline-sm text-on-surface truncate">AuthToken.Exchange</span>
+</div>
+<div class="col-span-7 relative h-5 bg-surface-container rounded overflow-hidden">
+<div class="absolute left-[3%] top-0 bottom-0 w-[10%] bg-surface-variant rounded flex items-center px-1.5">
+<span class="font-code-sm text-code-sm text-on-surface-variant truncate">auth: 85ms</span>
+</div>
+</div>
+<div class="col-span-2 text-right font-code-sm text-code-sm text-on-surface-variant">85 ms</div>
+</div>
+<!-- Swimlane Row 4: FAILING Tool Call (DB_Tool) -->
+<div class="grid grid-cols-12 gap-2 items-center bg-error-container/40 p-2 rounded hover:bg-error-container/60 cursor-pointer transition-colors" onclick="selectDagNode('dbtool')">
+<div class="col-span-3 flex items-center gap-2 truncate pl-3">
+<span class="material-symbols-outlined text-error text-[16px]">bolt</span>
+<span class="font-headline-sm text-headline-sm text-on-error-container font-semibold truncate">Tool.DB_Query</span>
+</div>
+<div class="col-span-7 relative h-5 bg-surface-container rounded overflow-hidden">
+<div class="absolute left-[50%] top-0 bottom-0 w-[30%] bg-error rounded flex items-center px-2 shadow">
+<span class="font-code-sm text-code-sm text-on-error truncate font-bold">504 TIMEOUT (2,410ms)</span>
+</div>
+</div>
+<div class="col-span-2 text-right font-code-sm text-code-sm text-on-error-container font-bold">2,410 ms</div>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: Forensic Root-Cause Sidebar + AI Diagnostic Assistant (4 Cols) -->
+<div class="xl:col-span-4 flex flex-col gap-5 min-w-0">
+<!-- ROOT-CAUSE REASONING PANEL -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-4">
+<!-- Header -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[22px]">find_in_page</span>
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">ROOT-CAUSE REASONING</h2>
+</div>
+<span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-secondary text-on-secondary font-medium uppercase shadow-sm">High Confidence</span>
+</div>
+<!-- 1. Fault Type Alert Banner -->
+<div class="bg-secondary-fixed/40 rounded-lg p-3.5 flex flex-col gap-1 shadow-sm border border-secondary-fixed">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-semibold">Fault Type Taxonomy</span>
+<div class="flex items-center justify-between">
+<span class="font-display-lg text-[22px] leading-7 text-primary font-bold">API Exception</span>
+<span class="px-2 py-0.5 rounded bg-error text-on-error font-code-sm text-code-sm font-semibold shadow-sm">CRITICAL</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface mt-1">
+            Downstream database socket connection dropped before response handshake completed. Upstream tool returned HTTP 504 Gateway Timeout.
+          </p>
+</div>
+<!-- 2. Localized Component Attribution -->
+<div class="bg-surface-container-low rounded-lg p-3.5 flex flex-col gap-2">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium">Localized Component</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[18px]">terminal</span>
+<code class="font-code-sm text-code-sm text-primary font-semibold bg-surface-container px-2 py-1 rounded">DB_Tool</code>
+<span class="font-body-sm text-body-sm text-on-surface-variant">in module</span>
+</div>
+<div class="bg-surface-container-lowest px-2.5 py-1.5 rounded font-code-sm text-code-sm text-on-surface-variant shadow-sm flex items-center justify-between">
+<span class="truncate">src/app/auth/authentication.py:148</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant cursor-pointer hover:text-primary transition-colors" onclick="showToast('Opened source file: authentication.py', 'info')" title="Open file">open_in_new</span>
+</div>
+</div>
+<!-- 3. Evidence-Based Reasoning Chain -->
+<div class="bg-surface-container-low rounded-lg p-3.5 flex flex-col gap-2.5">
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium">Evidence-Based Attribution</span>
+<ul class="flex flex-col gap-2 text-body-sm font-body-sm text-on-surface">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px] shrink-0 mt-0.5">check_circle</span>
+<span><strong>Schema Deviation:</strong> LLM generated parameter <code class="font-code-sm text-code-sm bg-surface-container px-1 py-0.5 rounded text-secondary">auth_token_v2</code> instead of registered contract <code class="font-code-sm text-code-sm bg-surface-container px-1 py-0.5 rounded text-primary">bearer_auth</code>.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px] shrink-0 mt-0.5">check_circle</span>
+<span><strong>Retry Exhaustion:</strong> Sub-agent attempted 3 backoff cycles with no header mutation before timeout termination.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-secondary text-[16px] shrink-0 mt-0.5">check_circle</span>
+<span><strong>Cascade Arrest:</strong> Supervisor killed branch execution at 2,840ms to protect global session budget.</span>
+</li>
+</ul>
+</div>
+<!-- 4. Code Trace Syntax Card with Copy -->
+<div class="bg-surface-container-highest rounded-lg p-3 flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<span class="font-code-sm text-code-sm text-on-surface-variant uppercase font-medium">Diagnostic Stack Attribution</span>
+<button class="flex items-center gap-1 font-label-sm text-label-sm text-secondary hover:text-primary transition-colors cursor-pointer" onclick="copyTraceCode()">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span id="copy-trace-text">Copy Trace</span>
+</button>
+</div>
+<div class="bg-[#271e1a] text-inverse-on-surface rounded p-3 font-code-sm text-code-sm overflow-x-auto shadow-inner leading-relaxed" id="diagnostic-code-block">
+<div><span class="text-tertiary-fixed-dim">export-diagnosis:</span> <span class="text-secondary-fixed">API Authentication Failure</span></div>
+<div><span class="text-[#b8a49e]">146</span> <span class="text-inverse-primary">def</span> <span class="text-secondary-fixed">dispatch_db_call</span>(self, payload):</div>
+<div><span class="text-[#b8a49e]">147</span> <span class="text-inverse-primary">try:</span></div>
+<div class="bg-secondary/40 -mx-3 px-3 py-0.5 rounded"><span class="text-[#b8a49e]">148</span>          res = self.client.execute(payload.schema) <span class="text-error-container font-bold">← [FATAL: 504 TIMEOUT]</span></div>
+<div><span class="text-[#b8a49e]">149</span> <span class="text-inverse-primary">except</span> SocketTimeout <span class="text-inverse-primary">as</span> e:</div>
+<div><span class="text-[#b8a49e]">150</span> <span class="text-inverse-primary">raise</span> AgentFatalExecutionError(e)</div>
+</div>
+</div>
+<!-- Action / Remediation Footer -->
+<div class="pt-1 flex items-center gap-2">
+<button class="w-full py-2 bg-[#271e1a] hover:bg-[#342a25] text-on-primary rounded font-headline-sm text-headline-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-[0.99]" id="btn-apply-patch" onclick="applySchemaPatch()">
+<span class="material-symbols-outlined text-[18px]" id="apply-patch-icon">build</span>
+<span id="apply-patch-text">Apply Patch to Schema Registry</span>
+</button>
+</div>
+</div>
+<!-- EMBEDDED DIAGNOSTIC COPILOT / CHAT WIDGET -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+<!-- Copilot Header -->
+<div class="flex items-center justify-between pb-2 border-b border-surface-container">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-sm">
+<span class="material-symbols-outlined text-[16px]">smart_toy</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">AI Forensic Assistant</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Synthesizing cluster trace telemetries</p>
+</div>
+</div>
+<span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span><span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Ready</span></span>
+</div>
+<!-- Chat Conversation Stream -->
+<div class="flex flex-col gap-2.5 max-h-56 overflow-y-auto pr-1" id="chat-messages-container">
+<!-- Assistant Message -->
+<div class="bg-surface-container-low rounded-lg p-3 text-body-sm font-body-sm text-on-surface flex flex-col gap-1.5 shadow-sm">
+<span class="font-label-sm text-label-sm text-secondary font-bold uppercase tracking-wider">Automated Diagnosis</span>
+<p>
+              I've inspected trace <strong>#8492</strong>. The agent hallucinated schema key <code class="font-code-sm text-code-sm bg-surface-container px-1 py-0.5 rounded">auth_token_v2</code> during the DB call, which was rejected with 504 timeout due to repeated credential verification handshakes.
+            </p>
+</div>
+<!-- User Feedback Prompt -->
+<div class="self-end bg-surface-container-high rounded-lg p-2.5 text-body-sm font-body-sm text-on-surface max-w-[85%]">
+            Can we auto-retry with standard schema contract?
+          </div>
+<!-- Assistant Response -->
+<div class="bg-surface-container-low rounded-lg p-3 text-body-sm font-body-sm text-on-surface flex flex-col gap-1 shadow-sm">
+<p>Yes. Remediation strategy generated: Inject schema validator hook before Step 04 dispatch.</p>
+</div>
+</div>
+<!-- Chat Input Field -->
+<form class="relative flex items-center mt-1" id="copilot-form" onsubmit="handleCopilotSubmit(event)">
+<input class="w-full bg-surface-container-low rounded-lg pl-3 pr-10 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary placeholder:text-on-surface-variant border border-transparent focus:border-secondary transition-all" id="copilot-input" placeholder="Ask AI Copilot for root-cause query..." type="text"/>
+<button class="absolute right-2 p-1.5 rounded-full bg-secondary text-on-secondary hover:bg-secondary/90 active:scale-95 transition-all flex items-center justify-center shadow-sm cursor-pointer" title="Send query" type="submit">
+<span class="material-symbols-outlined text-[16px]">send</span>
+</button>
+</form>
+</div>
+</div>
+</div>
+</div></main></div>
+<!-- Script for Interactive Handlers -->
+<script>
+  // 1. Sidebar tab switching
+  function switchSidebarTab(el) {
+    const navItems = document.querySelectorAll('#sidebar-nav .nav-item');
+    navItems.forEach(item => {
+      item.classList.remove('bg-secondary', 'text-on-secondary', 'font-headline-sm', 'text-headline-sm', 'border-l-2', 'border-secondary-container', 'shadow-sm');
+      item.classList.add('text-inverse-on-surface', 'font-body-md', 'text-body-md');
+      item.removeAttribute('aria-current');
+    });
+
+    el.classList.add('bg-secondary', 'text-on-secondary', 'font-headline-sm', 'text-headline-sm', 'border-l-2', 'border-secondary-container', 'shadow-sm');
+    el.classList.remove('text-inverse-on-surface', 'font-body-md', 'text-body-md');
+    el.setAttribute('aria-current', 'page');
+
+    const tabName = el.querySelector('span:last-child')?.innerText || 'Trace Canvas';
+    const breadcrumb = document.getElementById('active-breadcrumb-page');
+    if (breadcrumb) {
+      if (tabName === 'Trace Canvas') {
+        breadcrumb.innerText = 'Agent Execution Trace #8492-Failed';
+      } else {
+        breadcrumb.innerText = tabName + ' • Live Telemetry Stream';
+      }
+    }
+    showToast('Navigated to: ' + tabName, 'info');
+  }
+
+  // 2. Re-run Trace in Sandbox Simulation
+  let isRerunning = false;
+  function triggerRerunTrace() {
+    if (isRerunning) return;
+    isRerunning = true;
+
+    const btn = document.getElementById('rerun-btn');
+    const label = document.getElementById('rerun-label');
+    const icon = document.getElementById('rerun-icon');
+    const statusBadge = document.getElementById('trace-status-badge');
+    const statusText = document.getElementById('trace-status-text');
+    const statusDot = document.getElementById('trace-status-dot');
+
+    icon.classList.add('animate-spin');
+    label.innerText = 'Executing in Sandbox...';
+    btn.classList.add('opacity-80', 'pointer-events-none');
+
+    showToast('Sandbox runtime initialized: Dispatching simulated event stream...', 'info');
+
+    setTimeout(() => {
+      icon.classList.remove('animate-spin');
+      label.innerText = 'Re-run Completed (OK)';
+      btn.classList.remove('opacity-80', 'pointer-events-none', 'bg-secondary');
+      btn.classList.add('bg-[#2f6f4e]', 'text-white');
+
+      if (statusBadge && statusText && statusDot) {
+        statusBadge.classList.remove('bg-error-container', 'text-on-error-container');
+        statusBadge.classList.add('bg-[#d4edda]', 'text-[#155724]');
+        statusDot.classList.remove('bg-error', 'animate-ping');
+        statusDot.classList.add('bg-[#28a745]');
+        statusText.innerText = 'Re-run Completed: 0 Warnings';
+      }
+
+      // Update Fail Node in DAG to Success State
+      const failNode = document.querySelector('.dag-node[data-node="dbtool"]');
+      if (failNode) {
+        const ring = failNode.querySelector('.node-ring');
+        if (ring) {
+          ring.classList.remove('bg-error', 'animate-pulse');
+          ring.classList.add('bg-[#2f6f4e]');
+          const sym = ring.querySelector('.material-symbols-outlined');
+          if (sym) sym.innerText = 'check_circle';
+        }
+        const failTitle = document.getElementById('dag-fail-node-title');
+        const failSub = document.getElementById('dag-fail-node-sub');
+        if (failTitle) {
+          failTitle.innerText = 'DB_Tool: Success (Resolved)';
+          failTitle.classList.remove('text-error');
+          failTitle.classList.add('text-[#2f6f4e]');
+        }
+        if (failSub) {
+          failSub.innerText = 'HTTP 200 • Latency 142ms';
+          failSub.classList.remove('bg-error-container', 'text-on-error-container');
+          failSub.classList.add('bg-[#d4edda]', 'text-[#155724]');
+        }
+      }
+
+      showToast('Sandbox Trace Executed Successfully. All 6 nodes verified.', 'success');
+      isRerunning = false;
+    }, 2400);
+  }
+
+  // 3. View Toggle (Forensic View vs Raw JSON)
+  function setViewMode(mode) {
+    const btnForensic = document.getElementById('btn-forensic-view');
+    const btnRaw = document.getElementById('btn-raw-view');
+    const dagContainer = document.getElementById('visual-dag-container');
+    const rawContainer = document.getElementById('raw-json-container');
+
+    if (mode === 'raw') {
+      btnRaw.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      btnRaw.classList.remove('text-on-surface-variant');
+      btnForensic.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      btnForensic.classList.add('text-on-surface-variant');
+
+      dagContainer.classList.add('hidden');
+      rawContainer.classList.remove('hidden');
+    } else {
+      btnForensic.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      btnForensic.classList.remove('text-on-surface-variant');
+      btnRaw.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm');
+      btnRaw.classList.add('text-on-surface-variant');
+
+      rawContainer.classList.add('hidden');
+      dagContainer.classList.remove('hidden');
+    }
+  }
+
+  // 4. Interactive Trace Canvas DAG Nodes Click & Inspect
+  const nodeDataMap = {
+    input: {
+      step: 'Step 01',
+      title: 'Agent Ingestion Gateway',
+      target: 'Broker: Kafka-events-in',
+      packets: '12 items',
+      time: '2.1 ms',
+      status: 'Payload: Sanitized & Validated',
+      type: 'Execution Root'
+    },
+    orchestrator: {
+      step: 'Step 02',
+      title: 'Agent Core Loop',
+      target: 'Runtime: PyExecutorHost',
+      packets: '85 items',
+      time: '24.2 ms',
+      status: 'Context: Intact (OK)',
+      type: 'Primary Engine'
+    },
+    apicall: {
+      step: 'Step 03a',
+      title: 'Token Exchange (Auth)',
+      target: 'Auth Service: ck.v1.internal',
+      packets: '4 items',
+      time: '85 ms',
+      status: 'HTTP 200 • Token Active',
+      type: 'Sub-Tool'
+    },
+    inference: {
+      step: 'Step 03b',
+      title: 'Model Inference Branch',
+      target: 'Model: claude-3-sonnet',
+      packets: '1,240 tokens',
+      time: '1,020 ms',
+      status: 'Prompt: Complete',
+      type: 'LLM Call'
+    },
+    supervisor: {
+      step: 'Step 03c',
+      title: 'Agent State Supervisor',
+      target: 'Supervisor: SafetyGateDaemon',
+      packets: '48 items',
+      time: '14 ms',
+      status: 'Intercept: Enforced Timeout Watch',
+      type: 'Monitor'
+    },
+    dbtool: {
+      step: 'Step 04',
+      title: 'Direct DB Callout',
+      target: 'Target: PostgresReplicaUS',
+      packets: '230 items',
+      time: '2,410 ms',
+      status: 'Cache: Stale (Invalid)',
+      type: 'API Exception: 504'
+    },
+    postgres_cache: {
+      step: 'Cache Layer',
+      title: 'Redis/Postgres Query Cache',
+      target: 'Cluster: us-east-cache-01',
+      packets: '1 cache entry',
+      time: '0.8 ms',
+      status: 'Result: HIT (Key Valid)',
+      type: 'Cache Hit'
+    }
+  };
+
+  function selectDagNode(nodeKey) {
+    const data = nodeDataMap[nodeKey];
+    if (!data) return;
+
+    // Remove active highlight from all nodes
+    document.querySelectorAll('.dag-node').forEach(n => {
+      const ring = n.querySelector('.node-ring');
+      if (ring) {
+        ring.classList.remove('ring-2', 'ring-secondary', 'ring-offset-2');
+      }
+    });
+
+    const activeNodeEl = document.querySelector(`.dag-node[data-node="${nodeKey}"]`);
+    if (activeNodeEl) {
+      const ring = activeNodeEl.querySelector('.node-ring');
+      if (ring) {
+        ring.classList.add('ring-2', 'ring-secondary', 'ring-offset-2');
+      }
+    }
+
+    // Update Step Details card
+    const card = document.getElementById('inspector-card');
+    card.classList.add('scale-[1.02]');
+    setTimeout(() => card.classList.remove('scale-[1.02]'), 150);
+
+    document.getElementById('inspector-step-badge').innerText = data.step;
+    document.getElementById('inspector-title').innerText = data.title;
+    document.getElementById('inspector-target').innerText = data.target;
+    document.getElementById('inspector-packets').innerText = data.packets;
+    document.getElementById('inspector-time').innerText = data.time;
+    document.getElementById('inspector-status-desc').innerText = data.status;
+
+    const timeEl = document.getElementById('inspector-time');
+    if (nodeKey === 'dbtool') {
+      timeEl.classList.add('text-error');
+      timeEl.classList.remove('text-primary');
+    } else {
+      timeEl.classList.remove('text-error');
+      timeEl.classList.add('text-primary');
+    }
+
+    showToast(`Inspecting node: ${data.title} (${data.step})`, 'info');
+  }
+
+  // Graph sub tabs
+  function selectGraphSubTab(btn, mode) {
+    const pills = document.querySelectorAll('#graph-mode-pills button');
+    pills.forEach(p => {
+      p.classList.remove('bg-primary', 'text-on-primary');
+      p.classList.add('text-on-surface-variant');
+    });
+    btn.classList.add('bg-primary', 'text-on-primary');
+    btn.classList.remove('text-on-surface-variant');
+    showToast(`Canvas switched to view: ${btn.innerText}`, 'info');
+  }
+
+  let canvasZoomed = false;
+  function toggleCanvasZoom() {
+    canvasZoomed = !canvasZoomed;
+    const surface = document.getElementById('dag-surface');
+    const zoomIcon = document.getElementById('zoom-icon');
+    if (canvasZoomed) {
+      surface.classList.remove('h-[370px]');
+      surface.classList.add('h-[480px]');
+      zoomIcon.innerText = 'zoom_out';
+      showToast('Canvas view expanded', 'info');
+    } else {
+      surface.classList.add('h-[370px]');
+      surface.classList.remove('h-[480px]');
+      zoomIcon.innerText = 'zoom_in';
+      showToast('Canvas view normalized', 'info');
+    }
+  }
+
+  function recenterGraph() {
+    const surface = document.getElementById('dag-surface');
+    surface.classList.add('opacity-70');
+    setTimeout(() => {
+      surface.classList.remove('opacity-70');
+      showToast('DAG Graph center coordinates recalibrated', 'info');
+    }, 150);
+  }
+
+  function inspectDumpModal() {
+    showToast('Payload dump loaded: HTTP 504 handshake timeout packet', 'info');
+  }
+
+  // 5. Telemetry & Metrics Zoom and Toggle Handlers
+  function setTelemetryZoom(btn, zoom) {
+    const btns = document.querySelectorAll('#telemetry-zoom-btns button');
+    btns.forEach(b => {
+      b.classList.remove('bg-surface-container', 'text-primary');
+      b.classList.add('text-on-surface-variant');
+    });
+    btn.classList.add('bg-surface-container', 'text-primary');
+    btn.classList.remove('text-on-surface-variant');
+
+    const svg = document.getElementById('metrics-svg');
+    const spikeLabel = document.getElementById('chart-spike-label');
+    const spikeTooltip = document.getElementById('chart-spike-tooltip');
+
+    if (zoom === '5x') {
+      svg.classList.add('scale-x-125');
+      if (spikeLabel) spikeLabel.innerText = '+2410ms [ZOOMED DETAIL: 504.1 TIMEOUT]';
+      showToast('Temporal resolution zoomed to 5x high-fidelity slice', 'info');
+    } else {
+      svg.classList.remove('scale-x-125');
+      if (spikeLabel) spikeLabel.innerText = '+2400ms [SPIKE: 504 Timeout]';
+      showToast('Temporal resolution reset to 1x overview', 'info');
+    }
+  }
+
+  function toggleMetricFilter(btn, metric) {
+    btn.classList.toggle('opacity-40');
+    btn.classList.toggle('active');
+    const isActive = btn.classList.contains('active');
+
+    if (metric === 'latency') {
+      const fill = document.getElementById('chart-latency-fill');
+      const line = document.getElementById('chart-latency-line');
+      fill.style.opacity = isActive ? '1' : '0.05';
+      line.style.opacity = isActive ? '1' : '0.1';
+    } else if (metric === 'memory') {
+      const fill = document.getElementById('chart-mem-fill');
+      const line = document.getElementById('chart-mem-line');
+      fill.style.opacity = isActive ? '0.25' : '0.05';
+      line.style.opacity = isActive ? '1' : '0.1';
+    } else if (metric === 'fault') {
+      const marker = document.getElementById('chart-fault-marker');
+      const tooltip = document.getElementById('chart-spike-tooltip');
+      marker.style.opacity = isActive ? '1' : '0';
+      tooltip.style.opacity = isActive ? '1' : '0';
+    }
+  }
+
+  // 6. Copilot Interactive Chat
+  function handleCopilotSubmit(e) {
+    e.preventDefault();
+    const input = document.getElementById('copilot-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const container = document.getElementById('chat-messages-container');
+
+    // Append user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'self-end bg-surface-container-high rounded-lg p-2.5 text-body-sm font-body-sm text-on-surface max-w-[85%] animate-fade-in shadow-sm';
+    userMsg.innerText = text;
+    container.appendChild(userMsg);
+
+    input.value = '';
+    container.scrollTop = container.scrollHeight;
+
+    // Simulate Copilot thinking and answering
+    setTimeout(() => {
+      const botMsg = document.createElement('div');
+      botMsg.className = 'bg-surface-container-low rounded-lg p-3 text-body-sm font-body-sm text-on-surface flex flex-col gap-1 shadow-sm border-l-2 border-secondary';
+
+      let reply = "Tracing query across cluster pods... The database socket failure was triggered specifically by missing SSL mutual handshake certificates on 'auth_token_v2'.";
+      if (text.toLowerCase().includes('patch') || text.toLowerCase().includes('fix')) {
+        reply = "Recommended Patch: Modify schema contract to map 'auth_token_v2' to 'bearer_auth'. Click 'Apply Patch to Schema Registry' below to automatically deploy hotfix.";
+      } else if (text.toLowerCase().includes('timeout') || text.toLowerCase().includes('latency')) {
+        reply = "Latency peaked at 2,410ms after 3 unacknowledged TCP re-transmits. Downstream replica socket dropped cleanly at t+2400ms.";
+      }
+
+      botMsg.innerHTML = `<span class="font-label-sm text-label-sm text-secondary font-bold uppercase tracking-wider">Copilot Diagnosis</span><p>${reply}</p>`;
+      container.appendChild(botMsg);
+      container.scrollTop = container.scrollHeight;
+    }, 600);
+  }
+
+  // 7. Apply Patch to Schema Registry Button Action
+  function applySchemaPatch() {
+    const btn = document.getElementById('btn-apply-patch');
+    const text = document.getElementById('apply-patch-text');
+    const icon = document.getElementById('apply-patch-icon');
+
+    icon.classList.add('animate-spin');
+    text.innerText = 'Publishing patch to Schema Registry...';
+    btn.classList.add('pointer-events-none');
+
+    setTimeout(() => {
+      icon.classList.remove('animate-spin');
+      icon.innerText = 'check';
+      text.innerText = 'Patch Applied to Schema Registry v3.4.2';
+      btn.classList.remove('bg-[#271e1a]', 'hover:bg-[#342a25]');
+      btn.classList.add('bg-[#2f6f4e]', 'text-white');
+      btn.classList.remove('pointer-events-none');
+
+      showToast('Hotfix Patch v3.4.2 deployed: Schema aliased auth_token_v2 -> bearer_auth', 'success');
+    }, 1200);
+  }
+
+  // Copy Trace Stack
+  function copyTraceCode() {
+    const code = `export-diagnosis: API Authentication Failure
+146 def dispatch_db_call(self, payload):
+147     try:
+148         res = self.client.execute(payload.schema) # 504 TIMEOUT
+149     except SocketTimeout as e:
+150         raise AgentFatalExecutionError(e)`;
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(code).then(() => {
+        showToast('Trace code copied to clipboard!', 'success');
+      });
+    } else {
+      showToast('Trace code copied!', 'success');
+    }
+    const copyLabel = document.getElementById('copy-trace-text');
+    if (copyLabel) {
+      copyLabel.innerText = 'Copied!';
+      setTimeout(() => copyLabel.innerText = 'Copy Trace', 2000);
+    }
+  }
+
+  // Toast Notification Utility
+  function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    const isSuccess = type === 'success';
+    toast.className = `flex items-center gap-2.5 px-3.5 py-2 rounded-lg text-body-sm font-body-sm shadow-lg pointer-events-auto transition-all transform duration-200 border ${
+      isSuccess 
+        ? 'bg-[#2f6f4e] text-white border-[#24573d]' 
+        : 'bg-[#342a25] text-inverse-on-surface border-[#4d3e37]'
+    }`;
+
+    const icon = isSuccess ? 'task_alt' : 'info';
+    toast.innerHTML = `<span class="material-symbols-outlined text-[16px]">${icon}</span><span>${message}</span>`;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-y-1');
+      setTimeout(() => toast.remove(), 250);
+    }, 3200);
+  }
+</script>
+</body></html>

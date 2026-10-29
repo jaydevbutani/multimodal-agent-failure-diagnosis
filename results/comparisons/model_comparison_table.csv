@@ -1,0 +1,6 @@
+Model Architecture,Test Accuracy,Precision,Recall,Macro-F1,Weighted-F1,ROC-AUC,PR-AUC
+Logistic Regression (Baseline),0.7771,0.4959,0.6932,0.7133,0.7889,0.8344,0.6196
+Random Forest (Balanced),0.8427,0.6641,0.5795,0.7599,0.8387,0.8632,0.7128
+XGBoost Classifier,0.8337,0.612,0.6705,0.7659,0.8363,0.8595,0.7132
+Sequential BiLSTM (Trajectory Only),0.7971,0.5314,0.6727,0.7293,0.805,0.8318,0.5936
+Proposed Multi-View Fusion Network (Telemetry + Sequence),0.8081,0.5487,0.7295,0.7486,0.817,0.8568,0.6949

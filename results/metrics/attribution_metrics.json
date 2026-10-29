@@ -1,0 +1,24 @@
+{
+  "component_attribution": {
+    "task": "Responsible Component Attribution (Task D)",
+    "benchmark": "Who&When (Magentic-One)",
+    "samples": 58,
+    "classes": [
+      "Assistant",
+      "FileSurfer",
+      "Orchestrator",
+      "WebSurfer"
+    ],
+    "top1_accuracy": 0.6044,
+    "top2_accuracy": 0.8816,
+    "macro_f1": 0.4806
+  },
+  "temporal_localization": {
+    "task": "Step-Level Temporal Fault Localization (Task C)",
+    "benchmark": "Who&When",
+    "test_tasks_evaluated": 12,
+    "top1_exact_step_hit_rate": 0.0833,
+    "top3_step_hit_rate": 0.3333,
+    "mean_absolute_step_error": 6.25
+  }
+}

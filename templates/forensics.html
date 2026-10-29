@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Reasoning &amp; Forensics — Agent Health Intelligence{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <!-- Sub-Header -->
+  <div class="px-6 py-3.5 bg-surface-container-low flex flex-wrap items-center justify-between gap-4 shadow-sm border-b border-surface-container">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant truncate">
+        <a href="/dashboard" class="hover:text-primary transition-colors">Home</a>
+        <span>/</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface">Reasoning &amp; Multimodal Failure Forensics</span>
+      </div>
+      <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-secondary text-on-secondary font-medium uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+        Attribution Active
+      </span>
+    </div>
+
+    <button class="px-3.5 py-1.5 rounded bg-secondary text-on-secondary font-headline-sm text-headline-sm flex items-center gap-1.5 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer" onclick="window.location.href='/trace-canvas'">
+      <span class="material-symbols-outlined text-[16px]">account_tree</span>
+      <span>Inspect Active Canvas</span>
+    </button>
+  </div>
+
+  <div class="p-4 lg:p-6 flex flex-col gap-6">
+
+    <!-- Overview Banner -->
+    <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col gap-2">
+      <h2 class="font-headline-md text-headline-md text-primary tracking-tight">Evidence-Based Root-Cause Reasoning Architecture</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Unlike black-box diagnostic tools, the Agent Health Intelligence platform generates evidence-grounded root-cause attributions. Predictions are substantiated through three complementary layers: cross-modal attention gating, SHAP predictive feature importance, and Who&amp;When responsible component localization.
+      </p>
+    </div>
+
+    <!-- 3 Forensic Pillars Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <!-- Pillar 1: Cross-Modal Gated Fusion -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col gap-4">
+        <div class="flex items-center gap-2 border-b border-surface-container pb-2">
+          <span class="material-symbols-outlined text-secondary text-[22px]">hub</span>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface">1. Cross-Modal Fusion Gating</h3>
+        </div>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          Dynamically balances tabular execution telemetry with sequential tool trajectory embeddings:
+        </p>
+        <div class="bg-surface-container-low p-3 rounded-lg font-code-sm text-code-sm text-primary flex flex-col gap-1.5 border border-surface-container">
+          <div><span class="text-secondary font-bold">g</span> = &sigma;(W_g &middot; [h_tab ; h_seq] + b_g)</div>
+          <div><span class="text-primary font-bold">h_fused</span> = g &odot; h_tab + (1 - g) &odot; h_seq</div>
+          <div><span class="text-[#2f6f4e] font-bold">logit</span> = W_out &middot; ReLU(W_dense &middot; h_fused)</div>
+        </div>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          When an agent's failure manifests through repetitive commands, the sequence gate weight expands to capture transition anomalies.
+        </p>
+      </div>
+
+      <!-- Pillar 2: Feature Importance (SHAP) -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col gap-4">
+        <div class="flex items-center gap-2 border-b border-surface-container pb-2">
+          <span class="material-symbols-outlined text-secondary text-[22px]">analytics</span>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface">2. Predictive Feature Attribution</h3>
+        </div>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          Top predictive contributors evaluated across 88 tabular features on the held-out test split:
+        </p>
+        <ul class="flex flex-col gap-2 font-code-sm text-code-sm text-on-surface">
+          <li class="flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded">
+            <span>total_turns</span>
+            <span class="text-secondary font-bold">0.1420 (Gini)</span>
+          </li>
+          <li class="flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded">
+            <span>duration_seconds</span>
+            <span class="text-secondary font-bold">0.0984 (Gini)</span>
+          </li>
+          <li class="flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded">
+            <span>tool_calls_total</span>
+            <span class="text-secondary font-bold">0.0712 (Gini)</span>
+          </li>
+          <li class="flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded">
+            <span>DERIVED_retry_ratio</span>
+            <span class="text-secondary font-bold">0.0655 (Gini)</span>
+          </li>
+          <li class="flex items-center justify-between bg-surface-container-low px-2.5 py-1.5 rounded">
+            <span>DERIVED_tool_entropy</span>
+            <span class="text-secondary font-bold">0.0540 (Gini)</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Pillar 3: Who&When Attribution -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col gap-4">
+        <div class="flex items-center gap-2 border-b border-surface-container pb-2">
+          <span class="material-symbols-outlined text-secondary text-[22px]">account_tree</span>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface">3. Responsible Component Attribution</h3>
+        </div>
+        <p class="font-body-sm text-body-sm text-on-surface-variant">
+          Rooted in the <em>Who&amp;When (ICML 2025 Spotlight)</em> benchmark taxonomy to localize fault origination:
+        </p>
+        <div class="flex flex-col gap-2 font-body-sm text-body-sm">
+          <div class="p-2.5 bg-surface-container-low rounded border-l-2 border-error">
+            <span class="font-headline-sm text-[12px] text-error font-bold block uppercase">Model Delusion / Hallucination</span>
+            <span class="text-on-surface-variant text-[12px]">Agent generates nonexistent parameters or incorrect tool syntax.</span>
+          </div>
+          <div class="p-2.5 bg-surface-container-low rounded border-l-2 border-[#fe8357]">
+            <span class="font-headline-sm text-[12px] text-[#6f2000] font-bold block uppercase">Tool Execution Exception</span>
+            <span class="text-on-surface-variant text-[12px]">Downstream API timeout, missing environment package, or permission error.</span>
+          </div>
+          <div class="p-2.5 bg-surface-container-low rounded border-l-2 border-secondary">
+            <span class="font-headline-sm text-[12px] text-secondary font-bold block uppercase">Supervisor Cascade Handoff</span>
+            <span class="text-on-surface-variant text-[12px]">Premature task exit or context window budget exhaustion.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Remediation Strategies -->
+    <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col gap-3">
+      <h3 class="font-headline-sm text-headline-sm text-on-surface">Deterministic Operational Remediation Matrix</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left font-body-sm text-body-sm border-collapse">
+          <thead>
+            <tr class="border-b border-surface-container font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+              <th class="py-2 px-3">Identified Fault Type</th>
+              <th class="py-2 px-3">Supporting Telemetry Signature</th>
+              <th class="py-2 px-3">Recommended Operational Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-surface-container-low">
+            <tr>
+              <td class="py-2.5 px-3 font-semibold text-error">Cyclic Command Retry Thrashing</td>
+              <td class="py-2.5 px-3 font-code-sm text-[11px]">retries &gt; 2, retry_ratio &gt; 0.5</td>
+              <td class="py-2.5 px-3 text-on-surface-variant">Interrupt execution; break cyclic retry loop by injecting clarification prompts or resetting workspace.</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-3 font-semibold text-[#fe8357]">Information Over-Exploration Deadlock</td>
+              <td class="py-2.5 px-3 font-code-sm text-[11px]">search_to_edit_ratio &gt; 10, edits == 0</td>
+              <td class="py-2.5 px-3 text-on-surface-variant">Provide focused file path guidance to terminate unproductive directory search loops.</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-3 font-semibold text-secondary">Unbounded Code Modification Churn</td>
+              <td class="py-2.5 px-3 font-code-sm text-[11px]">edit_churn &gt; 300 lines/file</td>
+              <td class="py-2.5 px-3 text-on-surface-variant">Inspect diff blast radius; revert unbounded file rewrites before running tests.</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 px-3 font-semibold text-[#2f6f4e]">Nominal Execution Pattern</td>
+              <td class="py-2.5 px-3 font-code-sm text-[11px]">error_rate == 0, retries == 0</td>
+              <td class="py-2.5 px-3 text-on-surface-variant">Continue execution. No intervention required.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

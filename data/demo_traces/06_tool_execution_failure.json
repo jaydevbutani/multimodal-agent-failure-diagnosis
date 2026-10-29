@@ -1,0 +1,20 @@
+{
+  "trace_id": "DEMO-06-TOOL-FAILURE",
+  "task_id": "task_diff_syntax_crash",
+  "model": "claude-haiku-4-5-20251001",
+  "agent_name": "openhands",
+  "benchmark": "synthetic_demo",
+  "total_turns": 50,
+  "tool_calls_total": 18,
+  "search_tool_calls": 3,
+  "edit_tool_calls": 4,
+  "unique_files_read": 3,
+  "unique_files_edited": 1,
+  "error_count": 8,
+  "retry_count": 2,
+  "patch_size_lines": 12,
+  "duration_seconds": 310.0,
+  "rate_limited": false,
+  "exception_crashed": false,
+  "tool_call_sequence": ["read_file", "diff_editor", "diff_editor", "read_file", "patch_tool", "patch_tool", "execute_bash"]
+}

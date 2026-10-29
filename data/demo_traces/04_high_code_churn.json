@@ -1,0 +1,20 @@
+{
+  "trace_id": "DEMO-04-HIGH-CHURN",
+  "task_id": "task_unbounded_file_rewrite",
+  "model": "claude-sonnet-4-6",
+  "agent_name": "claude-code",
+  "benchmark": "synthetic_demo",
+  "total_turns": 70,
+  "tool_calls_total": 22,
+  "search_tool_calls": 3,
+  "edit_tool_calls": 8,
+  "unique_files_read": 2,
+  "unique_files_edited": 1,
+  "error_count": 6,
+  "retry_count": 2,
+  "patch_size_lines": 850,
+  "duration_seconds": 450.0,
+  "rate_limited": false,
+  "exception_crashed": false,
+  "tool_call_sequence": ["read_file", "edit_file", "run_test", "edit_file", "run_test", "edit_file", "run_test", "edit_file"]
+}

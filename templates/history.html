@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block title %}Incident History — Agent Health Intelligence{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <!-- Sub-Header -->
+  <div class="px-6 py-3.5 bg-surface-container-low flex flex-wrap items-center justify-between gap-4 shadow-sm border-b border-surface-container">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant truncate">
+        <a href="/dashboard" class="hover:text-primary transition-colors">Home</a>
+        <span>/</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface">Diagnostic History</span>
+      </div>
+      <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+        <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+        <span>Diagnostic History — 10 saved sessions maximum</span>
+      </span>
+    </div>
+
+    <button class="px-3.5 py-1.5 rounded bg-secondary text-on-secondary font-headline-sm text-headline-sm flex items-center gap-1.5 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer" onclick="window.location.href='/diagnose'">
+      <span class="material-symbols-outlined text-[16px]">add_circle</span>
+      <span>New Diagnosis</span>
+    </button>
+  </div>
+
+  <div class="p-4 lg:p-6 flex flex-col gap-6">
+
+    <!-- Filter & Search Toolbar -->
+    <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-2 bg-surface-container-low px-3 py-1.5 rounded-lg border border-surface-container min-w-[280px]">
+        <span class="material-symbols-outlined text-on-surface-variant text-[18px]">search</span>
+        <input type="text" id="history-search-input" placeholder="Search saved sessions or root causes..." class="bg-transparent font-body-sm text-body-sm text-on-surface focus:outline-none w-full" oninput="filterHistoryTable()"/>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <span class="font-label-sm text-label-sm text-on-surface-variant uppercase mr-1">Filter:</span>
+        <button class="px-2.5 py-1 rounded bg-primary text-on-primary font-label-sm text-label-sm filter-btn active cursor-pointer" onclick="setHistoryFilter(this, 'all')">All</button>
+        <button class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-label-sm filter-btn cursor-pointer" onclick="setHistoryFilter(this, 'failed')">Failures</button>
+        <button class="px-2.5 py-1 rounded bg-surface-container text-on-surface font-label-sm text-label-sm filter-btn cursor-pointer" onclick="setHistoryFilter(this, 'healthy')">Healthy</button>
+      </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col gap-4">
+      {% if history and history|length > 0 %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left font-body-sm text-body-sm border-collapse" id="history-table">
+          <thead>
+            <tr class="border-b border-surface-container font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+              <th class="py-2.5 px-3">Session Title</th>
+              <th class="py-2.5 px-3">Agent &amp; Model</th>
+              <th class="py-2.5 px-3">Failure Prob</th>
+              <th class="py-2.5 px-3">Status</th>
+              <th class="py-2.5 px-3">Identified Root Cause</th>
+              <th class="py-2.5 px-3">Timestamp</th>
+              <th class="py-2.5 px-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-surface-container-low" id="history-tbody">
+            {% for item in history %}
+            <tr class="hover:bg-surface-container-low transition-colors history-row" data-status="{{ item.predicted_status }}" data-text="{{ item.session_title|lower }} {{ item.root_cause|lower }} {{ item.agent_name|lower }}">
+              <td class="py-3 px-3">
+                <span class="font-headline-sm text-[13px] text-on-surface block font-semibold">{{ item.session_title }}</span>
+                <span class="font-code-sm text-[11px] text-on-surface-variant">Session #{{ item.result_id }}</span>
+              </td>
+              <td class="py-3 px-3">
+                <span class="font-code-sm text-[11px] bg-surface-container px-2 py-0.5 rounded text-on-surface block truncate max-w-[160px]">
+                  {{ item.model_used }}
+                </span>
+                <span class="font-body-sm text-[11px] text-on-surface-variant block mt-0.5">{{ item.agent_name }}</span>
+              </td>
+              <td class="py-3 px-3 font-code-sm font-bold {% if item.failure_probability >= item.threshold %}text-error{% else %}text-[#2f6f4e]{% endif %}">
+                {{ "%.4f"|format(item.failure_probability) }}
+              </td>
+              <td class="py-3 px-3">
+                {% if "FAILURE" in item.predicted_status %}
+                <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-error text-on-error uppercase font-bold">
+                  {{ item.predicted_status }}
+                </span>
+                {% elif "ELEVATED" in item.predicted_status %}
+                <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-[#fe8357] text-[#6f2000] uppercase font-bold">
+                  {{ item.predicted_status }}
+                </span>
+                {% else %}
+                <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-[#2f6f4e] text-white uppercase font-bold">
+                  HEALTHY
+                </span>
+                {% endif %}
+              </td>
+              <td class="py-3 px-3 text-on-surface-variant truncate max-w-xs font-body-sm">
+                {{ item.root_cause }}
+              </td>
+              <td class="py-3 px-3 font-code-sm text-[11px] text-on-surface-variant">
+                {{ item.created_at[:19] if item.created_at else '' }}
+              </td>
+              <td class="py-3 px-3 text-right">
+                <div class="flex items-center justify-end gap-1.5">
+                  <button class="px-2.5 py-1 rounded bg-secondary text-white hover:bg-secondary/90 transition-colors font-label-sm text-label-sm cursor-pointer shadow-xs" onclick="window.location.href='/trace-canvas?history_id={{ item.result_id }}'">
+                    Inspect
+                  </button>
+                  <button class="p-1 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant transition-colors cursor-pointer" onclick="showRecordModal({{ item.result_id }})" title="View Details">
+                    <span class="material-symbols-outlined text-[16px]">visibility</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="p-10 text-center bg-surface-container-low rounded-lg flex flex-col items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-secondary text-4xl">inventory_2</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface">No Incident History Found</span>
+        <p class="font-body-sm text-body-sm text-on-surface-variant max-w-md">
+          Diagnoses executed in the Diagnose Trace workspace are atomically logged to SQLite under your user account (<strong>{{ user.username }}</strong>).
+        </p>
+        <button class="mt-2 px-4 py-2 rounded bg-secondary text-on-secondary font-headline-sm text-headline-sm shadow-sm hover:opacity-90 transition-all cursor-pointer" onclick="window.location.href='/diagnose'">
+          Diagnose An Agent Trace
+        </button>
+        </button>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- Record Detail Modal -->
+<div class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4" id="record-modal" onclick="closeRecordModal()">
+  <div class="bg-surface-container-lowest rounded-xl shadow-2xl w-full max-w-2xl border border-surface-container overflow-hidden p-6 flex flex-col gap-4" onclick="event.stopPropagation()">
+    <div class="flex items-center justify-between border-b border-surface-container pb-3">
+      <div>
+        <h3 class="font-headline-md text-headline-md text-on-surface" id="modal-title">Diagnostic Record Details</h3>
+        <span class="font-code-sm text-code-sm text-on-surface-variant" id="modal-id">Session #</span>
+      </div>
+      <button class="p-1 text-on-surface-variant hover:text-on-surface cursor-pointer" onclick="closeRecordModal()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 text-body-sm">
+      <div class="bg-surface-container-low p-3 rounded-lg">
+        <span class="block font-label-sm text-label-sm text-on-surface-variant">Status &amp; Risk</span>
+        <span class="font-headline-sm text-headline-sm text-primary" id="modal-status">HEALTHY</span>
+      </div>
+      <div class="bg-surface-container-low p-3 rounded-lg">
+        <span class="block font-label-sm text-label-sm text-on-surface-variant">Failure Probability</span>
+        <span class="font-headline-sm text-headline-sm font-code-sm text-secondary" id="modal-prob">0.0000</span>
+      </div>
+    </div>
+
+    <div>
+      <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium block mb-1">Root Cause &amp; Why</span>
+      <p class="font-body-sm text-body-sm text-on-surface bg-surface-container-low p-3 rounded-lg border border-surface-container" id="modal-why"></p>
+    </div>
+
+    <div>
+      <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium block mb-1">Recommended Operational Action</span>
+      <p class="font-body-sm text-body-sm text-primary font-semibold bg-surface-container-low p-3 rounded-lg border border-surface-container" id="modal-action"></p>
+    </div>
+
+    <div class="pt-2 flex justify-end gap-2 border-t border-surface-container">
+      <button class="px-4 py-2 rounded bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md cursor-pointer" onclick="closeRecordModal()">Close</button>
+      <button class="px-4 py-2 rounded bg-secondary text-white hover:bg-secondary/90 font-label-md text-label-md cursor-pointer" id="modal-inspect-btn">Inspect on Canvas</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setHistoryFilter(btn, filter) {
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.remove('bg-primary', 'text-on-primary');
+      b.classList.add('bg-surface-container', 'text-on-surface');
+    });
+    btn.classList.add('bg-primary', 'text-on-primary');
+    btn.classList.remove('bg-surface-container', 'text-on-surface');
+
+    const rows = document.querySelectorAll('.history-row');
+    rows.forEach(r => {
+      const status = r.dataset.status.toUpperCase();
+      if (filter === 'all') {
+        r.style.display = '';
+      } else if (filter === 'failed') {
+        r.style.display = (status.includes('FAIL') || status.includes('ELEVATED')) ? '' : 'none';
+      } else if (filter === 'healthy') {
+        r.style.display = (!status.includes('FAIL') && !status.includes('ELEVATED')) ? '' : 'none';
+      }
+    });
+  }
+
+  function filterHistoryTable() {
+    const q = document.getElementById('history-search-input').value.toLowerCase().trim();
+    const rows = document.querySelectorAll('.history-row');
+    rows.forEach(r => {
+      const text = r.dataset.text || '';
+      r.style.display = (text.includes(q)) ? '' : 'none';
+    });
+  }
+
+  async function showRecordModal(recId) {
+    try {
+      const res = await fetch(`/api/history/${recId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+
+      document.getElementById('modal-title').innerText = data.session_title;
+      document.getElementById('modal-id').innerText = `Session #${data.id} • ${data.timestamp}`;
+      document.getElementById('modal-status').innerText = `${data.predicted_status} (${data.risk_level} Risk)`;
+      document.getElementById('modal-prob').innerText = (data.failure_probability).toFixed(4);
+      document.getElementById('modal-why').innerText = `${data.root_cause}: ${data.detected_issue}`;
+      document.getElementById('modal-action').innerText = data.recommended_action;
+      document.getElementById('modal-inspect-btn').onclick = () => window.location.href = `/trace-canvas?history_id=${data.result_id || data.id}`;
+
+      document.getElementById('record-modal').classList.remove('hidden');
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  function closeRecordModal() {
+    document.getElementById('record-modal').classList.add('hidden');
+  }
+</script>
+{% endblock %}

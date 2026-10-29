@@ -1,0 +1,20 @@
+{
+  "trace_id": "DEMO-05-OVER-EXPLORATION",
+  "task_id": "task_lost_in_repo_docs",
+  "model": "claude-haiku-4-5-20251001",
+  "agent_name": "openhands",
+  "benchmark": "synthetic_demo",
+  "total_turns": 85,
+  "tool_calls_total": 28,
+  "search_tool_calls": 24,
+  "edit_tool_calls": 0,
+  "unique_files_read": 22,
+  "unique_files_edited": 0,
+  "error_count": 1,
+  "retry_count": 0,
+  "patch_size_lines": 0,
+  "duration_seconds": 410.0,
+  "rate_limited": false,
+  "exception_crashed": false,
+  "tool_call_sequence": ["list_dir", "find_files", "grep", "read_file", "read_file", "grep", "read_file", "find_files", "read_file", "read_file"]
+}

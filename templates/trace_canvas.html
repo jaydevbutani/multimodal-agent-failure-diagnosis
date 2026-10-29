@@ -1,0 +1,462 @@
+{% extends "base.html" %}
+
+{% block title %}Agent Trace Canvas — Agent Health Intelligence{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <!-- Sub-Header / Telemetry Context Strip -->
+  <div class="px-6 py-3 bg-surface-container-low flex flex-wrap items-center justify-between gap-4 shadow-sm border-b border-surface-container">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant truncate">
+        <a href="/dashboard" class="hover:text-primary transition-colors">Home</a>
+        <span>/</span>
+        <a href="/trace-canvas" class="hover:text-primary transition-colors">Traces</a>
+        <span>/</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface truncate" id="active-breadcrumb-page">Loading Trace...</span>
+      </div>
+      
+      <!-- Status Badge -->
+      <span class="px-2.5 py-0.5 rounded font-label-sm text-label-sm bg-error text-on-error font-medium uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition-all" id="trace-status-badge">
+        <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping" id="trace-status-dot"></span>
+        <span id="trace-status-text">Analyzing</span>
+      </span>
+
+      <!-- Trace ID Badge -->
+      <span class="hidden md:inline-flex px-2 py-0.5 rounded font-code-sm text-code-sm bg-surface-container text-on-surface-variant" id="trace-id-badge">
+        Trace-ID: initializing...
+      </span>
+    </div>
+
+    <!-- Controls Toolbar -->
+    <div class="flex flex-wrap items-center gap-2.5">
+      <!-- Trace Source Selector -->
+      <div class="flex items-center gap-1.5 bg-surface-container-lowest px-2 py-1 rounded border border-surface-container shadow-xs">
+        <span class="material-symbols-outlined text-[16px] text-secondary">dataset</span>
+        <select class="bg-transparent font-label-md text-label-md text-on-surface focus:outline-none cursor-pointer" id="select-trace-source" onchange="handleTraceSourceChange(this.value)">
+          <optgroup label="Authentic Benchmark Trials (SWE-bench / Agent Diagnostics)" id="benchmark-options-group">
+            <option value="benchmark_0">Loading benchmark trials...</option>
+          </optgroup>
+          <optgroup label="Live Telemetry Simulations">
+            <option value="live_healthy">Live Nominal SWE-bench Run</option>
+            <option value="live_thrashing">Live Command Retry Thrashing Loop</option>
+            <option value="live_exploration">Live Over-Exploration Loop</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Model Selector -->
+      <div class="flex items-center gap-1.5 bg-surface-container-lowest px-2 py-1 rounded border border-surface-container shadow-xs">
+        <span class="material-symbols-outlined text-[16px] text-primary">psychology</span>
+        <select class="bg-transparent font-label-md text-label-md text-on-surface focus:outline-none cursor-pointer" id="select-model-choice" onchange="triggerDiagnosis()">
+          <option value="Proposed Multi-View Fusion Network" selected>Proposed Multi-View Fusion Network</option>
+          <option value="XGBoost Classifier">XGBoost Classifier</option>
+          <option value="Random Forest (Balanced)">Random Forest (Balanced)</option>
+          <option value="Logistic Regression (Baseline)">Logistic Regression (Baseline)</option>
+          <option value="Sequential BiLSTM (Trajectory Only)">Sequential BiLSTM (Trajectory Only)</option>
+        </select>
+      </div>
+
+      <!-- Threshold Slider -->
+      <div class="hidden xl:flex items-center gap-1.5 bg-surface-container-lowest px-2 py-1 rounded border border-surface-container shadow-xs">
+        <span class="font-code-sm text-code-sm text-on-surface-variant">Thresh:</span>
+        <input type="range" min="0.10" max="0.90" step="0.02" value="0.46" class="w-16 accent-secondary cursor-pointer" id="threshold-slider" oninput="updateThresholdValue(this.value)" onchange="triggerDiagnosis()"/>
+        <span class="font-code-sm text-code-sm font-bold text-primary" id="threshold-display">0.46</span>
+      </div>
+
+      <!-- Forensic View / Raw JSON View Toggle -->
+      <div class="flex items-center bg-surface-container rounded p-0.5 shadow-inner" id="view-toggle-group">
+        <button class="px-2.5 py-1 rounded bg-surface-container-lowest text-primary font-label-sm text-label-sm shadow-sm flex items-center gap-1.5 transition-all cursor-pointer" id="btn-forensic-view" onclick="setViewMode('forensic')">
+          <span class="material-symbols-outlined text-[14px]">insights</span>
+          Forensic View
+        </button>
+        <button class="px-2.5 py-1 text-on-surface-variant hover:text-primary font-label-sm text-label-sm transition-colors flex items-center gap-1.5 cursor-pointer" id="btn-raw-view" onclick="setViewMode('raw')">
+          <span class="material-symbols-outlined text-[14px]">raw_on</span>
+          Raw JSON
+        </button>
+      </div>
+
+      <!-- Re-run in Sandbox Simulation Button -->
+      <button class="px-3 py-1.5 rounded bg-secondary text-on-secondary font-headline-sm text-headline-sm flex items-center gap-1.5 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer" id="rerun-btn" onclick="triggerRerunSimulation()">
+        <span class="material-symbols-outlined text-[16px]" id="rerun-icon">replay</span>
+        <span id="rerun-label">Re-run Trace in Sandbox</span>
+      </button>
+
+      <!-- Custom Upload File Button -->
+      <label class="p-1.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant transition-colors cursor-pointer" title="Upload Custom JSON Trace">
+        <span class="material-symbols-outlined text-[18px]">upload_file</span>
+        <input type="file" accept=".json,.csv" class="hidden" onchange="handleCustomFileUpload(event)"/>
+      </label>
+    </div>
+  </div>
+
+  <!-- Primary Analytics Canvas Grid -->
+  <div class="p-4 lg:p-6 grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+    
+    <!-- LEFT COLUMN: Trace Graph + Temporal Telemetry (8 Cols) -->
+    <div class="xl:col-span-8 flex flex-col gap-5 min-w-0">
+
+      <!-- SECTION 1: Interactive Agent Trace Canvas (DAG) -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-4 relative overflow-hidden" id="canvas-card">
+        <!-- Canvas Toolbar Header -->
+        <div class="flex flex-wrap items-center justify-between gap-3 z-10">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-[22px]">schema</span>
+            <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">AGENT TRACE CANVAS</h2>
+            <span class="font-code-sm text-code-sm text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded" id="graph-node-count-badge">6 Nodes • Dynamic Execution Transitions</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="flex items-center bg-surface-container-low rounded p-1" id="graph-mode-pills">
+              <button class="px-2.5 py-1 rounded bg-primary text-on-primary font-label-sm text-label-sm transition-all" onclick="selectGraphSubTab(this, 'flow')">Execution Flow</button>
+              <button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-all" onclick="selectGraphSubTab(this, 'memory')">Memory Tree</button>
+              <button class="px-2.5 py-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm transition-all" onclick="selectGraphSubTab(this, 'subagent')">Sub-Agent Call</button>
+            </div>
+            <button class="p-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors cursor-pointer" onclick="recenterGraph()" title="Recenter Graph">
+              <span class="material-symbols-outlined text-[18px]">fit_screen</span>
+            </button>
+            <button class="p-1 rounded bg-surface-container-low hover:bg-surface-container text-on-surface-variant transition-colors cursor-pointer" id="btn-zoom-canvas" onclick="toggleCanvasZoom()" title="Zoom In">
+              <span class="material-symbols-outlined text-[18px]" id="zoom-icon">zoom_in</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Visual DAG Graph Container -->
+        <div id="visual-dag-container">
+          <!-- DAG Canvas Surface -->
+          <div class="relative w-full h-[370px] bg-surface-container-low rounded-lg overflow-hidden flex items-center justify-center transition-all duration-300" id="dag-surface">
+            <!-- Subtle Grid Texture -->
+            <div class="absolute inset-0 opacity-40 bg-[radial-gradient(#807471_1px,transparent_1px)] [background-size:16px_16px]"></div>
+
+            <!-- SVG DAG Overlay connecting nodes -->
+            <svg class="absolute inset-0 w-full h-full pointer-events-none" id="dag-svg" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="flowGrad" x1="0%" x2="100%" y1="0%" y2="0%">
+                  <stop offset="0%" stop-color="#807471" stop-opacity="0.4"></stop>
+                  <stop offset="100%" stop-color="#a23e18" stop-opacity="0.8"></stop>
+                </linearGradient>
+                <linearGradient id="failureGrad" x1="0%" x2="100%" y1="0%" y2="0%">
+                  <stop offset="0%" stop-color="#fe8357"></stop>
+                  <stop offset="100%" stop-color="#ba1a1a"></stop>
+                </linearGradient>
+                <filter height="140%" id="crimsonHalo" width="140%" x="-20%" y="-20%">
+                  <feDropShadow dx="0" dy="0" flood-color="#ba1a1a" flood-opacity="0.35" stdDeviation="6"></feDropShadow>
+                </filter>
+              </defs>
+              <!-- Dynamic connecting curves rendered via JavaScript based on trace -->
+              <g id="svg-paths-group"></g>
+            </svg>
+
+            <!-- Dynamic Graph Nodes Container -->
+            <div class="absolute inset-0 w-full h-full" id="dag-nodes-container">
+              <!-- Rendered via renderDagNodes() in JS -->
+            </div>
+
+            <!-- Node Detail Inspector Overlay (Docked inside Canvas top-right) -->
+            <div class="absolute top-3 right-3 w-64 bg-surface-container-lowest/95 backdrop-blur-md rounded-lg p-3 shadow-md flex flex-col gap-2 border border-surface-container z-20 transition-transform duration-150" id="inspector-card">
+              <div class="flex items-center justify-between">
+                <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium" id="inspector-header-label">Step Details</span>
+                <span class="px-1.5 py-0.2 rounded bg-tertiary-fixed text-on-tertiary-fixed font-code-sm text-code-sm" id="inspector-step-badge">Step 01</span>
+              </div>
+              <div class="flex flex-col gap-0.5">
+                <span class="font-headline-sm text-headline-sm text-on-surface" id="inspector-title">Agent Ingestion Gateway</span>
+                <p class="font-body-sm text-body-sm text-on-surface-variant truncate" id="inspector-target">Target: SWE-bench Task</p>
+              </div>
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <div class="bg-surface-container-low p-1.5 rounded">
+                  <span class="block font-label-sm text-label-sm text-on-surface-variant">Telemetry Pkts</span>
+                  <span class="font-headline-sm text-headline-sm text-on-surface" id="inspector-packets">14 turns</span>
+                </div>
+                <div class="bg-surface-container-low p-1.5 rounded">
+                  <span class="block font-label-sm text-label-sm text-on-surface-variant">Execution Time</span>
+                  <span class="font-headline-sm text-headline-sm text-primary" id="inspector-time">1,240 ms</span>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-on-surface-variant text-[11px] font-code-sm pt-0.5">
+                <span id="inspector-status-desc" class="truncate">Context: Active</span>
+                <span class="text-secondary font-medium hover:underline cursor-pointer" onclick="inspectDumpModal()">Inspect Dump</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Canvas Footer Status Tags -->
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2 font-body-sm text-body-sm text-on-surface-variant">
+            <div class="flex items-center gap-4">
+              <span class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors" onclick="selectDagNode('input')">
+                <span class="w-2.5 h-2.5 rounded-full bg-secondary"></span> Execution Root
+              </span>
+              <span class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors" onclick="selectDagNode('inference')">
+                <span class="w-2.5 h-2.5 rounded-full bg-surface-container-highest"></span> Model Context Call
+              </span>
+              <span class="flex items-center gap-1.5 cursor-pointer hover:text-primary transition-colors" onclick="selectDagNode('terminal_node')">
+                <span class="w-2.5 h-2.5 rounded-full bg-error" id="footer-terminal-dot"></span> Terminal Evaluation
+              </span>
+            </div>
+            <div class="font-code-sm text-code-sm" id="canvas-status-footer">Graph Runtime: 1.45s • Max Depth: 4</div>
+          </div>
+        </div>
+
+        <!-- Raw JSON View Container (Toggled via button) -->
+        <div class="hidden bg-[#271e1a] text-[#f5f0e7] rounded-lg p-4 font-code-sm text-code-sm overflow-x-auto shadow-inner h-[400px] leading-relaxed relative" id="raw-json-container">
+          <div class="flex justify-between items-center mb-3 pb-2 border-b border-[#473932]">
+            <span class="text-tertiary-fixed-dim uppercase tracking-wider font-label-sm text-label-sm">trace_payload_v2.json [Raw Inspector]</span>
+            <button class="text-secondary-fixed hover:underline flex items-center gap-1 font-label-sm text-label-sm cursor-pointer" onclick="copyTraceJson()">
+              <span class="material-symbols-outlined text-[14px]">content_copy</span> Copy Raw JSON
+            </button>
+          </div>
+          <pre class="text-[#f5ddd7] overflow-auto h-[330px]"><code id="raw-json-code">{}</code></pre>
+        </div>
+      </div>
+
+      <!-- SECTION 2: Temporal Telemetry & Metrics (Dual Swimlanes) -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-[22px]">show_chart</span>
+            <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">TEMPORAL TELEMETRY &amp; METRICS</h2>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 text-on-surface-variant font-label-sm text-label-sm select-none">
+              <button class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-low text-primary border border-secondary/30 transition-all filter-toggle active cursor-pointer" id="filter-latency" onclick="toggleMetricFilter(this, 'latency')">
+                <span class="w-2 h-2 rounded-full bg-secondary"></span> Latency (ms)
+              </button>
+              <button class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-low text-primary border border-tertiary-fixed-dim/40 transition-all filter-toggle active cursor-pointer" id="filter-memory" onclick="toggleMetricFilter(this, 'memory')">
+                <span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span> Memory Heap (MB)
+              </button>
+              <button class="flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-container-low text-primary border border-error/40 transition-all filter-toggle active cursor-pointer" id="filter-fault" onclick="toggleMetricFilter(this, 'fault')">
+                <span class="w-2 h-2 rounded-full bg-error"></span> Fault Marker
+              </button>
+            </div>
+            <div class="flex items-center bg-surface-container-low rounded p-0.5" id="telemetry-zoom-btns">
+              <button class="px-2 py-0.5 rounded bg-surface-container text-primary font-label-sm text-label-sm transition-all cursor-pointer" id="zoom-1x" onclick="setTelemetryZoom(this, '1x')">1x</button>
+              <button class="px-2 py-0.5 text-on-surface-variant hover:text-primary font-label-sm text-label-sm transition-all cursor-pointer" id="zoom-5x" onclick="setTelemetryZoom(this, '5x')">5x</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dual Metric Area Chart Sparkline -->
+        <div class="bg-surface-container-low rounded-lg p-3 relative flex flex-col gap-1 transition-all" id="chart-viewport">
+          <div class="flex items-center justify-between font-code-sm text-code-sm text-on-surface-variant px-1" id="chart-timeline-labels">
+            <span>0ms</span>
+            <span>+600ms</span>
+            <span>+1200ms</span>
+            <span>+1800ms</span>
+            <span class="text-error font-medium" id="chart-spike-label">+2400ms [SPIKE: Elevated Retry Loop]</span>
+            <span>+3000ms</span>
+          </div>
+
+          <div class="relative w-full h-32 overflow-hidden" id="chart-svg-wrap">
+            <!-- Inline Area Chart SVG -->
+            <svg class="w-full h-full transition-transform duration-300" id="metrics-svg" preserveAspectRatio="none" viewBox="0 0 800 120">
+              <!-- Memory Baseline Fill -->
+              <path class="transition-opacity duration-200" d="M 0 100 Q 150 95, 300 85 T 600 70 L 630 65 L 630 120 L 0 120 Z" fill="#fcba5f" fill-opacity="0.25" id="chart-mem-fill"></path>
+              <path class="transition-opacity duration-200" d="M 0 100 Q 150 95, 300 85 T 600 70 L 630 65" fill="none" id="chart-mem-line" stroke="#fcba5f" stroke-width="2"></path>
+
+              <!-- Latency Area Gradient Fill -->
+              <defs>
+                <linearGradient id="latencyGradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stop-color="#a23e18" stop-opacity="0.45"></stop>
+                  <stop offset="100%" stop-color="#a23e18" stop-opacity="0.0"></stop>
+                </linearGradient>
+              </defs>
+              <path class="transition-opacity duration-200" d="M 0 110 L 80 102 L 140 104 L 210 65 L 290 85 L 360 40 L 440 70 L 520 50 L 590 85 L 620 10 L 625 15 L 630 115 L 800 115 L 800 120 L 0 120 Z" fill="url(#latencyGradient)" id="chart-latency-fill"></path>
+              <path class="transition-opacity duration-200" d="M 0 110 L 80 102 L 140 104 L 210 65 L 290 85 L 360 40 L 440 70 L 520 50 L 590 85 L 620 10 L 625 15 L 630 115 L 800 115" fill="none" id="chart-latency-line" stroke="#a23e18" stroke-width="2.5"></path>
+
+              <!-- Failure Vertical Callout Pin -->
+              <g class="transition-opacity duration-200" id="chart-fault-marker">
+                <line stroke="#ba1a1a" stroke-dasharray="2,2" stroke-width="2" x1="620" x2="620" y1="0" y2="120"></line>
+                <circle cx="620" cy="12" fill="#ba1a1a" r="4.5"></circle>
+              </g>
+            </svg>
+
+            <!-- Marker Tooltip -->
+            <div class="absolute left-[73%] top-2 bg-error text-on-error font-code-sm text-code-sm px-2 py-1 rounded shadow-md pointer-events-none flex items-center gap-1" id="chart-spike-tooltip">
+              <span class="material-symbols-outlined text-[12px]">warning</span>
+              <span id="chart-spike-text">Spike: Retry Thrashing Detected</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi-Track Trace Waterfall / Swimlanes -->
+        <div class="flex flex-col gap-2 pt-2">
+          <div class="flex items-center justify-between font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant border-b border-surface-container pb-1">
+            <span>Execution Tracks &amp; Tool Spans</span>
+            <span>Duration Breakdown</span>
+          </div>
+
+          <!-- Swimlane Row 1: Agent Core Orchestration -->
+          <div class="grid grid-cols-12 gap-2 items-center bg-surface-container-low p-2 rounded hover:bg-surface-container cursor-pointer transition-colors" onclick="selectDagNode('orchestrator')">
+            <div class="col-span-3 flex items-center gap-2 truncate">
+              <span class="material-symbols-outlined text-secondary text-[16px]">smart_toy</span>
+              <span class="font-headline-sm text-headline-sm text-on-surface truncate">Agent.MainLoop</span>
+            </div>
+            <div class="col-span-7 relative h-5 bg-surface-container rounded overflow-hidden">
+              <div class="absolute left-0 top-0 bottom-0 w-full bg-secondary-container rounded opacity-80 flex items-center px-2">
+                <span class="font-code-sm text-code-sm text-on-secondary-container truncate font-medium" id="swimlane-orchestrate-text">orchestrate: 1,450ms total</span>
+              </div>
+            </div>
+            <div class="col-span-2 text-right font-code-sm text-code-sm text-on-surface-variant" id="swimlane-orchestrate-ms">1,450 ms</div>
+          </div>
+
+          <!-- Swimlane Row 2: Model Inference Call -->
+          <div class="grid grid-cols-12 gap-2 items-center bg-surface-container-low p-2 rounded hover:bg-surface-container cursor-pointer transition-colors" onclick="selectDagNode('inference')">
+            <div class="col-span-3 flex items-center gap-2 truncate pl-3">
+              <span class="material-symbols-outlined text-tertiary-fixed-dim text-[16px]">psychology</span>
+              <span class="font-headline-sm text-headline-sm text-on-surface truncate">ML.Inference</span>
+            </div>
+            <div class="col-span-7 relative h-5 bg-surface-container rounded overflow-hidden">
+              <div class="absolute left-[15%] top-0 bottom-0 w-[40%] bg-tertiary-fixed-dim rounded flex items-center px-2">
+                <span class="font-code-sm text-code-sm text-on-tertiary-fixed truncate font-medium" id="swimlane-inference-text">Multi-View Fusion • 88.4ms</span>
+              </div>
+            </div>
+            <div class="col-span-2 text-right font-code-sm text-code-sm text-on-surface-variant">88.4 ms</div>
+          </div>
+
+          <!-- Swimlane Row 3: Sequential Tool Span -->
+          <div class="grid grid-cols-12 gap-2 items-center bg-surface-container-low p-2 rounded hover:bg-surface-container cursor-pointer transition-colors" onclick="selectDagNode('tool_primary')">
+            <div class="col-span-3 flex items-center gap-2 truncate pl-3">
+              <span class="material-symbols-outlined text-on-surface-variant text-[16px]">terminal</span>
+              <span class="font-headline-sm text-headline-sm text-on-surface truncate" id="swimlane-tool-label">Tool.Sequence</span>
+            </div>
+            <div class="col-span-7 relative h-5 bg-surface-container rounded overflow-hidden">
+              <div class="absolute left-[3%] top-0 bottom-0 w-[30%] bg-surface-variant rounded flex items-center px-1.5" id="swimlane-tool-bar">
+                <span class="font-code-sm text-code-sm text-on-surface-variant truncate" id="swimlane-tool-text">tool calls dispatched</span>
+              </div>
+            </div>
+            <div class="col-span-2 text-right font-code-sm text-code-sm text-on-surface-variant" id="swimlane-tool-ms">180 ms</div>
+          </div>
+
+          <!-- Swimlane Row 4: Terminal Execution Span -->
+          <div class="grid grid-cols-12 gap-2 items-center p-2 rounded cursor-pointer transition-colors" id="swimlane-terminal-row" onclick="selectDagNode('terminal_node')">
+            <div class="col-span-3 flex items-center gap-2 truncate pl-3">
+              <span class="material-symbols-outlined text-[16px]" id="swimlane-terminal-icon">bolt</span>
+              <span class="font-headline-sm text-headline-sm font-semibold truncate" id="swimlane-terminal-title">Status Result</span>
+            </div>
+            <div class="col-span-7 relative h-5 bg-surface-container rounded overflow-hidden">
+              <div class="absolute left-[50%] top-0 bottom-0 w-[45%] rounded flex items-center px-2 shadow" id="swimlane-terminal-bar">
+                <span class="font-code-sm text-code-sm truncate font-bold" id="swimlane-terminal-bartext">PREDICTED OUTCOME</span>
+              </div>
+            </div>
+            <div class="col-span-2 text-right font-code-sm text-code-sm font-bold" id="swimlane-terminal-ms">450 ms</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Forensic Root-Cause Sidebar + AI Diagnostic Assistant (4 Cols) -->
+    <div class="xl:col-span-4 flex flex-col gap-5 min-w-0">
+
+      <!-- ROOT-CAUSE REASONING PANEL -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm flex flex-col gap-4">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-[22px]">find_in_page</span>
+            <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">ROOT-CAUSE REASONING</h2>
+          </div>
+          <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-secondary text-on-secondary font-medium uppercase shadow-sm" id="confidence-badge">High Confidence</span>
+        </div>
+
+        <!-- 1. Fault Type Alert Banner -->
+        <div class="bg-secondary-fixed/40 rounded-lg p-3.5 flex flex-col gap-1 shadow-sm border border-secondary-fixed" id="fault-banner">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-semibold">Fault Type Taxonomy</span>
+          <div class="flex items-center justify-between">
+            <span class="font-display-lg text-[20px] leading-7 text-primary font-bold" id="taxonomy-title">Nominal Execution Pattern</span>
+            <span class="px-2 py-0.5 rounded bg-error text-on-error font-code-sm text-code-sm font-semibold shadow-sm" id="taxonomy-severity">CRITICAL</span>
+          </div>
+          <p class="font-body-sm text-body-sm text-on-surface mt-1" id="taxonomy-desc">
+            Execution telemetry analyzed against the decision threshold.
+          </p>
+        </div>
+
+        <!-- 2. Localized Component Attribution -->
+        <div class="bg-surface-container-low rounded-lg p-3.5 flex flex-col gap-2">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium">Localized Component</span>
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary text-[18px]">terminal</span>
+            <code class="font-code-sm text-code-sm text-primary font-semibold bg-surface-container px-2 py-1 rounded" id="localized-component-name">Agent.BashLoop</code>
+            <span class="font-body-sm text-body-sm text-on-surface-variant">in module</span>
+          </div>
+          <div class="bg-surface-container-lowest px-2.5 py-1.5 rounded font-code-sm text-code-sm text-on-surface-variant shadow-sm flex items-center justify-between">
+            <span class="truncate" id="localized-component-file">src/execution/tool_dispatcher.py:84</span>
+            <span class="material-symbols-outlined text-[16px] text-on-surface-variant cursor-pointer hover:text-primary transition-colors" onclick="showToast('Opened source file reference.', 'info')" title="Open file">open_in_new</span>
+          </div>
+        </div>
+
+        <!-- 3. Evidence-Based Reasoning Chain -->
+        <div class="bg-surface-container-low rounded-lg p-3.5 flex flex-col gap-2.5">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant font-medium">Evidence-Based Attribution</span>
+          <ul class="flex flex-col gap-2 text-body-sm font-body-sm text-on-surface" id="evidence-list-container">
+            <!-- Populated via JS -->
+          </ul>
+        </div>
+
+        <!-- 4. Code Trace Syntax Card with Copy -->
+        <div class="bg-surface-container-highest rounded-lg p-3 flex flex-col gap-2">
+          <div class="flex items-center justify-between">
+            <span class="font-code-sm text-code-sm text-on-surface-variant uppercase font-medium">Diagnostic Stack Attribution</span>
+            <button class="flex items-center gap-1 font-label-sm text-label-sm text-secondary hover:text-primary transition-colors cursor-pointer" onclick="copyTraceCode()">
+              <span class="material-symbols-outlined text-[14px]">content_copy</span>
+              <span id="copy-trace-text">Copy Trace</span>
+            </button>
+          </div>
+          <div class="bg-[#271e1a] text-inverse-on-surface rounded p-3 font-code-sm text-code-sm overflow-x-auto shadow-inner leading-relaxed" id="diagnostic-code-block">
+            <div><span class="text-tertiary-fixed-dim">export-diagnosis:</span> <span class="text-secondary-fixed" id="code-block-diag-title">Telemetry Incident</span></div>
+            <div><span class="text-[#b8a49e]">146</span> <span class="text-inverse-primary">def</span> <span class="text-secondary-fixed">execute_agent_step</span>(self, step_payload):</div>
+            <div><span class="text-[#b8a49e]">147</span> <span class="text-inverse-primary">try:</span></div>
+            <div class="bg-secondary/40 -mx-3 px-3 py-0.5 rounded"><span class="text-[#b8a49e]">148</span>          res = self.tool_runner.dispatch(step_payload) <span class="text-error-container font-bold" id="code-block-error-tag">← [EVALUATED RISK]</span></div>
+            <div><span class="text-[#b8a49e]">149</span> <span class="text-inverse-primary">except</span> AgentToolException <span class="text-inverse-primary">as</span> e:</div>
+            <div><span class="text-[#b8a49e]">150</span> <span class="text-inverse-primary">raise</span> AgentFatalExecutionError(e)</div>
+          </div>
+        </div>
+
+        <!-- Action / Remediation Footer -->
+        <div class="pt-1 flex items-center gap-2">
+          <button class="w-full py-2 bg-[#271e1a] hover:bg-[#342a25] text-on-primary rounded font-headline-sm text-headline-sm transition-all duration-200 flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-[0.99]" id="btn-apply-patch" onclick="applyRemediationPatch()">
+            <span class="material-symbols-outlined text-[18px]" id="apply-patch-icon">build</span>
+            <span id="apply-patch-text">Deploy Operational Intervention</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- EMBEDDED DIAGNOSTIC COPILOT / CHAT WIDGET -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm flex flex-col gap-3">
+        <!-- Copilot Header -->
+        <div class="flex items-center justify-between pb-2 border-b border-surface-container">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-full bg-secondary flex items-center justify-center text-on-secondary shadow-sm">
+              <span class="material-symbols-outlined text-[16px]">smart_toy</span>
+            </div>
+            <div>
+              <h3 class="font-headline-sm text-headline-sm text-on-surface">AI Forensic Assistant</h3>
+              <p class="font-label-sm text-label-sm text-on-surface-variant">Evidence-grounded root-cause reasoning</p>
+            </div>
+          </div>
+          <span class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+            <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Ready</span>
+          </span>
+        </div>
+
+        <!-- Chat Conversation Stream -->
+        <div class="flex flex-col gap-2.5 max-h-56 overflow-y-auto pr-1" id="chat-messages-container">
+          <!-- Populated via JS -->
+        </div>
+
+        <!-- Chat Input Field -->
+        <form class="relative flex items-center mt-1" id="copilot-form" onsubmit="handleCopilotSubmit(event)">
+          <input class="w-full bg-surface-container-low rounded-lg pl-3 pr-10 py-2 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-1 focus:ring-secondary placeholder:text-on-surface-variant border border-transparent focus:border-secondary transition-all" id="copilot-input" placeholder="Ask AI Copilot for root-cause query..." type="text"/>
+          <button class="absolute right-2 p-1.5 rounded-full bg-secondary text-on-secondary hover:bg-secondary/90 active:scale-95 transition-all flex items-center justify-center shadow-sm cursor-pointer" title="Send query" type="submit">
+            <span class="material-symbols-outlined text-[16px]">send</span>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/trace-canvas.js"></script>
+{% endblock %}

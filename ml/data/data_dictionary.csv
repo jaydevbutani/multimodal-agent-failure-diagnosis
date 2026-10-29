@@ -1,0 +1,33 @@
+Feature Name,Data Type,Description
+task_id,Categorical / ID,Unique benchmark problem / task identifier
+model,Categorical,"Underlying LLM backbone evaluated (e.g. claude-haiku-4-5, claude-sonnet-4-6)"
+agent_name,Categorical,"Autonomous agent system framework (claude-code, openhands, cursor-cli)"
+config_name,Categorical,Specific agent configuration profile applied during execution
+benchmark,Categorical,"Evaluation benchmark suite (e.g. openhands, sdlc_fix, org_migration)"
+reward,"Continuous Numerical [0, 1]",Continuous evaluation score awarded by benchmark verifier (0.0 to 1.0)
+passed,Binary Target (Boolean),"Primary ground-truth binary outcome: True if all tests passed, False if failed"
+has_verifier_result,Binary Indicator,Indicator whether benchmark sandbox verifier executed to completion
+total_turns,Discrete Numerical,Total user/agent conversational interaction turns in the trial
+tool_calls_total,Discrete Numerical,Total count of external tool/command invocations by the agent
+search_tool_calls,Discrete Numerical,"Count of text or keyword search tool invocations (Grep, Find)"
+edit_tool_calls,Discrete Numerical,"Count of code editing tool invocations (StrReplace, Write)"
+code_nav_tool_calls,Discrete Numerical,"Count of AST/symbol code navigation invocations (GoToDef, FindRefs)"
+semantic_search_tool_calls,Discrete Numerical,Count of vector/embedding semantic search invocations
+unique_files_read,Discrete Numerical,Number of distinct repository files inspected by the agent
+unique_files_edited,Discrete Numerical,Number of distinct repository files modified by the agent
+files_read_list,Structured Sequence (List),List of absolute file paths inspected during the session
+files_edited_list,Structured Sequence (List),List of absolute file paths modified during the session
+error_count,Discrete Numerical,"Total count of environment, syntax, or execution errors returned to agent"
+retry_count,Discrete Numerical,Total count of retry actions triggered after failed commands
+trajectory_length,Discrete Numerical,Sequential length of recorded tool execution steps
+has_result_json,Binary Indicator,Whether trial execution metadata result JSON was preserved
+has_trajectory,Binary Indicator,Whether step-level trajectory JSON was logged
+duration_seconds,Continuous Numerical (Seconds),Total wall-clock runtime duration of the agent session in seconds
+rate_limited,Binary Indicator,Boolean flag indicating whether execution was throttled by API rate limits
+exception_crashed,Binary Indicator,Boolean flag indicating whether the agent runtime suffered an uncaught crash
+patch_size_lines,Discrete Numerical,Total number of modified lines in the final generated patch/diff
+tool_call_sequence,Sequential Trajectory (Array),Ordered sequential list of tools invoked throughout the execution trajectory
+benchmark_source,Categorical,Source provenance type of the benchmark trial
+trial_path,Path / Metadata,Internal filesystem path of the original raw trial directory
+trial_id,Unique Key (Grouping Key),Unique 32-character hexadecimal trial session identifier
+trial_id_full,Unique Hash,Full 64-character SHA identifier of the trial session

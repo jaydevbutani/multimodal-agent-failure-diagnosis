@@ -1,0 +1,24 @@
+Feature,Original_or_Derived,Formula_or_Source,Reason,Leakage_Risk
+total_turns,Original,Raw count of dialogue interaction turns,Measures conversational depth and task complexity,None (Computed within trial session)
+tool_calls_total,Original,Raw sum of tool invocations,Captures overall agent activity level,None
+search_tool_calls,Original,"Count of search operations (Grep, Find)",Reflects information-gathering phase intensity,None
+edit_tool_calls,Original,"Count of edit operations (Write, Replace)",Reflects solution implementation intensity,None
+code_nav_tool_calls,Original,"Count of AST navigation calls (Def, Refs)",Reflects structured code exploration,None
+unique_files_read,Original,Distinct file count read,Context breadth indicator,None
+unique_files_edited,Original,Distinct file count edited,Blast radius indicator of changes,None
+error_count,Original,Total error responses returned by environment,Direct execution friction indicator,None
+retry_count,Original,Total repeated commands after failure,Diagnostic thrashing / loop indicator,None
+duration_seconds,Original,Wall-clock session execution duration,Temporal resource consumption,None
+patch_size_lines,Original,Modified line count in final git patch,Code modification volume,None
+rate_limited,Original,API rate limit throttle boolean,Environment disruption signal,None
+exception_crashed,Original,Runtime unhandled crash boolean,Fatal infrastructure failure indicator,None
+DERIVED_error_rate,DERIVED FEATURE,"error_count / max(1, tool_calls_total)",Normalizes error counts by agent activity level,Zero: calculated on individual trial telemetry
+DERIVED_retry_ratio,DERIVED FEATURE,"retry_count / max(1, error_count)",Measures agent propensity to enter repetitive retry loops upon encountering errors,Zero: strictly within-sample arithmetic
+DERIVED_search_to_edit_ratio,DERIVED FEATURE,"search_tool_calls / max(1, edit_tool_calls)",Differentiates over-exploration/churn from focused editing,Zero: strictly within-sample arithmetic
+DERIVED_edit_churn,DERIVED FEATURE,"patch_size_lines / max(1, unique_files_edited)",Average code lines modified per file; high values signal uncontrolled rewrites,Zero: strictly within-sample arithmetic
+DERIVED_tool_intensity,DERIVED FEATURE,"tool_calls_total / max(1, total_turns)",Frequency of tool usage per turn; distinguishes conversational vs tool-heavy steps,Zero: strictly within-sample arithmetic
+DERIVED_read_to_edit_ratio,DERIVED FEATURE,"unique_files_read / max(1, unique_files_edited)",Investigative breadth relative to execution modification,Zero: strictly within-sample arithmetic
+DERIVED_time_per_turn,DERIVED FEATURE,"duration_seconds / max(1, total_turns)",Latency pace per conversational turn; flags network stall or complex deliberation,Zero: strictly within-sample arithmetic
+DERIVED_tool_entropy,DERIVED FEATURE,-sum(p * log(p)) over tool call frequency distribution in tool_call_sequence,Information-theoretic diversity of tool usage; low entropy signals single-tool looping,Zero: computed solely on tool_call_sequence within trial
+DERIVED_log_duration,DERIVED FEATURE,log1p(duration_seconds),Mitigates extreme right-skewness of session execution time,Zero: monotonic elementwise transformation
+DERIVED_log_patch_size,DERIVED FEATURE,log1p(patch_size_lines),"Stabilizes variance across patch sizes from 1 line to 10,000+ lines",Zero: monotonic elementwise transformation

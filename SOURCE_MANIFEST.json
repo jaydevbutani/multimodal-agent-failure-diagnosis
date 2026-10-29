@@ -1,0 +1,56 @@
+{
+  "manifest_version": "1.0.0",
+  "project_title": "Machine Learning for AI Agent Failure Detection, Attribution and Root-Cause Analysis",
+  "course": "Applications and Use Cases of Machine Learning (AUCML - TE7483)",
+  "institution": "Symbiosis Institute of Technology (SIT), Pune",
+  "created_at": "2026-10-24T00:26:00Z",
+  "datasets": [
+    {
+      "dataset_name": "Agent Diagnostics (Observatory Signals)",
+      "role": "Primary Supervised Dataset (Failure Detection & Severity Diagnosis)",
+      "official_url": "https://github.com/sjarmak/agent-diagnostics",
+      "repository_url": "https://github.com/sjarmak/agent-diagnostics.git",
+      "source_commit": "0206772a2a7e536951972e9f336d0c0b96461fc9",
+      "license": "Apache License 2.0",
+      "local_path": "data/raw/agent_diagnostics/signals.parquet",
+      "file_size_bytes": 1485209,
+      "sha256": "4cea2359787900e8fc20e0e583b21763da99f46d99868cf7f18a1877c9425222",
+      "original_record_count": 11995,
+      "original_column_count": 32,
+      "target_variable": "passed (boolean) and reward (float)",
+      "preprocessing_performed": "Grouped task partitioning, log-transform on high-skew telemetry, sequence tool tokenization, standardized scaling on train split only"
+    },
+    {
+      "dataset_name": "Who&When (Algorithm-Generated & Hand-Crafted)",
+      "role": "Specialized Benchmark (Temporal Fault Localization & Component Attribution)",
+      "official_url": "https://github.com/ag2ai/Agents_Failure_Attribution",
+      "repository_url": "https://huggingface.co/datasets/Kevin355/Who_and_When",
+      "paper_reference": "Which Agent Causes Task Failures and When? On Automated Failure Attribution of LLM Multi-Agent Systems (ICML 2025 Spotlight)",
+      "license": "MIT License",
+      "local_paths": [
+        "data/raw/who_when/who_and_when_ag.parquet",
+        "data/raw/who_when/who_and_when_hc.parquet"
+      ],
+      "sha256": {
+        "who_and_when_ag.parquet": "1d1720f4a8416ee0ed64bc13fa3f75655891e760a917924a071deac443133cf8",
+        "who_and_when_hc.parquet": "d28ffe10b124b2ba46a662be3b438fbe0de7c4c4fcba4f46302c0a4b2575f62f"
+      },
+      "original_record_count": 184,
+      "total_execution_turns": 4092,
+      "target_variables": "mistake_step (temporal localization), mistake_agent (component attribution), mistake_reason (root-cause evidence)"
+    },
+    {
+      "dataset_name": "TraceLab (SyFI Coding Trace Snapshot)",
+      "role": "Observational & Cross-Domain Validation (Tool Execution Error Telemetry)",
+      "official_url": "https://github.com/uw-syfi/TraceLab",
+      "release_tag": "v2026-06-08-syfi-trace",
+      "license": "Apache License 2.0 / CC BY 4.0",
+      "local_path": "data/raw/tracelab/syfi_coding_trace.jsonl.gz",
+      "file_size_bytes": 53601226,
+      "sha256": "9d265eae69a31cae203848bea936f018148eed7ca8bf56050c5abe96da0b4e6b",
+      "session_count": 8058,
+      "step_count": 665453,
+      "target_variables": "is_error (step-level tool execution failure), tool_wall_latency_ms"
+    }
+  ]
+}

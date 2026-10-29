@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Agent Health Intelligence{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <!-- Sub-Header / Context Strip -->
+  <div class="px-6 py-3.5 bg-surface-container-low flex flex-wrap items-center justify-between gap-4 shadow-sm border-b border-surface-container">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant truncate">
+        <span class="hover:text-primary cursor-pointer transition-colors">Home</span>
+        <span>/</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface">Dashboard • Operational Overview</span>
+      </div>
+      <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+        <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+        Runtime Synchronized
+      </span>
+    </div>
+
+    <div class="flex items-center gap-2.5">
+      <button class="px-3.5 py-1.5 rounded bg-secondary text-on-secondary font-headline-sm text-headline-sm flex items-center gap-1.5 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer" onclick="window.location.href='/diagnose'">
+        <span class="material-symbols-outlined text-[16px]">account_tree</span>
+        <span>Diagnose Trace</span>
+      </button>
+      <button class="p-1.5 rounded bg-surface-container hover:bg-surface-container-high text-on-surface-variant transition-colors" onclick="showToast('Exporting summary dashboard report...', 'info')" title="Export Summary">
+        <span class="material-symbols-outlined text-[18px]">share</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Primary Dashboard Grid -->
+  <div class="p-4 lg:p-6 flex flex-col gap-6">
+
+    <!-- Hero Banner (Mocha container) -->
+    <div class="w-full rounded-xl overflow-hidden shadow-sm bg-[#463630] text-on-primary">
+      <div class="p-6 bg-gradient-to-r from-[#463630] via-[#4f3e37] to-[#463630] flex flex-col gap-2 border-b border-[#5a4841]/50">
+        <div class="inline-flex items-center gap-1.5 self-start px-2 py-0.5 rounded-full bg-secondary-container/25 text-secondary-fixed font-label-sm text-label-sm uppercase tracking-wider">
+          <span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">shield</span>
+          <span>Agentic Execution Safety Layer</span>
+        </div>
+        <h1 class="font-headline-lg text-headline-lg text-white tracking-tight">
+          Agent Health Intelligence Platform
+        </h1>
+        <p class="font-body-md text-body-md text-[#d4c5bf] max-w-3xl leading-relaxed">
+          Diagnose silent agent failures, command retry thrashing, and unbounded code modifications across autonomous LLM agent executions using heterogeneous trace telemetry and sequential tool representations.
+        </p>
+      </div>
+
+      <!-- 6-Stage Diagnostic Flow Strip -->
+      <div class="p-4 bg-surface-container-low border-t border-surface-container/60">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-center">
+          <div class="bg-surface-container-lowest p-2.5 rounded-lg border border-surface-container shadow-xs flex flex-col items-center">
+            <span class="material-symbols-outlined text-secondary text-xl">description</span>
+            <span class="font-headline-sm text-[13px] text-on-surface mt-1">1. Trace Ingestion</span>
+            <span class="font-code-sm text-xs text-on-surface-variant">Telemetry &amp; Tools</span>
+          </div>
+          <div class="bg-surface-container-lowest p-2.5 rounded-lg border border-surface-container shadow-xs flex flex-col items-center">
+            <span class="material-symbols-outlined text-secondary text-xl">tune</span>
+            <span class="font-headline-sm text-[13px] text-on-surface mt-1">2. Derived Signals</span>
+            <span class="font-code-sm text-xs text-on-surface-variant">10 Behavioral Ratios</span>
+          </div>
+          <div class="bg-surface-container-lowest p-2.5 rounded-lg border border-surface-container shadow-xs flex flex-col items-center">
+            <span class="material-symbols-outlined text-secondary text-xl">hub</span>
+            <span class="font-headline-sm text-[13px] text-on-surface mt-1">3. Multi-View ML</span>
+            <span class="font-code-sm text-xs text-on-surface-variant">Tabular + BiLSTM</span>
+          </div>
+          <div class="bg-surface-container-lowest p-2.5 rounded-lg border border-surface-container shadow-xs flex flex-col items-center">
+            <span class="material-symbols-outlined text-secondary text-xl">speed</span>
+            <span class="font-headline-sm text-[13px] text-on-surface mt-1">4. Risk Prediction</span>
+            <span class="font-code-sm text-xs text-on-surface-variant">Calibrated Threshold</span>
+          </div>
+          <div class="bg-surface-container-lowest p-2.5 rounded-lg border border-surface-container shadow-xs flex flex-col items-center">
+            <span class="material-symbols-outlined text-secondary text-xl">psychology</span>
+            <span class="font-headline-sm text-[13px] text-on-surface mt-1">5. Root-Cause Why</span>
+            <span class="font-code-sm text-xs text-on-surface-variant">Evidence Attribution</span>
+          </div>
+          <div class="bg-surface-container-lowest p-2.5 rounded-lg border border-surface-container shadow-xs flex flex-col items-center">
+            <span class="material-symbols-outlined text-secondary text-xl">build_circle</span>
+            <span class="font-headline-sm text-[13px] text-on-surface mt-1">6. Remediation</span>
+            <span class="font-code-sm text-xs text-on-surface-variant">Operational Action</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Executive Metrics Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+      <!-- Metric 1 -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Active Model</span>
+          <span class="material-symbols-outlined text-secondary text-[20px]">psychology</span>
+        </div>
+        <div class="mt-2">
+          <span class="font-headline-md text-headline-md text-primary font-bold">Multi-View Fusion</span>
+          <span class="block font-code-sm text-code-sm text-secondary font-medium mt-0.5">Cross-Modal Gated Attention</span>
+        </div>
+        <div class="mt-3 pt-2 border-t border-surface-container-low flex items-center justify-between text-body-sm text-on-surface-variant">
+          <span>Tabular + BiLSTM</span>
+          <span class="font-code-sm font-semibold text-primary">88 Dimensions</span>
+        </div>
+      </div>
+
+      <!-- Metric 2 -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Total Benchmarks</span>
+          <span class="material-symbols-outlined text-tertiary-fixed-dim text-[20px]">database</span>
+        </div>
+        <div class="mt-2">
+          <span class="font-headline-md text-headline-md text-primary font-bold">11,995 Trials</span>
+          <span class="block font-code-sm text-code-sm text-on-surface-variant mt-0.5">Agent Diagnostics Repository</span>
+        </div>
+        <div class="mt-3 pt-2 border-t border-surface-container-low flex items-center justify-between text-body-sm text-on-surface-variant">
+          <span>Leakage-Free Test Split</span>
+          <span class="font-code-sm font-semibold text-primary">1,996 Trials</span>
+        </div>
+      </div>
+
+      <!-- Metric 3 -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Your Saved Diagnoses</span>
+          <span class="material-symbols-outlined text-primary text-[20px]">inventory_2</span>
+        </div>
+        <div class="mt-2">
+          <span class="font-display-lg text-[28px] leading-8 text-primary font-bold">{{ history_count }}</span>
+          <span class="block font-code-sm text-code-sm text-on-surface-variant mt-0.5">Authenticated user: {{ user.username }}</span>
+        </div>
+        <div class="mt-3 pt-2 border-t border-surface-container-low flex items-center justify-between text-body-sm text-on-surface-variant">
+          <span>Database Isolation</span>
+          <span class="font-code-sm font-semibold text-[#2f6f4e]">SQLite Active</span>
+        </div>
+      </div>
+
+      <!-- Metric 4 -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-on-surface-variant">Intercepted Failures</span>
+          <span class="material-symbols-outlined text-error text-[20px]">error</span>
+        </div>
+        <div class="mt-2">
+          <span class="font-display-lg text-[28px] leading-8 text-error font-bold">{{ fail_count }}</span>
+          <span class="block font-code-sm text-code-sm text-error mt-0.5">Prevented silent agent crash</span>
+        </div>
+        <div class="mt-3 pt-2 border-t border-surface-container-low flex items-center justify-between text-body-sm text-on-surface-variant">
+          <span>Failure Recall</span>
+          <span class="font-code-sm font-semibold text-primary">86.59% (Fusion)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Action Launchpads -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <!-- Action 1 -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col justify-between gap-4 group hover:border-secondary transition-all cursor-pointer" onclick="window.location.href='/diagnose'">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center shrink-0 group-hover:bg-secondary group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-[22px]">schema</span>
+          </div>
+          <div>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Diagnose Agent Trace</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+              Upload JSON/CSV traces or inspect benchmark executions with the multi-view failure detector.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center justify-between font-label-md text-label-md text-secondary pt-2 border-t border-surface-container-low">
+          <span>Start Diagnosis</span>
+          <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- Action 2 -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col justify-between gap-4 group hover:border-secondary transition-all cursor-pointer" onclick="window.location.href='/live'">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center shrink-0 group-hover:bg-secondary group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-[22px]">play_circle</span>
+          </div>
+          <div>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Live Execution Monitor</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+              Stream live agent telemetry: Nominal SWE-bench trajectory, Command Retry Thrashing, or Search Deadlock.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center justify-between font-label-md text-label-md text-secondary pt-2 border-t border-surface-container-low">
+          <span>Run Live Simulation</span>
+          <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </div>
+      </div>
+
+      <!-- Action 3 -->
+      <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col justify-between gap-4 group hover:border-secondary transition-all cursor-pointer" onclick="window.location.href='/history'">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center shrink-0 group-hover:bg-secondary group-hover:text-white transition-colors">
+            <span class="material-symbols-outlined text-[22px]">history</span>
+          </div>
+          <div>
+            <h3 class="font-headline-sm text-headline-sm text-on-surface">Diagnostic History Store</h3>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+              Review isolated past failure sessions, root-cause patterns, and exported telemetry summaries.
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center justify-between font-label-md text-label-md text-secondary pt-2 border-t border-surface-container-low">
+          <span>View Session Audits</span>
+          <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Diagnostic History Table -->
+    <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-[22px]">history</span>
+          <h2 class="font-headline-md text-headline-md text-on-surface tracking-tight">Recent Diagnoses for {{ user.username }}</h2>
+        </div>
+        <a href="/history" class="font-label-md text-label-md text-secondary hover:underline flex items-center gap-1">
+          <span>View All History</span>
+          <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+        </a>
+      </div>
+
+      {% if history and history|length > 0 %}
+      <div class="overflow-x-auto">
+        <table class="w-full text-left font-body-sm text-body-sm border-collapse">
+          <thead>
+            <tr class="border-b border-surface-container font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+              <th class="py-2.5 px-3">Session Title</th>
+              <th class="py-2.5 px-3">Model Used</th>
+              <th class="py-2.5 px-3">Failure Prob</th>
+              <th class="py-2.5 px-3">Status</th>
+              <th class="py-2.5 px-3">Root Cause</th>
+              <th class="py-2.5 px-3 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-surface-container-low">
+            {% for item in history %}
+            <tr class="hover:bg-surface-container-low transition-colors">
+              <td class="py-3 px-3">
+                <span class="font-headline-sm text-[13px] text-on-surface block">{{ item.session_title }}</span>
+                <span class="font-code-sm text-xs text-on-surface-variant">{{ item.created_at[:19] if item.created_at else '' }}</span>
+              </td>
+              <td class="py-3 px-3">
+                <span class="font-code-sm text-xs bg-surface-container px-2 py-0.5 rounded text-on-surface">
+                  {{ item.model_used }}
+                </span>
+              </td>
+              <td class="py-3 px-3 font-code-sm font-bold {% if item.failure_probability >= item.threshold %}text-error{% else %}text-[#2f6f4e]{% endif %}">
+                {{ "%.4f"|format(item.failure_probability) }}
+              </td>
+              <td class="py-3 px-3">
+                {% if "FAILURE" in item.predicted_status %}
+                <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-error text-on-error uppercase font-bold">
+                  {{ item.predicted_status }}
+                </span>
+                {% elif "ELEVATED" in item.predicted_status %}
+                <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-[#fe8357] text-[#6f2000] uppercase font-bold">
+                  {{ item.predicted_status }}
+                </span>
+                {% else %}
+                <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-[#2f6f4e] text-white uppercase font-bold">
+                  HEALTHY
+                </span>
+                {% endif %}
+              </td>
+              <td class="py-3 px-3 text-on-surface-variant truncate max-w-xs font-body-sm">
+                {{ item.root_cause }}
+              </td>
+              <td class="py-3 px-3 text-right">
+                <button class="px-2.5 py-1 rounded bg-surface-container hover:bg-secondary hover:text-white transition-colors font-label-sm text-label-sm cursor-pointer" onclick="window.location.href='/diagnose?history_id={{ item.result_id }}'">
+                  Inspect
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="p-8 text-center bg-surface-container-low rounded-lg flex flex-col items-center justify-center gap-2">
+        <span class="material-symbols-outlined text-secondary text-3xl">inbox</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface">No saved diagnoses yet</span>
+        <p class="font-body-sm text-body-sm text-on-surface-variant max-w-md">
+          Head over to the Diagnose Trace workspace to evaluate benchmark execution traces or execute live agent simulations.
+        </p>
+        <button class="mt-2 px-4 py-2 rounded bg-secondary text-on-secondary font-headline-sm text-headline-sm shadow-sm hover:opacity-90 transition-all cursor-pointer" onclick="window.location.href='/diagnose'">
+          Diagnose An Agent Trace
+        </button>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

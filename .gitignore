@@ -1,0 +1,83 @@
+# Python Bytecode & Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.project
+.settings/
+
+# OS-generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+~$*
+*.tmp
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.pem
+*.key
+*.cert
+*.crt
+
+# Local Databases & Runtime SQLite Storage
+*.db
+*.sqlite
+*.sqlite3
+data/*.db
+data/app_database.db
+data/aucml.db
+
+# Live Run Traces (Generated during interactive simulations)
+data/raw/live_traces/
+
+# Large Auxiliary Raw Datasets (Exploratory / Unused by Core Models)
+data/raw/trace_commons/
+data/raw/tracelab/
+data/raw/toolfailbench_*.json
+data/raw/mad_human_labelled.json
+
+# Local Large Spreadsheets & Raw Matrix Dumps
+data/dataset_full.csv
+data/dataset_multimodal_agent_failures.xlsx
+data/processed/*.npy
+
+# Academic Rubric & Grading Sheets (Course-specific PDFs)
+*.pdf
+
+# Temporary Logs
+*.log
+logs/

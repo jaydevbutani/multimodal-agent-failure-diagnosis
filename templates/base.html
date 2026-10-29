@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>{% block title %}Agent Health Intelligence — Multimodal AI Diagnostic Platform{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+  <style>
+    @layer base {
+      html, body { margin: 0; padding: 0; }
+      body { overscroll-behavior: none; }
+      main > :first-child { margin-top: 0 !important; }
+      main > :last-child { margin-bottom: 0 !important; }
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f2ede4; }
+    ::-webkit-scrollbar-thumb { background: #d2c3bf; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #807471; }
+  </style>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface": "#fef9f0",
+            "surface-dim": "#ded9d1",
+            "surface-bright": "#fef9f0",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#f8f3ea",
+            "surface-container": "#f2ede4",
+            "surface-container-high": "#ece8df",
+            "surface-container-highest": "#e7e2d9",
+            "on-surface": "#1d1c16",
+            "on-surface-variant": "#4f4542",
+            "inverse-surface": "#32302a",
+            "inverse-on-surface": "#f5f0e7",
+            "outline": "#807471",
+            "outline-variant": "#d2c3bf",
+            "surface-tint": "#6c5b55",
+            "primary": "#271e1a",
+            "on-primary": "#ffffff",
+            "primary-container": "#382d27",
+            "on-primary-container": "#b8a49e",
+            "inverse-primary": "#d8c2bb",
+            "secondary": "#a23e18",
+            "on-secondary": "#ffffff",
+            "secondary-container": "#fe8357",
+            "on-secondary-container": "#6f2000",
+            "tertiary": "#130800",
+            "on-tertiary": "#ffffff",
+            "tertiary-container": "#311d00",
+            "on-tertiary-container": "#b67d27",
+            "error": "#ba1a1a",
+            "on-error": "#ffffff",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a",
+            "primary-fixed": "#f5ddd7",
+            "primary-fixed-dim": "#d8c2bb",
+            "on-primary-fixed": "#251915",
+            "on-primary-fixed-variant": "#53433e",
+            "secondary-fixed": "#ffdbcf",
+            "secondary-fixed-dim": "#ffb59c",
+            "on-secondary-fixed": "#390c00",
+            "on-secondary-fixed-variant": "#822801",
+            "tertiary-fixed": "#ffddb5",
+            "tertiary-fixed-dim": "#fcba5f",
+            "on-tertiary-fixed": "#2a1800",
+            "on-tertiary-fixed-variant": "#643f00",
+            "background": "#fef9f0",
+            "on-background": "#1d1c16",
+            "surface-variant": "#e7e2d9"
+          },
+          borderRadius: {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          spacing: {
+            "margin-panel": "0.75rem",
+            "margin": "1.25rem",
+            "space-sm": "0.5rem",
+            "space-xl": "1.75rem",
+            "space-lg": "1.25rem",
+            "space-2xl": "2.5rem",
+            "space-xs": "0.25rem",
+            "gutter": "1rem",
+            "gutter-compact": "0.5rem",
+            "space-md": "0.75rem"
+          },
+          fontFamily: {
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-md": ["Space Grotesk"],
+            "display-lg": ["Space Grotesk"],
+            "headline-lg": ["Space Grotesk"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "label-md": ["JetBrains Mono"],
+            "label-sm": ["JetBrains Mono"],
+            "body-md": ["Plus Jakarta Sans"],
+            "code-sm": ["JetBrains Mono"]
+          },
+          fontSize: {
+            "headline-sm": ["16px", { lineHeight: "22px", letterSpacing: "0.01em", fontWeight: "600" }],
+            "headline-md": ["18px", { lineHeight: "24px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "display-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "headline-lg": ["24px", { lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "700" }],
+            "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "body-md": ["14px", { lineHeight: "21px", fontWeight: "400" }],
+            "body-sm": ["13px", { lineHeight: "19px", fontWeight: "400" }],
+            "label-md": ["13px", { lineHeight: "18px", letterSpacing: "0.02em", fontWeight: "500" }],
+            "label-sm": ["12px", { lineHeight: "16px", letterSpacing: "0.03em", fontWeight: "500" }],
+            "code-sm": ["12px", { lineHeight: "18px", fontWeight: "400" }]
+          }
+        }
+      }
+    };
+  </script>
+  {% block head %}{% endblock %}
+</head>
+<body class="bg-background font-body-md text-body-md text-on-surface">
+
+  <!-- 1. Fixed Top Masthead (Deep Espresso) -->
+  <header class="fixed top-0 left-0 right-0 h-14 bg-[#342a25] border-b border-[#473932] z-50 shadow-[0_1px_8px_rgba(40,30,25,0.2)]">
+    <div class="h-14 w-full px-4 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="flex items-center justify-center w-8 h-8 rounded bg-secondary text-on-secondary shrink-0 shadow-sm">
+          <span class="material-symbols-outlined text-[18px]">shield</span>
+        </div>
+        <div class="flex items-center gap-2 truncate">
+          <a href="/dashboard" class="font-headline-md text-headline-md text-inverse-on-surface truncate tracking-tight hover:text-white transition-colors">
+            Agent Health Intelligence
+          </a>
+          <span class="hidden xl:inline text-[#c4b3ad] font-code-sm text-code-sm truncate">
+            — Multimodal Failure Diagnosis &amp; Root-Cause Attribution
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 shrink-0">
+        <!-- Status Indicator -->
+        <div class="hidden md:flex items-center gap-2 px-2.5 py-1 rounded bg-[#2a211d] text-secondary-fixed border border-[#443630]">
+          <span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+          <span class="font-label-sm text-label-sm tracking-wide uppercase">Fault Inspection Active</span>
+        </div>
+
+        <!-- Cluster Selector -->
+        <div class="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#2a211d] border border-[#443630] text-inverse-on-surface hover:bg-[#3d312b] cursor-pointer transition-colors" onclick="showToast('Cluster us-east-prod: 4 nodes active, 0 latency alarms.', 'info')">
+          <span class="material-symbols-outlined text-[#c4b3ad] text-[16px]">domain</span>
+          <span class="font-label-md text-label-md text-inverse-on-surface">Cluster: us-east-prod</span>
+          <span class="material-symbols-outlined text-[#c4b3ad] text-[16px]">expand_more</span>
+        </div>
+
+        <!-- Cmd + K Search -->
+        <div class="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded bg-[#2a211d] border border-[#443630] text-[#c4b3ad] cursor-pointer hover:border-outline-variant" onclick="openCmdKModal()">
+          <span class="material-symbols-outlined text-[16px]">search</span>
+          <span class="font-label-sm text-label-sm text-[#c4b3ad]">Cmd + K</span>
+        </div>
+
+        <!-- Notification Bell -->
+        <button class="flex items-center justify-center w-8 h-8 rounded text-inverse-on-surface hover:bg-[#2a211d] transition-colors relative" onclick="showToast('2 diagnostic anomalies intercepted in latest benchmark run.', 'info')" title="Notifications">
+          <span class="material-symbols-outlined text-[20px]">notifications</span>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-secondary rounded-full"></span>
+        </button>
+
+        <!-- User Profile Pill -->
+        <div class="flex items-center gap-2 bg-[#2a211d] border border-[#443630] px-2.5 py-1 rounded-full cursor-pointer hover:border-secondary transition-colors" onclick="window.location.href='/settings'">
+          <div class="w-6 h-6 rounded-full bg-secondary flex items-center justify-center text-white font-bold text-xs uppercase">
+            {{ user.username[0] if user else 'O' }}
+          </div>
+          <span class="font-label-sm text-label-sm text-[#f5ddd7] truncate max-w-[120px]">{{ user.full_name if (user and user.full_name) else (user.username if user else 'Operator') }}</span>
+          <span class="px-1.5 py-0.2 rounded-full bg-secondary/30 text-[#ffb59c] font-code-sm text-xs uppercase font-semibold">Operator</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Fixed Left Sidebar (Deep Espresso) -->
+  <aside class="fixed left-0 top-14 bottom-0 w-64 bg-[#342a25] border-r border-[#473932] z-40 flex flex-col justify-between py-4 shadow-[1px_0_12px_rgba(40,30,25,0.15)]">
+    <div class="flex flex-col gap-4">
+      <div class="px-4 flex items-center justify-between">
+        <span class="font-label-sm text-label-sm uppercase tracking-wider text-[#c4b3ad]">Platform Navigation</span>
+        <span class="material-symbols-outlined text-[#c4b3ad] text-[16px]">tune</span>
+      </div>
+
+      <nav class="flex flex-col gap-1.5 px-2" id="sidebar-nav">
+        <!-- 1. Dashboard -->
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 transition-all duration-150 rounded {% if active_tab == 'dashboard' %}bg-secondary text-on-secondary font-headline-sm text-headline-sm border-l-2 border-secondary-container shadow-sm{% else %}text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary font-body-md text-body-md{% endif %}" href="/dashboard">
+          <span class="material-symbols-outlined text-[19px]">space_dashboard</span>
+          <span>Dashboard</span>
+        </a>
+
+        <!-- 2. Trace Diagnosis -->
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 transition-all duration-150 rounded {% if active_tab == 'diagnose' or active_tab == 'trace-canvas' %}bg-secondary text-on-secondary font-headline-sm text-headline-sm border-l-2 border-secondary-container shadow-sm{% else %}text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary font-body-md text-body-md{% endif %}" href="/trace-canvas">
+          <span class="material-symbols-outlined text-[19px]">account_tree</span>
+          <span>Trace Canvas</span>
+        </a>
+
+        <!-- 3. Live Agent Simulation -->
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 transition-all duration-150 rounded {% if active_tab == 'live' %}bg-secondary text-on-secondary font-headline-sm text-headline-sm border-l-2 border-secondary-container shadow-sm{% else %}text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary font-body-md text-body-md{% endif %}" href="/live">
+          <span class="material-symbols-outlined text-[19px]">sensors</span>
+          <span>Live Simulation</span>
+        </a>
+
+        <!-- 4. Model Evaluation & Methodology -->
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 transition-all duration-150 rounded {% if active_tab == 'model-evaluation' or active_tab == 'models' or active_tab == 'dataset-methodology' or active_tab == 'dataset' %}bg-secondary text-on-secondary font-headline-sm text-headline-sm border-l-2 border-secondary-container shadow-sm{% else %}text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary font-body-md text-body-md{% endif %}" href="/model-evaluation">
+          <span class="material-symbols-outlined text-[19px]">leaderboard</span>
+          <span>Model Evaluation &amp; Methodology</span>
+        </a>
+
+        <!-- 5. Diagnostic History -->
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 transition-all duration-150 rounded {% if active_tab == 'history' %}bg-secondary text-on-secondary font-headline-sm text-headline-sm border-l-2 border-secondary-container shadow-sm{% else %}text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary font-body-md text-body-md{% endif %}" href="/history">
+          <span class="material-symbols-outlined text-[19px]">history</span>
+          <span>Diagnostic History</span>
+        </a>
+
+        <!-- 6. Settings -->
+        <a class="nav-item flex items-center gap-3 px-3 py-2.5 transition-all duration-150 rounded {% if active_tab == 'settings' %}bg-secondary text-on-secondary font-headline-sm text-headline-sm border-l-2 border-secondary-container shadow-sm{% else %}text-inverse-on-surface hover:bg-[#2a211d] hover:text-on-primary font-body-md text-body-md{% endif %}" href="/settings">
+          <span class="material-symbols-outlined text-[19px]">settings</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Sidebar Bottom Controls -->
+    <div class="px-2 flex flex-col gap-1 border-t border-[#473932] pt-3">
+      <!-- 6. Sign Out -->
+      <a class="nav-item flex items-center gap-3 px-3 py-2.5 text-inverse-on-surface hover:bg-error/30 hover:text-white transition-colors font-body-md text-body-md rounded cursor-pointer" onclick="handleLogout()">
+        <span class="material-symbols-outlined text-[19px]">logout</span>
+        <span>Sign Out</span>
+      </a>
+      <div class="px-3 py-2 text-[#a89791] font-code-sm text-[11px] flex items-center justify-between">
+        <span>Agent Health v2.4</span>
+        <span class="w-2 h-2 rounded-full bg-[#2f6f4e]"></span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- 3. Primary Content Canvas -->
+  <div class="pl-64">
+    <main class="relative pt-14 w-full bg-background min-h-screen">
+      <!-- Notification Toast Container -->
+      <div class="fixed top-16 right-6 z-50 flex flex-col gap-2 pointer-events-none" id="toast-container"></div>
+
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+
+  <!-- Cmd + K Search Modal -->
+  <div class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-start justify-center pt-24" id="cmdk-modal" onclick="closeCmdKModal(event)">
+    <div class="bg-surface-container-lowest rounded-xl shadow-2xl w-full max-w-xl border border-surface-container overflow-hidden" onclick="event.stopPropagation()">
+      <div class="flex items-center gap-3 px-4 py-3 border-b border-surface-container bg-surface-container-low">
+        <span class="material-symbols-outlined text-on-surface-variant">search</span>
+        <input class="w-full bg-transparent font-body-lg text-body-lg text-on-surface focus:outline-none placeholder:text-on-surface-variant/60" id="cmdk-input" placeholder="Search traces, benchmarks, models, or root causes..." type="text"/>
+        <kbd class="font-code-sm text-code-sm px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant">ESC</kbd>
+      </div>
+      <div class="p-2 max-h-80 overflow-y-auto flex flex-col gap-1 text-body-md">
+        <a class="flex items-center justify-between p-2.5 rounded hover:bg-surface-container cursor-pointer transition-colors" href="/trace-canvas">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-secondary text-[20px]">account_tree</span>
+            <span class="font-headline-sm text-headline-sm text-on-surface">Inspect Interactive Trace Canvas</span>
+          </div>
+          <span class="font-code-sm text-code-sm text-on-surface-variant">Jump ➔</span>
+        </a>
+        <a class="flex items-center justify-between p-2.5 rounded hover:bg-surface-container cursor-pointer transition-colors" href="/models">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-primary text-[20px]">dataset</span>
+            <span class="font-headline-sm text-headline-sm text-on-surface">5-Model Comparison &amp; Registry</span>
+          </div>
+          <span class="font-code-sm text-code-sm text-on-surface-variant">Jump ➔</span>
+        </a>
+        <a class="flex items-center justify-between p-2.5 rounded hover:bg-surface-container cursor-pointer transition-colors" href="/history">
+          <div class="flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-on-surface-variant text-[20px]">history</span>
+            <span class="font-headline-sm text-headline-sm text-on-surface">Incident History &amp; Audits</span>
+          </div>
+          <span class="font-code-sm text-code-sm text-on-surface-variant">Jump ➔</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Universal Toast Utility
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      const isSuccess = (type === 'success');
+      const isError = (type === 'error');
+      
+      let bgClass = 'bg-[#342a25] text-inverse-on-surface border-[#4d3e37]';
+      let icon = 'info';
+      if (isSuccess) {
+        bgClass = 'bg-[#2f6f4e] text-white border-[#24573d]';
+        icon = 'task_alt';
+      } else if (isError) {
+        bgClass = 'bg-error text-white border-error';
+        icon = 'error';
+      }
+
+      toast.className = `flex items-center gap-2.5 px-3.5 py-2 rounded-lg text-body-sm font-body-sm shadow-lg pointer-events-auto transition-all transform duration-200 border ${bgClass}`;
+      toast.innerHTML = `<span class="material-symbols-outlined text-[16px]">${icon}</span><span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-1');
+        setTimeout(() => toast.remove(), 250);
+      }, 3400);
+    }
+
+    // Logout Handler
+    async function handleLogout() {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+        showToast('Signed out cleanly.', 'info');
+        window.location.href = '/login';
+      } catch (e) {
+        window.location.href = '/login';
+      }
+    }
+
+    // Cmd + K Modal
+    function openCmdKModal() {
+      const modal = document.getElementById('cmdk-modal');
+      modal.classList.remove('hidden');
+      document.getElementById('cmdk-input').focus();
+    }
+    function closeCmdKModal(e) {
+      document.getElementById('cmdk-modal').classList.add('hidden');
+    }
+    window.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        openCmdKModal();
+      }
+      if (e.key === 'Escape') {
+        document.getElementById('cmdk-modal')?.classList.add('hidden');
+      }
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

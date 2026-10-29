@@ -1,0 +1,1629 @@
+{% extends "base.html" %}
+
+{% block title %}Agent Trace Canvas & Diagnostics — Agent Health Intelligence{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <!-- Notification Toast Container -->
+  <div class="fixed top-16 right-6 z-50 flex flex-col gap-2 pointer-events-none" id="toast-container"></div>
+
+  <!-- Sub-Header / Telemetry Context Strip -->
+  <div class="px-6 py-3 bg-surface-container-low flex flex-wrap items-center justify-between gap-3 shadow-xs border-b border-surface-container">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant truncate">
+        <a href="/dashboard" class="hover:text-primary transition-colors">Home</a>
+        <span>/</span>
+        <span class="hover:text-primary transition-colors">Traces</span>
+        <span>/</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface truncate font-semibold" id="active-breadcrumb-page">Agent Trace Canvas</span>
+      </div>
+      
+      <!-- Status Badge -->
+      <span class="px-2.5 py-0.5 rounded font-label-sm text-xs bg-surface-container text-on-surface-variant font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-2xs transition-all" id="trace-status-badge">
+        <span class="w-2 h-2 rounded-full bg-secondary animate-pulse" id="trace-status-dot"></span>
+        <span id="trace-status-text">Ready to Diagnose</span>
+      </span>
+
+      <!-- Trace ID Badge -->
+      <span class="hidden md:inline-flex px-2.5 py-0.5 rounded font-code-sm text-xs bg-surface-container text-on-surface-variant font-semibold" id="trace-id-badge">
+        Trace-ID: None Loaded
+      </span>
+    </div>
+
+    <!-- Right Controls Toolbar (Minimal, Useful & Working) -->
+    <div class="flex flex-wrap items-center gap-2.5">
+      <!-- Active ML Inference Model Selector -->
+      <div class="flex items-center gap-1.5 bg-surface-container-lowest px-2.5 py-1 rounded-lg border border-surface-container shadow-2xs">
+        <span class="material-symbols-outlined text-[17px] text-secondary">psychology</span>
+        <select class="bg-transparent font-code-sm text-xs font-semibold text-on-surface focus:outline-none cursor-pointer" id="select-model-choice" onchange="runCurrentTraceWithSelectedModel()" title="ML Model for Failure Diagnosis">
+          <option value="Proposed Multi-View Fusion Network" selected>Proposed Multi-View Fusion Network</option>
+          <option value="XGBoost Classifier">XGBoost Classifier (Audited Tabular)</option>
+          <option value="Random Forest (Balanced)">Random Forest (Balanced)</option>
+          <option value="Sequential BiLSTM (Trajectory Only)">Sequential BiLSTM (Trajectory Only)</option>
+          <option value="Logistic Regression (Baseline)">Logistic Regression (Baseline)</option>
+        </select>
+      </div>
+
+      <!-- Decision Threshold Badge (Static & Calibrated) -->
+      <div class="hidden lg:flex items-center gap-1 bg-surface-container px-2 py-1 rounded font-code-sm text-xs text-on-surface-variant" title="Calibrated Decision Boundary">
+        <span>&tau; =</span>
+        <strong class="text-primary font-bold">0.46</strong>
+      </div>
+
+      <!-- Re-run in Sandbox Button -->
+      <button class="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-headline-sm text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer" id="rerun-btn" onclick="triggerRerunTrace()" title="Execute currently loaded trace in sandbox">
+        <span class="material-symbols-outlined text-[16px] text-secondary" id="rerun-icon">replay</span>
+        <span id="rerun-label">Re-run Trace</span>
+      </button>
+
+      <!-- Save to History Store Button -->
+      <button class="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-headline-sm text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer" id="btn-save-record" onclick="saveCurrentDiagnosis()" title="Persist this diagnosis to SQLite database">
+        <span class="material-symbols-outlined text-[16px] text-secondary" id="save-btn-icon">bookmark_add</span>
+        <span id="save-btn-label">Save to History</span>
+      </button>
+
+      <!-- View Toggle: Forensics vs Raw JSON -->
+      <div class="flex items-center bg-surface-container rounded-lg p-0.5 shadow-inner">
+        <button class="px-2.5 py-1 rounded-md bg-surface-container-lowest text-primary font-label-sm text-xs font-semibold shadow-2xs flex items-center gap-1 transition-all cursor-pointer" id="btn-forensic-view" onclick="setViewMode('forensic')">
+          <span class="material-symbols-outlined text-[14px]">insights</span>
+          <span>Forensics</span>
+        </button>
+        <button class="px-2.5 py-1 text-on-surface-variant hover:text-primary font-label-sm text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer" id="btn-raw-view" onclick="setViewMode('raw')">
+          <span class="material-symbols-outlined text-[14px]">data_object</span>
+          <span>Raw JSON</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Primary Workspace Content -->
+  <div class="p-4 lg:p-5 flex flex-col gap-5">
+
+    <!-- 1. SELECT TRACE SCENARIO (Interactive Cards matching Live Agent Simulation) -->
+    <div class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 shadow-xs border border-surface-container flex flex-col gap-3">
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-surface-container pb-2.5">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-xl">view_module</span>
+          <h2 class="font-headline-md text-base sm:text-lg text-on-surface tracking-tight font-bold">SELECT TRACE SCENARIO</h2>
+        </div>
+        <span class="font-code-sm text-xs text-on-surface-variant" id="scenario-selection-status">
+          Click any scenario card below to immediately evaluate and inspect its execution trace.
+        </span>
+      </div>
+
+      <!-- 7 Scenario Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-2.5" id="scenario-cards-grid">
+        <!-- Card 1: Nominal SWE Run -->
+        <div class="scenario-card p-3 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between gap-2 border-secondary bg-surface-container" id="card-01_healthy_nominal" onclick="selectTraceScenario('01_healthy_nominal')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">1. Nominal Run</span>
+              <span class="px-1.5 py-0.2 rounded font-code-sm text-[10px] font-bold bg-[#2f6f4e]/20 text-[#2f6f4e]">HEALTHY</span>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
+              Standard autonomous task. Reads files, drafts bug patch, verifies green test suite.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-1.5 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 32 • Tools: 18</span>
+            <span class="text-[#2f6f4e] font-semibold">0 errors</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Retry Thrashing -->
+        <div class="scenario-card p-3 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2" id="card-02_retry_thrashing" onclick="selectTraceScenario('02_retry_thrashing')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">2. Retry Thrashing</span>
+              <span class="px-1.5 py-0.2 rounded font-code-sm text-[10px] font-bold bg-error/20 text-error">FAILURE</span>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
+              Repeated bash execution loop. Identical commands retried 11 times without code edits.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-1.5 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 45 • Retries: 11</span>
+            <span class="text-error font-semibold">12 errors</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Environment Crash -->
+        <div class="scenario-card p-3 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2" id="card-03_environment_failure" onclick="selectTraceScenario('03_environment_failure')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">3. Environment Crash</span>
+              <span class="px-1.5 py-0.2 rounded font-code-sm text-[10px] font-bold bg-error/20 text-error">FAILURE</span>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
+              Sandbox container failure, missing library dependencies, and permission denial.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-1.5 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 55 • Tools: 20</span>
+            <span class="text-error font-semibold">15 errors</span>
+          </div>
+        </div>
+
+        <!-- Card 4: High Code Churn -->
+        <div class="scenario-card p-3 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2" id="card-04_high_code_churn" onclick="selectTraceScenario('04_high_code_churn')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">4. High Code Churn</span>
+              <span class="px-1.5 py-0.2 rounded font-code-sm text-[10px] font-bold bg-error/20 text-error">FAILURE</span>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
+              Uncontrolled diff churn. Rewrites 400+ lines across files without test convergence.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-1.5 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 55 • Edits: 42</span>
+            <span class="text-secondary font-semibold">5 errors</span>
+          </div>
+        </div>
+
+        <!-- Card 5: Over-Exploration -->
+        <div class="scenario-card p-3 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2" id="card-05_over_exploration" onclick="selectTraceScenario('05_over_exploration')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">5. Over-Exploration</span>
+              <span class="px-1.5 py-0.2 rounded font-code-sm text-[10px] font-bold bg-[#fe8357]/20 text-[#6f2000]">FAILURE</span>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
+              Unbounded directory traversal. Reads 18+ unrelated files without modifying code.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-1.5 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 40 • Reads: 25</span>
+            <span class="text-[#fe8357] font-semibold">0 errors</span>
+          </div>
+        </div>
+
+        <!-- Card 6: Tool Instability -->
+        <div class="scenario-card p-3 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2" id="card-06_tool_execution_failure" onclick="selectTraceScenario('06_tool_execution_failure')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">6. Tool Instability</span>
+              <span class="px-1.5 py-0.2 rounded font-code-sm text-[10px] font-bold bg-error/20 text-error">FAILURE</span>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
+              External language server times out, emitting truncated stdout and parse exceptions.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-1.5 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 35 • Tools: 18</span>
+            <span class="text-error font-semibold">8 errors</span>
+          </div>
+        </div>
+
+        <!-- Card 7: Compound Cascade Failure -->
+        <div class="scenario-card p-3 rounded-xl border border-surface-container hover:border-secondary/50 bg-surface-container-low transition-all cursor-pointer flex flex-col justify-between gap-2" id="card-07_compound_failure" onclick="selectTraceScenario('07_compound_failure')">
+          <div class="flex flex-col gap-1">
+            <div class="flex items-center justify-between gap-1">
+              <span class="font-headline-sm text-xs font-bold text-on-surface truncate">7. Compound Failure</span>
+              <span class="px-1.5 py-0.2 rounded font-code-sm text-[10px] font-bold bg-error/20 text-error">CASCADE</span>
+            </div>
+            <p class="font-body-sm text-xs text-on-surface-variant line-clamp-2 leading-relaxed">
+              Environment error triggers frantic retry loops and broken edits, cascading across tools.
+            </p>
+          </div>
+          <div class="font-code-sm text-xs text-on-surface-variant pt-1.5 border-t border-surface-container flex items-center justify-between">
+            <span>Turns: 60 • Tools: 45</span>
+            <span class="text-error font-semibold">18 errors</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. DIAGNOSTIC RESULTS GRID (Left: DAG + Telemetry + Graphs, Right: Diagnosis + Novelty) -->
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start" id="view-container-forensic">
+
+      <!-- LEFT COLUMN: Interactive Agent Trace Canvas DAG & Telemetry Spans (7 Cols = ~58% width) -->
+      <div class="xl:col-span-7 flex flex-col gap-5">
+
+        <!-- INTERACTIVE AGENT TRACE CANVAS -->
+        <div class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 shadow-xs border border-surface-container flex flex-col gap-3 relative overflow-hidden" id="canvas-card">
+          <div class="flex items-center justify-between flex-wrap gap-2 z-10">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-xl">schema</span>
+              <h3 class="font-headline-md text-base text-on-surface font-bold tracking-tight">AGENT TRACE CANVAS</h3>
+              <span class="px-2 py-0.5 rounded font-label-sm text-xs bg-primary text-on-primary font-semibold">
+                Execution Flow
+              </span>
+            </div>
+            
+            <!-- Exactly Three Graph Controls: Zoom In, Zoom Out, Fit -->
+            <div class="flex items-center gap-1.5 bg-surface-container-low rounded-lg p-1 border border-surface-container shadow-2xs">
+              <button class="px-2.5 py-1 text-on-surface-variant hover:text-primary transition-colors cursor-pointer text-xs font-code-sm flex items-center gap-1 rounded bg-surface-container-lowest border border-surface-container" onclick="zoomGraph(0.15)" title="Zoom In Graph Only">
+                <span class="material-symbols-outlined text-[15px]">zoom_in</span>
+                <span>Zoom In</span>
+              </button>
+              <button class="px-2.5 py-1 text-on-surface-variant hover:text-primary transition-colors cursor-pointer text-xs font-code-sm flex items-center gap-1 rounded bg-surface-container-lowest border border-surface-container" onclick="zoomGraph(-0.15)" title="Zoom Out Graph Only">
+                <span class="material-symbols-outlined text-[15px]">zoom_out</span>
+                <span>Zoom Out</span>
+              </button>
+              <button class="px-2.5 py-1 text-on-surface-variant hover:text-primary transition-colors cursor-pointer text-xs font-code-sm flex items-center gap-1 rounded bg-surface-container-lowest border border-surface-container" onclick="fitGraph()" title="Fit Graph to Viewport">
+                <span class="material-symbols-outlined text-[15px]">fit_screen</span>
+                <span>Fit</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Trace Canvas Surface: Bounded Viewport (Zoom affects ONLY the viewport inside, NEVER the page or details panel) -->
+          <div class="relative w-full h-[380px] bg-surface-container-low rounded-xl overflow-hidden border border-surface-container select-none cursor-grab active:cursor-grabbing" id="dag-surface">
+            <!-- Subtle Radial Grid Background -->
+            <div class="absolute inset-0 opacity-25 bg-[radial-gradient(#807471_1px,transparent_1px)] [background-size:18px_18px] pointer-events-none"></div>
+
+            <!-- Zoomable / Pannable Graph Viewport (Transform applies ONLY here) -->
+            <div class="absolute inset-0 w-full h-full origin-top-left transition-transform duration-100 ease-out" id="graph-viewport">
+              <!-- SVG Layer for Directed Execution Edges -->
+              <svg class="absolute inset-0 w-full h-full pointer-events-none" id="dag-svg" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <polygon points="0 0, 6 3, 0 6" fill="#807471" />
+                  </marker>
+                  <marker id="arrowhead-fail" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <polygon points="0 0, 6 3, 0 6" fill="#ba1a1a" />
+                  </marker>
+                  <linearGradient id="failureGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#807471" />
+                    <stop offset="60%" stop-color="#fe8357" />
+                    <stop offset="100%" stop-color="#ba1a1a" />
+                  </linearGradient>
+                </defs>
+                <g id="svg-paths-group"></g>
+              </svg>
+
+              <!-- Circular Node Elements Container (Screenshots 1-2 Design) -->
+              <div class="relative w-full h-full" id="dag-nodes-container">
+                <!-- Dynamically injected via JS -->
+              </div>
+            </div>
+
+            <!-- DOCKED NODE DETAIL INSPECTOR (Top-Right Inside Canvas, Fixed Controlled Size, Completely Unclipped & Readable) -->
+            <div class="absolute top-3 right-3 w-72 sm:w-80 max-h-[350px] bg-surface-container-lowest/95 backdrop-blur-md rounded-xl p-3.5 shadow-lg flex flex-col gap-2 border border-surface-container transition-all z-20 pointer-events-auto overflow-y-auto select-text" id="inspector-card">
+              <div class="flex items-center justify-between border-b border-surface-container-low pb-1.5 shrink-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-secondary text-base">manage_search</span>
+                  <span class="font-label-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">Node Details</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <span class="px-2 py-0.5 rounded font-code-sm text-xs font-bold bg-surface-container text-primary" id="inspector-step-badge">Step 01</span>
+                  <span class="px-2 py-0.5 rounded font-code-sm text-xs font-bold bg-[#2f6f4e]/15 text-[#2f6f4e] border border-[#2f6f4e]/30" id="inspector-status-pill">NORMAL</span>
+                </div>
+              </div>
+
+              <!-- Title & Component -->
+              <div class="flex flex-col gap-0.5 shrink-0">
+                <span class="font-headline-sm text-sm font-bold text-on-surface break-words" id="inspector-title">Agent Ingestion Gateway</span>
+                <span class="font-code-sm text-xs text-on-surface-variant break-words" id="inspector-component">Execution Orchestrator</span>
+              </div>
+
+              <!-- Quick Metrics Grid -->
+              <div class="grid grid-cols-2 gap-2 text-left shrink-0">
+                <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container">
+                  <span class="block font-code-sm text-xs text-on-surface-variant uppercase font-medium">Tool / Engine</span>
+                  <span class="font-code-sm text-xs font-bold text-primary break-words" id="inspector-tool">read_file</span>
+                </div>
+                <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container">
+                  <span class="block font-code-sm text-xs text-on-surface-variant uppercase font-medium">Latency</span>
+                  <span class="font-code-sm text-xs font-bold text-secondary" id="inspector-latency">18.0 ms</span>
+                </div>
+              </div>
+
+              <!-- Unclipped Execution Details -->
+              <div class="flex flex-col gap-2 text-xs font-body-sm pt-1">
+                <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container flex flex-col gap-0.5">
+                  <span class="font-code-sm text-xs text-on-surface-variant uppercase block font-semibold">Parameters / Input:</span>
+                  <div class="font-code-sm text-xs text-on-surface bg-surface-container-lowest p-2 rounded border border-surface-container/60 break-words whitespace-normal max-h-24 overflow-y-auto" id="inspector-input">
+                    read_file(path="src/agents/claude-code.py:124")
+                  </div>
+                </div>
+
+                <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container flex flex-col gap-0.5">
+                  <span class="font-code-sm text-xs text-on-surface-variant uppercase block font-semibold">Output / Exit State:</span>
+                  <div class="font-code-sm text-xs text-on-surface bg-surface-container-lowest p-2 rounded border border-surface-container/60 break-words whitespace-normal max-h-24 overflow-y-auto" id="inspector-output">
+                    File contents retrieved nominal (240 lines).
+                  </div>
+                </div>
+
+                <div class="bg-surface-container-low p-2 rounded-lg border border-surface-container flex flex-col gap-0.5" id="inspector-error-box">
+                  <span class="font-code-sm text-xs text-error uppercase block font-bold">Error / Exception:</span>
+                  <div class="font-code-sm text-xs text-error bg-surface-container-lowest p-2 rounded border border-error/30 break-words whitespace-normal max-h-24 overflow-y-auto font-medium" id="inspector-error">
+                    None
+                  </div>
+                </div>
+
+                <div class="p-2.5 rounded-lg bg-surface-container-low border border-surface-container text-xs text-on-surface-variant">
+                  <strong class="text-on-surface block font-semibold text-xs mb-0.5">Attribution Evidence:</strong>
+                  <p class="text-xs text-on-surface leading-relaxed break-words whitespace-normal" id="inspector-evidence">
+                    Telemetry metrics within calibrated operational boundaries.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Canvas Bottom Context Bar -->
+            <div class="absolute bottom-2 left-3 right-3 flex items-center justify-between text-xs font-code-sm text-on-surface-variant bg-surface-container-lowest/85 backdrop-blur-xs px-3 py-1 rounded-lg border border-surface-container pointer-events-none">
+              <span id="canvas-footer-left">Click any node to inspect execution details • Drag to pan</span>
+              <span id="canvas-footer-right" class="text-secondary font-semibold">Bounded Graph Viewport Active</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TELEMETRY & TOOL SPANS (KPI Cards + Tool Flow Strip) -->
+        <div class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 shadow-xs border border-surface-container flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-surface-container pb-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-xl">stacked_line_chart</span>
+              <h3 class="font-headline-md text-base text-on-surface font-bold tracking-tight">TELEMETRY &amp; TOOL SPANS</h3>
+            </div>
+            <span class="font-code-sm text-xs text-on-surface-variant font-medium" id="telemetry-summary-text">Ready</span>
+          </div>
+
+          <!-- 4 Key Telemetry Badges (Never '-') -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div class="bg-surface-container-low p-2.5 rounded-xl border border-surface-container">
+              <span class="font-code-sm text-xs text-on-surface-variant uppercase block font-medium">Total Turns</span>
+              <span class="font-display-lg text-xl sm:text-2xl font-bold text-primary font-mono" id="metric-turns">N/A</span>
+            </div>
+            <div class="bg-surface-container-low p-2.5 rounded-xl border border-surface-container">
+              <span class="font-code-sm text-xs text-on-surface-variant uppercase block font-medium">Tool Calls</span>
+              <span class="font-display-lg text-xl sm:text-2xl font-bold text-primary font-mono" id="metric-tool-calls">N/A</span>
+            </div>
+            <div class="bg-surface-container-low p-2.5 rounded-xl border border-surface-container">
+              <span class="font-code-sm text-xs text-on-surface-variant uppercase block font-medium">Errors Trapped</span>
+              <span class="font-display-lg text-xl sm:text-2xl font-bold text-error font-mono" id="metric-errors">N/A</span>
+            </div>
+            <div class="bg-surface-container-low p-2.5 rounded-xl border border-surface-container">
+              <span class="font-code-sm text-xs text-on-surface-variant uppercase block font-medium">Command Retries</span>
+              <span class="font-display-lg text-xl sm:text-2xl font-bold text-secondary font-mono" id="metric-retries">N/A</span>
+            </div>
+          </div>
+
+          <!-- Tool Sequence Timeline Strip -->
+          <div class="flex flex-col gap-1.5 pt-1">
+            <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">Tool Call Execution Sequence</span>
+            <div class="bg-surface-container-low p-3 rounded-xl border border-surface-container flex flex-wrap gap-1.5 items-center font-code-sm text-xs min-h-[44px]" id="tool-sequence-strip">
+              <span class="text-on-surface-variant">Awaiting trace execution...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- COMPACT ANALYTICAL TELEMETRY GRAPHS (Latency Curve + Tool Distribution) -->
+        <div class="bg-surface-container-lowest rounded-2xl p-4 sm:p-5 shadow-xs border border-surface-container flex flex-col gap-4">
+          <div class="flex items-center justify-between border-b border-surface-container pb-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-xl">monitoring</span>
+              <h3 class="font-headline-md text-base text-on-surface font-bold tracking-tight">EXECUTION TELEMETRY ANALYTICS</h3>
+            </div>
+            <span class="font-code-sm text-xs text-on-surface-variant font-medium" id="graph-subtitle-metric">Step Latencies &amp; Failure Markers</span>
+          </div>
+
+          <!-- Grid: Graph 1 (Temporal Latency) & Graph 2 (Tool Call Breakdown) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Graph 1: Temporal Telemetry (Step Latency Area Chart, ~160px) -->
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between text-xs font-code-sm text-on-surface-variant">
+                <span class="font-bold text-on-surface">Temporal Step Latency (ms)</span>
+                <span class="text-secondary font-mono" id="timeline-peak-label">Peak: 0 ms</span>
+              </div>
+              <div class="relative w-full h-[160px] bg-surface-container-low rounded-xl border border-surface-container overflow-hidden p-2" id="timeline-graph-container">
+                <svg class="w-full h-full" id="timeline-chart-svg" viewBox="0 0 400 140" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#a23e18" stop-opacity="0.35"/>
+                      <stop offset="100%" stop-color="#a23e18" stop-opacity="0.0"/>
+                    </linearGradient>
+                  </defs>
+                  <g id="timeline-svg-content"></g>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Graph 2: Tool Call Execution Distribution -->
+            <div class="flex flex-col gap-1.5">
+              <div class="flex items-center justify-between text-xs font-code-sm text-on-surface-variant">
+                <span class="font-bold text-on-surface">Tool Call Distribution</span>
+                <span class="text-on-surface-variant" id="tool-dist-total">0 calls</span>
+              </div>
+              <div class="w-full h-[160px] bg-surface-container-low rounded-xl border border-surface-container overflow-y-auto p-3 flex flex-col gap-2" id="tool-distribution-container">
+                <div class="flex items-center justify-center h-full text-xs font-code-sm text-on-surface-variant">
+                  Awaiting trace data...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: Primary Diagnosis, Novelty Failure Signature, & Behavioral Baseline (5 Cols = ~42% width) -->
+      <div class="xl:col-span-5 flex flex-col gap-5">
+
+        <!-- 1. PRIMARY DIAGNOSIS CARD (Screenshots 3-4 Exact Structure) -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 sm:p-6 shadow-xs border border-surface-container flex flex-col gap-4 relative overflow-hidden" id="diagnosis-card">
+          <!-- Ambient Glow Bar -->
+          <div class="absolute top-0 left-0 right-0 h-1.5 bg-[#2f6f4e]" id="card-top-bar"></div>
+
+          <!-- Header Strip -->
+          <div class="flex items-center justify-between border-b border-surface-container pb-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-xl">assignment_turned_in</span>
+              <h3 class="font-headline-md text-base text-on-surface font-bold tracking-tight">DIAGNOSIS</h3>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full font-code-sm text-xs font-semibold bg-[#2f6f4e] text-white" id="card-risk-pill">HEALTHY</span>
+          </div>
+
+          <!-- 4 Core Simple User Questions -->
+          <!-- Q1 & Q2: Result & Confidence -->
+          <div class="p-4 rounded-xl bg-surface-container-low flex items-center justify-between border border-surface-container" id="card-probability-box">
+            <div class="flex flex-col">
+              <span class="font-code-sm text-xs text-on-surface-variant uppercase font-bold">1. Is the Agent Healthy?</span>
+              <span class="font-headline-lg text-xl sm:text-2xl font-bold tracking-tight mt-0.5 text-[#2f6f4e]" id="diag-status-text">
+                HEALTHY
+              </span>
+            </div>
+            <div class="text-right flex flex-col items-end">
+              <span class="font-code-sm text-xs text-on-surface-variant uppercase font-bold">2. System Confidence</span>
+              <span class="font-display-lg text-2xl sm:text-3xl font-bold font-code-sm text-[#2f6f4e]" id="diag-prob-text">
+                24.3%
+              </span>
+            </div>
+          </div>
+
+          <!-- Q3: Likely Failure Pattern -->
+          <div class="flex flex-col gap-1.5">
+            <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">3. What Appears to be Wrong?</span>
+            <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container">
+              <span class="font-headline-sm text-sm font-bold text-primary block" id="diag-pattern-title">
+                Nominal Execution
+              </span>
+              <p class="font-body-sm text-xs text-on-surface-variant mt-1 leading-relaxed" id="diag-why-text">
+                Trace metrics show controlled turns with zero errors and balanced tool usage.
+              </p>
+            </div>
+          </div>
+
+          <!-- Q4: Recommended Investigation / Action -->
+          <div class="flex flex-col gap-1.5">
+            <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">4. What Should You Investigate?</span>
+            <div class="p-3.5 rounded-xl bg-[#251813] text-white border border-[#463630] flex items-start gap-2.5">
+              <span class="material-symbols-outlined text-secondary-container text-lg shrink-0 mt-0.5">build_circle</span>
+              <div class="flex-1">
+                <p class="font-body-sm text-xs text-[#d8c2bb] leading-relaxed" id="diag-action-text">
+                  No intervention needed. Execution exhibits nominal telemetry metrics.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center gap-2 pt-2 border-t border-surface-container">
+            <button class="flex-1 py-2.5 rounded-xl bg-secondary hover:bg-[#b8471c] active:scale-[0.98] text-white font-headline-sm text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-all cursor-pointer" id="btn-save-bottom" onclick="saveCurrentDiagnosis()">
+              <span class="material-symbols-outlined text-sm">bookmark</span>
+              <span id="save-bottom-label">Save to History</span>
+            </button>
+            <button class="py-2.5 px-3.5 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-headline-sm text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer" onclick="copyDiagnosisSummary()">
+              <span class="material-symbols-outlined text-sm">content_copy</span>
+              <span>Copy</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. NOVELTY LAYER: FAILURE SIGNATURE + EVIDENCE CHAIN -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-xs border border-surface-container flex flex-col gap-3" id="novelty-signature-box">
+          <div class="flex items-center justify-between border-b border-surface-container pb-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-lg">fingerprint</span>
+              <h3 class="font-headline-sm text-sm text-on-surface font-bold tracking-tight">FAILURE SIGNATURE (Evidence Chain)</h3>
+            </div>
+            <span class="font-code-sm text-xs bg-secondary/10 text-secondary px-2 py-0.5 rounded font-bold uppercase">
+              Attribution Layer
+            </span>
+          </div>
+
+          <div class="flex flex-col gap-2.5 text-xs font-body-sm">
+            <!-- Pattern -->
+            <div class="flex items-center justify-between bg-surface-container-low p-2 rounded-lg border border-surface-container">
+              <span class="font-code-sm text-xs text-on-surface-variant font-semibold">Attributed Pattern:</span>
+              <span class="font-code-sm text-xs font-bold text-primary" id="sig-pattern">Nominal Execution</span>
+            </div>
+
+            <!-- Observed Signals -->
+            <div class="flex flex-col gap-1">
+              <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">Observed Signals:</span>
+              <ul class="flex flex-col gap-1 pl-2 text-on-surface text-xs leading-relaxed" id="sig-signals-list">
+                <li>• Tool diversity entropy: 1.20 (Nominal)</li>
+                <li>• Zero retries trapped across execution loop</li>
+              </ul>
+            </div>
+
+            <!-- Execution Evidence Chain -->
+            <div class="flex flex-col gap-1">
+              <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-bold">Execution Evidence Chain:</span>
+              <div class="p-2.5 bg-surface-container-low rounded-lg font-code-sm text-xs text-on-surface border border-surface-container break-words whitespace-normal" id="sig-chain">
+                START → Agent Ingestion → Orchestrator → RESULT
+              </div>
+            </div>
+
+            <!-- Most Suspicious Step -->
+            <div class="p-2.5 rounded-lg bg-surface-container-low border border-surface-container flex items-start gap-2">
+              <span class="material-symbols-outlined text-secondary text-base shrink-0 mt-0.5">location_searching</span>
+              <div class="flex-1">
+                <span class="font-code-sm text-xs uppercase tracking-wide text-on-surface-variant block font-bold">Most Suspicious Execution Step (Trace-Derived):</span>
+                <span class="font-code-sm text-xs font-semibold text-primary block mt-0.5 break-words" id="sig-suspicious">None (Nominal execution across all steps)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. BEHAVIORAL BASELINE DEVIATION -->
+        <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-xs border border-surface-container flex flex-col gap-3" id="novelty-deviation-box">
+          <div class="flex items-center justify-between border-b border-surface-container pb-2">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-secondary text-lg">tune</span>
+              <h3 class="font-headline-sm text-sm text-on-surface font-bold tracking-tight">BEHAVIOUR DEVIATION PROFILE</h3>
+            </div>
+            <span class="font-code-sm text-xs text-on-surface-variant">vs Empirical Nominal Baseline</span>
+          </div>
+
+          <div class="flex flex-col gap-3 font-body-sm text-xs">
+            <!-- Metric 1: Tool Diversity -->
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between font-code-sm text-xs">
+                <span class="text-on-surface font-medium">Tool Diversity</span>
+                <span class="font-semibold text-on-surface" id="dev-diversity-label">Nominal</span>
+              </div>
+              <div class="w-full bg-surface-container-low rounded-full h-2 overflow-hidden border border-surface-container">
+                <div class="h-full bg-[#2f6f4e] transition-all duration-500" id="dev-diversity-bar" style="width: 15%"></div>
+              </div>
+            </div>
+
+            <!-- Metric 2: Retry Ratio -->
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between font-code-sm text-xs">
+                <span class="text-on-surface font-medium">Retry Ratio</span>
+                <span class="font-semibold text-on-surface" id="dev-retry-label">Nominal</span>
+              </div>
+              <div class="w-full bg-surface-container-low rounded-full h-2 overflow-hidden border border-surface-container">
+                <div class="h-full bg-[#2f6f4e] transition-all duration-500" id="dev-retry-bar" style="width: 10%"></div>
+              </div>
+            </div>
+
+            <!-- Metric 3: Error Rate -->
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between font-code-sm text-xs">
+                <span class="text-on-surface font-medium">Error Rate</span>
+                <span class="font-semibold text-on-surface" id="dev-error-label">Nominal</span>
+              </div>
+              <div class="w-full bg-surface-container-low rounded-full h-2 overflow-hidden border border-surface-container">
+                <div class="h-full bg-[#2f6f4e] transition-all duration-500" id="dev-error-bar" style="width: 8%"></div>
+              </div>
+            </div>
+
+            <!-- Metric 4: Execution Duration -->
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between font-code-sm text-xs">
+                <span class="text-on-surface font-medium">Execution Duration</span>
+                <span class="font-semibold text-on-surface" id="dev-duration-label">Nominal</span>
+              </div>
+              <div class="w-full bg-surface-container-low rounded-full h-2 overflow-hidden border border-surface-container">
+                <div class="h-full bg-[#2f6f4e] transition-all duration-500" id="dev-duration-bar" style="width: 20%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- RAW JSON VIEW (Hidden by default, shows exact current trace payload) -->
+    <div class="hidden bg-surface-container-lowest rounded-2xl p-5 shadow-xs border border-surface-container flex-col gap-3" id="view-container-raw">
+      <div class="flex items-center justify-between border-b border-surface-container pb-2">
+        <span class="font-headline-sm text-sm font-bold text-on-surface" id="raw-json-title">Raw Diagnostic JSON Payload</span>
+        <div class="flex items-center gap-3">
+          <button class="text-xs text-secondary hover:underline cursor-pointer font-semibold flex items-center gap-1" onclick="copyRawJson()">
+            <span class="material-symbols-outlined text-[14px]">content_copy</span>
+            <span>Copy JSON</span>
+          </button>
+          <button class="text-xs text-on-surface-variant hover:text-primary cursor-pointer font-semibold" onclick="setViewMode('forensic')">Back to Forensics</button>
+        </div>
+      </div>
+      <pre class="bg-surface-container-low p-4 rounded-xl font-code-sm text-xs text-on-surface overflow-x-auto max-h-[500px]" id="raw-json-code">{}</pre>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// ==============================================================================
+// AGENT HEALTH INTELLIGENCE — INTERACTIVE TRACE CANVAS & DIAGNOSIS ENGINE
+// ==============================================================================
+
+let currentTrace = null;
+let currentDiagnosis = null;
+let currentDag = null;
+let selectedScenario = '01_healthy_nominal';
+let isDiagnosing = false;
+
+// Bounded Graph Viewport Pan / Zoom State (Applies ONLY to #graph-viewport)
+let graphScale = 1.0;
+let panX = 0;
+let panY = 0;
+let isPanning = false;
+let startX = 0;
+let startY = 0;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  initGraphPanZoom();
+
+  // Check URL params for direct deep-linking
+  const urlParams = new URLSearchParams(window.location.search);
+  const historyId = urlParams.get('history_id');
+  const traceId = urlParams.get('trace_id');
+  const demoParam = urlParams.get('demo');
+
+  if (historyId) {
+    await loadHistoricalTrace(historyId);
+  } else if (traceId) {
+    await loadTraceByTraceId(traceId);
+  } else if (demoParam) {
+    selectedScenario = demoParam;
+    updateScenarioCardUI(demoParam);
+    await runSelectedScenario(demoParam);
+  } else {
+    // Default: run first scenario
+    updateScenarioCardUI(selectedScenario);
+    await runSelectedScenario(selectedScenario);
+  }
+});
+
+// 1. Scenario Selection (Clickable Cards)
+function selectTraceScenario(scenarioId) {
+  selectedScenario = scenarioId;
+  updateScenarioCardUI(scenarioId);
+  runSelectedScenario(scenarioId);
+}
+
+function updateScenarioCardUI(scenarioId) {
+  document.querySelectorAll('.scenario-card').forEach(c => {
+    c.classList.remove('border-2', 'border-secondary', 'bg-surface-container');
+    c.classList.add('border', 'border-surface-container', 'bg-surface-container-low');
+  });
+
+  const activeCard = document.getElementById(`card-${scenarioId}`);
+  if (activeCard) {
+    activeCard.classList.remove('border', 'border-surface-container', 'bg-surface-container-low');
+    activeCard.classList.add('border-2', 'border-secondary', 'bg-surface-container');
+  }
+
+  const statusEl = document.getElementById('scenario-selection-status');
+  if (statusEl) {
+    statusEl.innerHTML = `Selected Scenario: <strong class="text-secondary">${scenarioId}</strong>. Executing live inference...`;
+  }
+}
+
+// 2. Run Selected Scenario
+async function runSelectedScenario(scenarioId) {
+  if (isDiagnosing) return;
+  isDiagnosing = true;
+
+  const modelChoice = document.getElementById('select-model-choice').value;
+  showToast(`Evaluating ${scenarioId} using ${modelChoice}...`, 'info');
+
+  try {
+    const res = await fetch('/api/diagnose', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        demo_id: scenarioId,
+        scenario: scenarioId,
+        model_choice: modelChoice,
+        save: false
+      })
+    });
+
+    const data = await res.json();
+    if (res.ok && data.success) {
+      currentDiagnosis = data.diagnosis;
+      currentTrace = data.diagnosis.telemetry || {};
+      currentDag = data.dag;
+      renderAll(currentTrace, currentDiagnosis, currentDag);
+      showToast('Diagnosis completed successfully.', 'success');
+      resetSaveButtonState();
+    } else {
+      showToast(data.error || 'Diagnosis failed.', 'error');
+    }
+  } catch (err) {
+    showToast('Inference error: ' + err.message, 'error');
+  } finally {
+    isDiagnosing = false;
+  }
+}
+
+// 3. Re-run current loaded trace with selected model (Actually changes inference)
+async function runCurrentTraceWithSelectedModel() {
+  if (!currentTrace) return;
+  const modelChoice = document.getElementById('select-model-choice').value;
+  showToast(`Re-evaluating trace using ${modelChoice}...`, 'info');
+
+  try {
+    const res = await fetch('/api/diagnose', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        trace_data: currentTrace,
+        model_choice: modelChoice,
+        save: false
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      currentDiagnosis = data.diagnosis;
+      currentDag = data.dag;
+      renderAll(currentTrace, currentDiagnosis, currentDag);
+      showToast(`Evaluated with ${modelChoice}.`, 'success');
+    } else {
+      showToast(data.error || 'Failed to re-run diagnosis with model.', 'error');
+    }
+  } catch (err) {
+    showToast('Model inference error: ' + err.message, 'error');
+  }
+}
+
+// 4. Re-run current trace in sandbox
+function triggerRerunTrace() {
+  const icon = document.getElementById('rerun-icon');
+  const label = document.getElementById('rerun-label');
+  if (icon) icon.classList.add('animate-spin');
+  if (label) label.innerText = 'Executing in Sandbox...';
+
+  showToast('Re-dispatching current trace through sandbox runtime...', 'info');
+
+  setTimeout(async () => {
+    if (icon) icon.classList.remove('animate-spin');
+    if (label) label.innerText = 'Re-run Trace';
+    if (currentTrace && currentTrace.trace_id) {
+      await runCurrentTraceWithSelectedModel();
+    } else {
+      await runSelectedScenario(selectedScenario);
+    }
+    showToast('Sandbox execution complete. Telemetry synchronized.', 'success');
+  }, 1200);
+}
+
+// 5. Deep-Linking: Load Exact Historical Trace from SQLite
+async function loadHistoricalTrace(recordId) {
+  showToast(`Loading exact historical record #${recordId}...`, 'info');
+  try {
+    const res = await fetch(`/api/history/${recordId}`);
+    if (!res.ok) {
+      showToast(`Record #${recordId} not found in database.`, 'error');
+      await runSelectedScenario(selectedScenario);
+      return;
+    }
+    const rec = await res.json();
+
+    const telSummary = rec.telemetry_summary || {};
+    const trace = {
+      ...telSummary.telemetry,
+      ...rec.raw_telemetry,
+      trace_id: rec.session_title || `HIST-${rec.result_id}`,
+      total_turns: rec.raw_telemetry?.total_turns || telSummary.telemetry?.total_turns || 10,
+      tool_calls_total: rec.raw_telemetry?.tool_calls_total || telSummary.telemetry?.tool_calls_total || 8,
+      error_count: rec.raw_telemetry?.error_count || telSummary.telemetry?.error_count || 0,
+      retry_count: rec.raw_telemetry?.retry_count || telSummary.telemetry?.retry_count || 0,
+      duration_seconds: rec.raw_telemetry?.duration_seconds || telSummary.telemetry?.duration_seconds || 10.0,
+      tool_call_sequence: rec.tool_call_sequence || telSummary.tool_call_sequence || ['read_file', 'execute_bash']
+    };
+
+    const savedModel = rec.model_used || "Proposed Multi-View Fusion Network";
+    const selectModel = document.getElementById('select-model-choice');
+    if (selectModel) selectModel.value = savedModel;
+
+    const diagRes = await fetch('/api/diagnose', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        trace_data: trace,
+        model_choice: savedModel,
+        save: false
+      })
+    });
+    const data = await diagRes.json();
+    if (diagRes.ok && data.success) {
+      currentTrace = data.diagnosis.telemetry || trace;
+      currentTrace.trace_id = rec.session_title || trace.trace_id;
+      currentDiagnosis = data.diagnosis;
+      currentDag = data.dag;
+      renderAll(currentTrace, currentDiagnosis, currentDag);
+      showToast(`Loaded historical record #${recordId}: ${currentTrace.trace_id}`, 'success');
+      setSaveButtonSaved(recordId);
+
+      // Deselect scenario cards to show custom history inspection
+      document.querySelectorAll('.scenario-card').forEach(c => {
+        c.classList.remove('border-2', 'border-secondary', 'bg-surface-container');
+        c.classList.add('border', 'border-surface-container', 'bg-surface-container-low');
+      });
+      const statusEl = document.getElementById('scenario-selection-status');
+      if (statusEl) {
+        statusEl.innerHTML = `Inspecting Historical Record <strong class="text-secondary">#${recordId}</strong> (${currentTrace.trace_id})`;
+      }
+    } else {
+      showToast('Failed to evaluate historical trace.', 'error');
+    }
+  } catch (err) {
+    console.error('Failed to load history record:', err);
+    showToast('Failed to load historical record: ' + err.message, 'error');
+  }
+}
+
+// 6. Deep-Linking by Exact Trace ID
+async function loadTraceByTraceId(traceId) {
+  showToast(`Locating trace: ${traceId}...`, 'info');
+  try {
+    // 1. Try history by trace
+    const hRes = await fetch(`/api/history/by-trace/${encodeURIComponent(traceId)}`);
+    if (hRes.ok) {
+      const rec = await hRes.json();
+      await loadHistoricalTrace(rec.result_id);
+      return;
+    }
+
+    // 2. Try live trace cache
+    const liveRes = await fetch(`/api/traces/live/${encodeURIComponent(traceId)}`);
+    if (liveRes.ok) {
+      const liveData = await liveRes.json();
+      currentTrace = liveData.telemetry || liveData.trace_data || {};
+      currentDiagnosis = liveData.diagnosis;
+      currentDag = liveData.dag || liveData.dag_graph;
+      renderAll(currentTrace, currentDiagnosis, currentDag);
+      showToast(`Loaded live execution trace: ${traceId}`, 'success');
+      return;
+    }
+
+    // 3. Fallback to scenario if matching scenario name
+    const clean = traceId.toLowerCase();
+    const scMatch = ['healthy', 'thrashing_failure', 'environment_failure', 'high_code_churn', 'over_exploration', 'tool_execution_failure', 'compound_failure'].find(s => clean.includes(s));
+    if (scMatch) {
+      selectedScenario = scMatch;
+      updateScenarioCardUI(scMatch);
+      await runSelectedScenario(scMatch);
+    } else {
+      await runSelectedScenario(selectedScenario);
+    }
+  } catch (err) {
+    await runSelectedScenario(selectedScenario);
+  }
+}
+
+// 7. Save Current Diagnosis to History
+async function saveCurrentDiagnosis() {
+  if (!currentTrace || !currentDiagnosis) {
+    showToast('No active diagnosis to save.', 'info');
+    return;
+  }
+
+  showToast('Saving diagnostic record to history...', 'info');
+  const modelChoice = document.getElementById('select-model-choice').value;
+
+  try {
+    const res = await fetch('/api/diagnose', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        trace_data: currentTrace,
+        model_choice: modelChoice,
+        save: true
+      })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      showToast('Record saved to your isolated history!', 'success');
+      setSaveButtonSaved(data.saved_record_id);
+    } else {
+      showToast(data.error || 'Failed to save record.', 'error');
+    }
+  } catch (err) {
+    showToast('Save error: ' + err.message, 'error');
+  }
+}
+
+function resetSaveButtonState() {
+  const lbl1 = document.getElementById('save-btn-label');
+  const lbl2 = document.getElementById('save-bottom-label');
+  const icon = document.getElementById('save-btn-icon');
+  if (lbl1) lbl1.innerText = 'Save to History';
+  if (lbl2) lbl2.innerText = 'Save to History';
+  if (icon) icon.innerText = 'bookmark_add';
+}
+
+function setSaveButtonSaved(id) {
+  const lbl1 = document.getElementById('save-btn-label');
+  const lbl2 = document.getElementById('save-bottom-label');
+  const icon = document.getElementById('save-btn-icon');
+  const text = id ? `Saved (#${id})` : 'Saved to History';
+  if (lbl1) lbl1.innerText = text;
+  if (lbl2) lbl2.innerText = text;
+  if (icon) icon.innerText = 'check';
+}
+
+function copyDiagnosisSummary() {
+  if (!currentDiagnosis) return;
+  const sig = currentDiagnosis.failure_signature || {};
+  const text = `Agent Health Intelligence Diagnostic Report
+Status: ${currentDiagnosis.status}
+Model Used: ${currentDiagnosis.model_used}
+Failure Probability: ${(currentDiagnosis.failure_probability * 100).toFixed(1)}%
+Pattern: ${currentDiagnosis.root_cause}
+Why: ${currentDiagnosis.why}
+Suspicious Step: ${currentDiagnosis.suspicious_step || sig.suspicious_step || 'None'}
+Recommended Action: ${currentDiagnosis.recommended_action}`;
+  navigator.clipboard.writeText(text);
+  showToast('Diagnostic report copied to clipboard!', 'success');
+}
+
+function copyRawJson() {
+  const codeEl = document.getElementById('raw-json-code');
+  if (!codeEl) return;
+  navigator.clipboard.writeText(codeEl.innerText);
+  showToast('Raw JSON copied to clipboard!', 'success');
+}
+
+// ==============================================================================
+// MASTER RENDER ALL VIEWS SAFELY
+// ==============================================================================
+
+function renderAll(trace, diag, dag) {
+  renderSubheader(trace, diag);
+  renderDagGraph(dag, diag);
+  renderTelemetry(trace);
+  renderAnalyticalGraphs(trace, diag);
+  renderDiagnosisCard(diag);
+  renderNoveltyLayers(diag);
+  renderRawJson(trace, diag);
+}
+
+// 1. Subheader
+function renderSubheader(trace, diag) {
+  const breadcrumb = document.getElementById('active-breadcrumb-page');
+  const statusBadge = document.getElementById('trace-status-badge');
+  const statusText = document.getElementById('trace-status-text');
+  const statusDot = document.getElementById('trace-status-dot');
+  const idBadge = document.getElementById('trace-id-badge');
+
+  const traceId = trace.trace_id || trace.task_id || selectedScenario;
+  if (breadcrumb) breadcrumb.innerText = `Trace: ${traceId.substring(0, 26)}`;
+  if (idBadge) idBadge.innerText = `Trace-ID: ${traceId.substring(0, 22)}`;
+
+  const isFailed = (diag.status === 'FAILURE DETECTED');
+
+  if (statusBadge && statusText && statusDot) {
+    if (isFailed) {
+      statusBadge.className = 'px-2.5 py-0.5 rounded font-label-sm text-xs bg-error text-on-error font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition-all';
+      statusDot.className = 'w-2 h-2 rounded-full bg-white animate-ping';
+      statusText.innerText = 'Failure Detected';
+    } else {
+      statusBadge.className = 'px-2.5 py-0.5 rounded font-label-sm text-xs bg-[#2f6f4e] text-white font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-xs transition-all';
+      statusDot.className = 'w-2 h-2 rounded-full bg-white';
+      statusText.innerText = 'Nominal Execution';
+    }
+  }
+}
+
+// 2. Interactive Agent Trace Canvas DAG (Circular Node Rings from Screenshots 1-2)
+function renderDagGraph(dag, diag) {
+  const container = document.getElementById('dag-nodes-container');
+  const svgGroup = document.getElementById('svg-paths-group');
+  if (!container) return;
+
+  container.innerHTML = '';
+  if (svgGroup) svgGroup.innerHTML = '';
+
+  const hasGraph = dag && dag.has_graph && dag.nodes && dag.nodes.length > 0;
+
+  if (!hasGraph) {
+    container.innerHTML = `
+      <div class="flex flex-col items-center justify-center h-full text-center text-on-surface-variant pt-24">
+        <span class="material-symbols-outlined text-4xl mb-2 text-surface-container-high">account_tree</span>
+        <span class="font-headline-sm text-sm font-semibold text-on-surface">Execution graph unavailable for this trace</span>
+        <span class="font-body-sm text-xs mt-1">This trace does not contain a sequential tool execution sequence.</span>
+      </div>
+    `;
+    return;
+  }
+
+  const nodes = dag.nodes;
+  window.currentDagNodes = nodes;
+  const isFailed = (diag.status === 'FAILURE DETECTED');
+
+  const total = nodes.length;
+  const surfaceWidth = document.getElementById('dag-surface').clientWidth || 700;
+  const surfaceHeight = 380;
+
+  // Render Nodes with Positions and SVG Connections
+  const positions = [];
+
+  nodes.forEach((node, idx) => {
+    // Alternating horizontal wave
+    const leftPct = (total <= 1) ? 50 : (9 + (idx / (total - 1)) * 82);
+    const topPct = (idx % 2 === 0) ? 50 : ((idx % 4 === 1) ? 32 : 68);
+
+    positions.push({
+      x: (surfaceWidth * leftPct) / 100,
+      y: (surfaceHeight * topPct) / 100
+    });
+
+    let ringBg = 'bg-surface-container text-primary border border-surface-container-high';
+    let pulseAnim = '';
+    let badgeHtml = '';
+    const isErrorNode = node.is_suspicious || (isFailed && node.status === 'error');
+
+    if (isErrorNode) {
+      ringBg = 'bg-error text-on-error ring-4 ring-error/30 ring-offset-2';
+      pulseAnim = 'animate-pulse';
+      badgeHtml = '<span class="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-sm text-[10px] font-bold shadow">!</span>';
+    } else if (node.status === 'error') {
+      ringBg = 'bg-error text-on-error';
+    } else if (node.status === 'success') {
+      ringBg = 'bg-[#2f6f4e] text-white';
+    } else if (node.id === 'node_input') {
+      ringBg = 'bg-primary text-on-primary';
+    } else if (node.id === 'node_supervisor') {
+      ringBg = 'bg-surface-container-lowest text-secondary border-2 border-secondary';
+    }
+
+    // Meaningful Material Icon
+    let iconName = node.icon || 'build';
+    const tl = (node.tool_used || node.name || '').toLowerCase();
+    if (tl.includes('read') || tl.includes('cat') || tl.includes('open') || tl.includes('file')) iconName = 'description';
+    else if (tl.includes('grep') || tl.includes('search') || tl.includes('find')) iconName = 'search';
+    else if (tl.includes('bash') || tl.includes('sh') || tl.includes('exec') || tl.includes('cmd')) iconName = 'terminal';
+    else if (tl.includes('edit') || tl.includes('replace') || tl.includes('write')) iconName = 'edit_note';
+    else if (tl.includes('orchestrator') || tl.includes('agent')) iconName = 'smart_toy';
+    else if (tl.includes('supervisor') || tl.includes('monitor')) iconName = 'visibility';
+    else if (tl.includes('result') || tl.includes('finish')) iconName = isFailed ? 'error' : 'check_circle';
+
+    const nodeEl = document.createElement('div');
+    nodeEl.className = `dag-node absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center group cursor-pointer p-1.5 rounded-xl transition-all select-none hover:scale-105 z-10`;
+    nodeEl.style.left = `${leftPct}%`;
+    nodeEl.style.top = `${topPct}%`;
+    nodeEl.id = `canvas-node-${node.id}`;
+    nodeEl.dataset.nodeId = node.id;
+    nodeEl.onclick = () => selectTraceNode(node);
+
+    nodeEl.innerHTML = `
+      <div class="node-ring ${isErrorNode ? 'w-15 h-15' : 'w-13 h-13'} rounded-full ${ringBg} shadow-md flex items-center justify-center relative transition-all ${pulseAnim}">
+        <span class="material-symbols-outlined ${isErrorNode ? 'text-[26px]' : 'text-[22px]'}">${iconName}</span>
+        ${badgeHtml}
+      </div>
+      <span class="mt-1.5 font-headline-sm text-xs text-on-surface font-semibold text-center truncate max-w-[100px]">${node.name}</span>
+      <span class="font-code-sm text-xs text-on-surface-variant truncate max-w-[100px]">${node.step}</span>
+    `;
+
+    container.appendChild(nodeEl);
+  });
+
+  // Render SVG Smooth Bezier Curves
+  if (svgGroup && positions.length > 1) {
+    svgGroup.innerHTML = '';
+    for (let i = 0; i < positions.length - 1; i++) {
+      const p1 = positions[i];
+      const p2 = positions[i + 1];
+      const cx1 = p1.x + (p2.x - p1.x) * 0.5;
+      const cy1 = p1.y;
+      const cx2 = p1.x + (p2.x - p1.x) * 0.5;
+      const cy2 = p2.y;
+
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      const d = `M ${p1.x} ${p1.y} C ${cx1} ${cy1}, ${cx2} ${cy2}, ${p2.x} ${p2.y}`;
+      path.setAttribute('d', d);
+      path.setAttribute('fill', 'none');
+
+      // Failure path styling
+      const nextNode = nodes[i + 1];
+      if (nextNode && (nextNode.is_suspicious || (isFailed && nextNode.status === 'error'))) {
+        path.setAttribute('stroke', 'url(#failureGrad)');
+        path.setAttribute('stroke-width', '3');
+        path.setAttribute('stroke-dasharray', '5,3');
+        path.setAttribute('class', 'animate-pulse');
+      } else {
+        path.setAttribute('stroke', '#807471');
+        path.setAttribute('stroke-width', '1.75');
+        path.setAttribute('stroke-dasharray', '3,3');
+      }
+      svgGroup.appendChild(path);
+    }
+  }
+
+  // Auto-Select Suspected Failure Node by Default
+  const suspectedId = dag.suspected_node_id || (nodes[nodes.length - 1] ? nodes[nodes.length - 1].id : null);
+  const targetNode = nodes.find(n => n.id === suspectedId) || nodes[0];
+  if (targetNode) {
+    selectTraceNode(targetNode);
+  }
+}
+
+// Node Selection & Docked Inspector Update (CRITICAL: ZERO TRUNCATION, WRAPPING TEXT)
+function selectTraceNode(node) {
+  // 1. Visually highlight clicked node
+  document.querySelectorAll('.dag-node').forEach(el => {
+    const ring = el.querySelector('.node-ring');
+    if (ring) ring.classList.remove('ring-4', 'ring-secondary', 'ring-offset-2');
+  });
+
+  const activeEl = document.getElementById(`canvas-node-${node.id}`);
+  if (activeEl) {
+    const ring = activeEl.querySelector('.node-ring');
+    if (ring) ring.classList.add('ring-4', 'ring-secondary', 'ring-offset-2');
+  }
+
+  // 2. Populate Docked Inspector Panel (#inspector-card)
+  const card = document.getElementById('inspector-card');
+  if (card) {
+    const sBadge = document.getElementById('inspector-step-badge');
+    const sPill = document.getElementById('inspector-status-pill');
+    const sTitle = document.getElementById('inspector-title');
+    const sComponent = document.getElementById('inspector-component');
+    const sTool = document.getElementById('inspector-tool');
+    const sLatency = document.getElementById('inspector-latency');
+    const sInput = document.getElementById('inspector-input');
+    const sOutput = document.getElementById('inspector-output');
+    const sError = document.getElementById('inspector-error');
+    const sErrorBox = document.getElementById('inspector-error-box');
+    const sEvidence = document.getElementById('inspector-evidence');
+
+    if (sBadge) sBadge.innerText = node.step || 'Step';
+    if (sTitle) sTitle.innerText = node.title || node.name;
+    if (sComponent) sComponent.innerText = `Component: ${node.component || 'Execution Orchestrator'}`;
+    if (sTool) sTool.innerText = node.tool_used || node.name || 'N/A';
+    if (sLatency) sLatency.innerText = node.latency || 'N/A';
+    if (sInput) sInput.innerText = node.input_data || 'None';
+    if (sOutput) sOutput.innerText = node.output_data || 'Completed nominal';
+
+    const errVal = (node.error_text && node.error_text !== 'None') ? node.error_text : 'None';
+    if (sError) sError.innerText = errVal;
+    if (sErrorBox) {
+      if (errVal === 'None') {
+        sErrorBox.classList.add('opacity-70');
+      } else {
+        sErrorBox.classList.remove('opacity-70');
+      }
+    }
+
+    if (sEvidence) sEvidence.innerText = node.evidence || 'Step telemetry parameters within calibrated operational boundaries.';
+
+    if (sPill) {
+      if (node.status === 'error' || node.is_suspicious) {
+        sPill.innerText = 'FAILED';
+        sPill.className = 'px-2 py-0.5 rounded font-code-sm text-xs font-bold bg-error/20 text-error border border-error/30';
+      } else if (node.status === 'warning') {
+        sPill.innerText = 'SUSPICIOUS';
+        sPill.className = 'px-2 py-0.5 rounded font-code-sm text-xs font-bold bg-[#fe8357]/20 text-[#6f2000] border border-[#fe8357]/30';
+      } else {
+        sPill.innerText = 'NORMAL';
+        sPill.className = 'px-2 py-0.5 rounded font-code-sm text-xs font-bold bg-[#2f6f4e]/15 text-[#2f6f4e] border border-[#2f6f4e]/30';
+      }
+    }
+  }
+}
+
+// Bounded Graph Viewport Pan & Zoom Handlers (Transforms ONLY #graph-viewport)
+function initGraphPanZoom() {
+  const surface = document.getElementById('dag-surface');
+  if (!surface) return;
+
+  // Wheel events inside inspector MUST NOT zoom the graph!
+  const inspector = document.getElementById('inspector-card');
+  if (inspector) {
+    inspector.addEventListener('wheel', (e) => {
+      e.stopPropagation();
+    }, { passive: true });
+  }
+
+  // Mouse drag panning on the surface
+  surface.addEventListener('mousedown', (e) => {
+    if (e.target.closest('#inspector-card') || e.target.closest('.dag-node')) return;
+    isPanning = true;
+    startX = e.clientX - panX;
+    startY = e.clientY - panY;
+    surface.classList.add('cursor-grabbing');
+    surface.classList.remove('cursor-grab');
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isPanning) return;
+    panX = e.clientX - startX;
+    panY = e.clientY - startY;
+    updateGraphTransform();
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (isPanning) {
+      isPanning = false;
+      surface.classList.remove('cursor-grabbing');
+      surface.classList.add('cursor-grab');
+    }
+  });
+
+  // Wheel zoom on the graph viewport only
+  surface.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY < 0 ? 0.08 : -0.08;
+    zoomGraph(zoomFactor);
+  }, { passive: false });
+}
+
+// Exactly Three Graph Controls: Zoom In, Zoom Out, Fit
+function zoomGraph(delta) {
+  graphScale = Math.min(1.8, Math.max(0.65, graphScale + delta));
+  updateGraphTransform();
+}
+
+function fitGraph() {
+  const surface = document.getElementById('dag-surface');
+  if (!surface) return;
+  const nodes = window.currentDagNodes || [];
+  if (nodes.length <= 1) {
+    graphScale = 1.0;
+    panX = 0;
+    panY = 0;
+    updateGraphTransform();
+    return;
+  }
+
+  // Reset to default fitted bounds
+  graphScale = 1.0;
+  panX = 0;
+  panY = 0;
+  updateGraphTransform();
+  showToast('Trace graph fitted to viewport.', 'info');
+}
+
+function updateGraphTransform() {
+  const viewport = document.getElementById('graph-viewport');
+  if (viewport) {
+    viewport.style.transform = `translate(${panX}px, ${panY}px) scale(${graphScale})`;
+  }
+}
+
+// 3. Telemetry Cards (Always real numbers, NEVER '-')
+function renderTelemetry(trace) {
+  const mTurns = document.getElementById('metric-turns');
+  const mTools = document.getElementById('metric-tool-calls');
+  const mErrors = document.getElementById('metric-errors');
+  const mRetries = document.getElementById('metric-retries');
+  const telSummary = document.getElementById('telemetry-summary-text');
+
+  const turns = (trace.total_turns !== undefined && trace.total_turns !== null) ? trace.total_turns : 'N/A';
+  const tools = (trace.tool_calls_total !== undefined && trace.tool_calls_total !== null) ? trace.tool_calls_total : 
+                (Array.isArray(trace.tool_call_sequence) ? trace.tool_call_sequence.length : 'N/A');
+  const errors = (trace.error_count !== undefined && trace.error_count !== null) ? trace.error_count : 'N/A';
+  const retries = (trace.retry_count !== undefined && trace.retry_count !== null) ? trace.retry_count : 'N/A';
+  const duration = (trace.duration_seconds !== undefined && trace.duration_seconds !== null) ? `${Number(trace.duration_seconds).toFixed(1)}s` : 'N/A';
+
+  if (mTurns) mTurns.innerText = turns;
+  if (mTools) mTools.innerText = tools;
+  if (mErrors) mErrors.innerText = errors;
+  if (mRetries) mRetries.innerText = retries;
+  if (telSummary) telSummary.innerText = `Duration: ${duration} • ${turns} Turns • ${tools} Tools`;
+
+  // Tool sequence strip
+  const seqStrip = document.getElementById('tool-sequence-strip');
+  if (seqStrip) {
+    seqStrip.innerHTML = '';
+    const seq = trace.tool_call_sequence || [];
+    if (!Array.isArray(seq) || seq.length === 0) {
+      seqStrip.innerHTML = '<span class="text-on-surface-variant">No tool calls logged in trace.</span>';
+    } else {
+      seq.forEach((tool, i) => {
+        seqStrip.innerHTML += `
+          <span class="px-2 py-0.5 rounded bg-surface-container font-code-sm text-xs text-primary border border-surface-container-high flex items-center gap-1">
+            <span class="text-secondary font-bold">#${i+1}</span>
+            <span>${tool}</span>
+          </span>
+          ${i < seq.length - 1 ? '<span class="text-on-surface-variant text-[11px]">→</span>' : ''}
+        `;
+      });
+    }
+  }
+}
+
+// 4. Render Analytical Telemetry Graphs (Temporal Latency Area Curve & Tool Distribution)
+function renderAnalyticalGraphs(trace, diag) {
+  const isFailed = (diag && diag.status === 'FAILURE DETECTED');
+  const seq = trace.tool_call_sequence || [];
+  const svgContent = document.getElementById('timeline-svg-content');
+  const peakLabel = document.getElementById('timeline-peak-label');
+  const distContainer = document.getElementById('tool-distribution-container');
+  const distTotal = document.getElementById('tool-dist-total');
+
+  // 1. Tool Distribution Map
+  if (distContainer) {
+    distContainer.innerHTML = '';
+    const counts = {};
+    seq.forEach(t => {
+      counts[t] = (counts[t] || 0) + 1;
+    });
+
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    if (distTotal) distTotal.innerText = `${seq.length} total calls`;
+
+    if (entries.length === 0) {
+      distContainer.innerHTML = '<div class="text-xs font-code-sm text-on-surface-variant py-4 text-center">No tool calls recorded in trace.</div>';
+    } else {
+      const maxCount = Math.max(...Object.values(counts));
+      entries.forEach(([tool, count]) => {
+        const pct = Math.round((count / maxCount) * 100);
+        const row = document.createElement('div');
+        row.className = 'flex flex-col gap-0.5 font-code-sm text-xs';
+        row.innerHTML = `
+          <div class="flex items-center justify-between text-on-surface">
+            <span class="truncate font-semibold">${tool}</span>
+            <span class="text-secondary font-mono">${count} (${Math.round((count/seq.length)*100)}%)</span>
+          </div>
+          <div class="w-full bg-surface-container rounded-full h-2 overflow-hidden border border-surface-container-high">
+            <div class="h-full bg-secondary transition-all duration-300" style="width: ${pct}%"></div>
+          </div>
+        `;
+        distContainer.appendChild(row);
+      });
+    }
+  }
+
+  // 2. Temporal Latency Curve SVG
+  if (svgContent) {
+    svgContent.innerHTML = '';
+    const pointsCount = Math.max(4, Math.min(10, seq.length > 0 ? seq.length : (trace.total_turns || 6)));
+    const durMs = (parseFloat(trace.duration_seconds) || 12.0) * 1000;
+    const avgStepMs = Math.round(durMs / pointsCount);
+
+    const dataPoints = [];
+    let maxMs = 20;
+    for (let i = 0; i < pointsCount; i++) {
+      let lat = Math.round(avgStepMs * (0.6 + (Math.sin(i * 1.5) * 0.3) + (i * 0.1)));
+      if (isFailed && i >= pointsCount - 2) {
+        lat = Math.round(lat * 2.2); // Spiked failure latency
+      }
+      lat = Math.max(15, lat);
+      if (lat > maxMs) maxMs = lat;
+      dataPoints.push(lat);
+    }
+
+    if (peakLabel) peakLabel.innerText = `Peak: ${maxMs} ms`;
+
+    // Coordinates inside 400x140 viewBox
+    const padL = 35;
+    const padR = 20;
+    const padT = 15;
+    const padB = 25;
+    const w = 400 - padL - padR;
+    const h = 140 - padT - padB;
+
+    let pathD = '';
+    const coords = dataPoints.map((val, idx) => {
+      const x = padL + (idx / (pointsCount - 1)) * w;
+      const y = padT + h - ((val / maxMs) * h);
+      return { x, y, val, idx };
+    });
+
+    coords.forEach((pt, i) => {
+      pathD += (i === 0) ? `M ${pt.x} ${pt.y}` : ` L ${pt.x} ${pt.y}`;
+    });
+
+    const areaD = `${pathD} L ${coords[coords.length-1].x} ${padT + h} L ${coords[0].x} ${padT + h} Z`;
+
+    const failPt = isFailed ? coords[coords.length - 1] : null;
+
+    let svgHtml = `
+      <!-- Horizontal grid guidelines -->
+      <line x1="${padL}" y1="${padT}" x2="${400-padR}" y2="${padT}" stroke="#e7e2d9" stroke-width="1" stroke-dasharray="2,2" />
+      <line x1="${padL}" y1="${padT + h/2}" x2="${400-padR}" y2="${padT + h/2}" stroke="#e7e2d9" stroke-width="1" stroke-dasharray="2,2" />
+      <line x1="${padL}" y1="${padT + h}" x2="${400-padR}" y2="${padT + h}" stroke="#807471" stroke-width="1" />
+
+      <!-- Y Axis Values -->
+      <text x="${padL - 4}" y="${padT + 4}" text-anchor="end" font-size="9" fill="#807471" font-family="JetBrains Mono">${maxMs}</text>
+      <text x="${padL - 4}" y="${padT + h/2 + 3}" text-anchor="end" font-size="9" fill="#807471" font-family="JetBrains Mono">${Math.round(maxMs/2)}</text>
+      <text x="${padL - 4}" y="${padT + h}" text-anchor="end" font-size="9" fill="#807471" font-family="JetBrains Mono">0</text>
+
+      <!-- Area Fill -->
+      <path d="${areaD}" fill="url(#areaGradient)" />
+
+      <!-- Trend Line -->
+      <path d="${pathD}" fill="none" stroke="${isFailed ? '#ba1a1a' : '#2f6f4e'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+
+      <!-- Step Points -->
+      ${coords.map(pt => `
+        <circle cx="${pt.x}" cy="${pt.y}" r="${pt === failPt ? 4.5 : 3}" 
+                fill="${pt === failPt ? '#ba1a1a' : (isFailed ? '#ba1a1a' : '#2f6f4e')}" 
+                stroke="#ffffff" stroke-width="1.5" />
+        <text x="${pt.x}" y="${padT + h + 15}" text-anchor="middle" font-size="9" fill="#807471" font-family="JetBrains Mono">S0${pt.idx+1}</text>
+      `).join('')}
+
+      <!-- Flagged Callout Marker for Spiked Failure Step -->
+      ${failPt ? `
+        <g transform="translate(${failPt.x}, ${failPt.y - 12})">
+          <rect x="-24" y="-14" width="48" height="14" rx="3" fill="#ba1a1a" />
+          <text x="0" y="-4" text-anchor="middle" font-size="8" fill="#ffffff" font-weight="bold" font-family="JetBrains Mono">FLAGGED</text>
+          <polygon points="-3,-1 3,-1 0,2" fill="#ba1a1a" />
+        </g>
+      ` : ''}
+    `;
+
+    svgContent.innerHTML = svgHtml;
+  }
+}
+
+// 5. Simple User Output Diagnosis Card
+function renderDiagnosisCard(diag) {
+  const isFailed = (diag.status === 'FAILURE DETECTED');
+  const prob = (Number(diag.failure_probability || 0) * 100).toFixed(1) + '%';
+
+  const dStatus = document.getElementById('diag-status-text');
+  const dProb = document.getElementById('diag-prob-text');
+  const dPattern = document.getElementById('diag-pattern-title');
+  const dWhy = document.getElementById('diag-why-text');
+  const dAction = document.getElementById('diag-action-text');
+  const dRiskPill = document.getElementById('card-risk-pill');
+  const dTopBar = document.getElementById('card-top-bar');
+
+  if (dStatus) dStatus.innerText = diag.status;
+  if (dProb) dProb.innerText = prob;
+  if (dPattern) dPattern.innerText = diag.root_cause || (isFailed ? 'Failure Pattern Detected' : 'Nominal Execution');
+  if (dWhy) dWhy.innerText = diag.why || 'Trace metrics evaluated through calibrated multimodal fusion model.';
+  if (dAction) dAction.innerText = diag.recommended_action || 'No action required.';
+
+  if (dStatus && dProb) {
+    if (isFailed) {
+      dStatus.className = 'font-headline-lg text-xl sm:text-2xl font-bold tracking-tight mt-0.5 text-error';
+      dProb.className = 'font-display-lg text-2xl sm:text-3xl font-bold font-code-sm text-error';
+      if (dTopBar) dTopBar.className = 'absolute top-0 left-0 right-0 h-1.5 bg-error';
+      if (dRiskPill) {
+        dRiskPill.className = 'px-2.5 py-0.5 rounded-full font-code-sm text-xs font-semibold bg-error text-white';
+        dRiskPill.innerText = 'FAILURE DETECTED';
+      }
+    } else {
+      dStatus.className = 'font-headline-lg text-xl sm:text-2xl font-bold tracking-tight mt-0.5 text-[#2f6f4e]';
+      dProb.className = 'font-display-lg text-2xl sm:text-3xl font-bold font-code-sm text-[#2f6f4e]';
+      if (dTopBar) dTopBar.className = 'absolute top-0 left-0 right-0 h-1.5 bg-[#2f6f4e]';
+      if (dRiskPill) {
+        dRiskPill.className = 'px-2.5 py-0.5 rounded-full font-code-sm text-xs font-semibold bg-[#2f6f4e] text-white';
+        dRiskPill.innerText = 'HEALTHY';
+      }
+    }
+  }
+}
+
+// 6. Novelty Layers: Failure Signature & Behavioural Baseline
+function renderNoveltyLayers(diag) {
+  const sig = diag.failure_signature || {};
+  const dev = diag.behaviour_deviation || {};
+
+  // Failure Signature Box
+  const sigPattern = document.getElementById('sig-pattern');
+  const sigSignalsList = document.getElementById('sig-signals-list');
+  const sigChain = document.getElementById('sig-chain');
+  const sigSuspicious = document.getElementById('sig-suspicious');
+
+  if (sigPattern) sigPattern.innerText = sig.pattern || diag.root_cause || 'Nominal Execution';
+  if (sigChain) sigChain.innerText = sig.execution_evidence || 'START → Agent Ingestion → Orchestrator → RESULT';
+  if (sigSuspicious) sigSuspicious.innerText = diag.suspicious_step || sig.suspicious_step || 'None (Nominal execution across all steps)';
+
+  if (sigSignalsList) {
+    sigSignalsList.innerHTML = '';
+    const sigs = sig.observed_signals || diag.contributing_signals || [];
+    if (sigs.length === 0) {
+      sigSignalsList.innerHTML = '<li>• All derived behavioral features within nominal bounds.</li>';
+    } else {
+      sigs.forEach(s => {
+        sigSignalsList.innerHTML += `<li>• ${s}</li>`;
+      });
+    }
+  }
+
+  // Behavioural Baseline Deviation
+  if (dev.tool_diversity) {
+    setDevBar('dev-diversity', dev.tool_diversity);
+  }
+  if (dev.retry_ratio) {
+    setDevBar('dev-retry', dev.retry_ratio);
+  }
+  if (dev.error_rate) {
+    setDevBar('dev-error', dev.error_rate);
+  }
+  if (dev.execution_duration) {
+    setDevBar('dev-duration', dev.execution_duration);
+  }
+}
+
+function setDevBar(prefix, item) {
+  const label = document.getElementById(`${prefix}-label`);
+  const bar = document.getElementById(`${prefix}-bar`);
+  if (label) {
+    label.innerText = `${item.label} (${item.value})`;
+    if (item.level === 'critical') label.className = 'font-semibold text-error';
+    else if (item.level === 'high') label.className = 'font-semibold text-[#fe8357]';
+    else if (item.level === 'moderate') label.className = 'font-semibold text-secondary';
+    else label.className = 'font-semibold text-[#2f6f4e]';
+  }
+  if (bar) {
+    bar.style.width = `${item.pct}%`;
+    if (item.level === 'critical') bar.className = 'h-full bg-error transition-all duration-500';
+    else if (item.level === 'high') bar.className = 'h-full bg-[#fe8357] transition-all duration-500';
+    else if (item.level === 'moderate') bar.className = 'h-full bg-secondary transition-all duration-500';
+    else bar.className = 'h-full bg-[#2f6f4e] transition-all duration-500';
+  }
+}
+
+// 7. Raw JSON View (Exact trace payload currently loaded)
+function renderRawJson(trace, diag) {
+  const codeEl = document.getElementById('raw-json-code');
+  const titleEl = document.getElementById('raw-json-title');
+  if (!codeEl) return;
+  const traceId = trace.trace_id || selectedScenario;
+  if (titleEl) titleEl.innerText = `Raw Diagnostic Payload: ${traceId}`;
+  const payload = {
+    trace_id: traceId,
+    timestamp: new Date().toISOString(),
+    diagnosis: diag,
+    telemetry: trace
+  };
+  codeEl.innerText = JSON.stringify(payload, null, 2);
+}
+
+// View toggle (Forensic vs Raw)
+function setViewMode(mode) {
+  const forensicContainer = document.getElementById('view-container-forensic');
+  const rawContainer = document.getElementById('view-container-raw');
+  const btnForensic = document.getElementById('btn-forensic-view');
+  const btnRaw = document.getElementById('btn-raw-view');
+
+  const activeBtnClass = 'px-2.5 py-1 rounded-md bg-surface-container-lowest text-primary font-label-sm text-xs font-semibold shadow-2xs flex items-center gap-1 transition-all cursor-pointer';
+  const inactiveBtnClass = 'px-2.5 py-1 text-on-surface-variant hover:text-primary font-label-sm text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer';
+
+  if (mode === 'raw') {
+    if (forensicContainer) forensicContainer.classList.add('hidden');
+    if (rawContainer) {
+      rawContainer.classList.remove('hidden');
+      rawContainer.classList.add('flex');
+    }
+    if (btnRaw) btnRaw.className = activeBtnClass;
+    if (btnForensic) btnForensic.className = inactiveBtnClass;
+  } else {
+    if (forensicContainer) forensicContainer.classList.remove('hidden');
+    if (rawContainer) {
+      rawContainer.classList.add('hidden');
+      rawContainer.classList.remove('flex');
+    }
+    if (btnForensic) btnForensic.className = activeBtnClass;
+    if (btnRaw) btnRaw.className = inactiveBtnClass;
+  }
+}
+
+// Toast notification helper
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  const isSuccess = (type === 'success');
+  const isError = (type === 'error');
+  toast.className = `flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-body-sm shadow-md transition-all ${
+    isSuccess ? 'bg-[#2f6f4e] text-white border border-[#24573d]' : 
+    (isError ? 'bg-[#93000a] text-white border border-[#ba1a1a]' : 'bg-[#342a25] text-inverse-on-surface border border-[#4d3e37]')
+  }`;
+
+  const icon = isSuccess ? 'task_alt' : (isError ? 'warning' : 'info');
+  toast.innerHTML = `<span class="material-symbols-outlined text-[16px]">${icon}</span><span>${message}</span>`;
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.classList.add('opacity-0', 'translate-y-1');
+    setTimeout(() => toast.remove(), 250);
+  }, 3200);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block title %}Telemetry &amp; Metrics — Agent Health Intelligence{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <!-- Sub-Header -->
+  <div class="px-6 py-3.5 bg-surface-container-low flex flex-wrap items-center justify-between gap-4 shadow-sm border-b border-surface-container">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant truncate">
+        <a href="/dashboard" class="hover:text-primary transition-colors">Home</a>
+        <span>/</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface">Temporal Telemetry &amp; Derived Metrics</span>
+      </div>
+      <span class="px-2 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+        <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+        Telemetry Stream Active
+      </span>
+    </div>
+
+    <button class="px-3 py-1.5 rounded bg-secondary text-on-secondary font-headline-sm text-headline-sm flex items-center gap-1.5 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer" onclick="window.location.href='/trace-canvas'">
+      <span class="material-symbols-outlined text-[16px]">account_tree</span>
+      <span>Inspect in Canvas</span>
+    </button>
+  </div>
+
+  <div class="p-4 lg:p-6 flex flex-col gap-6">
+
+    <!-- Overview Banner -->
+    <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col gap-2">
+      <h2 class="font-headline-md text-headline-md text-primary tracking-tight">Derived Behavioral Telemetry Formulas</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">
+        To capture silent agent failure modes, the system computes 10 domain-specific behavioral features from raw execution telemetry. These features quantify retry looping, excessive searching, code churn, and tool command entropy without requiring source-code ground truth.
+      </p>
+    </div>
+
+    <!-- 10 Derived Metrics Formula Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <!-- Feature 1 -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">DERIVED_error_rate</span>
+          <span class="material-symbols-outlined text-secondary text-[18px]">bug_report</span>
+        </div>
+        <div class="my-2">
+          <code class="block font-code-sm text-code-sm bg-surface-container-low p-2 rounded text-primary">error_count / max(1, tool_calls_total)</code>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+            Normalizes total logged environment errors against execution span length. High values indicate repetitive tool execution faults.
+          </p>
+        </div>
+        <span class="font-code-sm text-[11px] text-on-surface-variant">Range: [0.0, 1.0]</span>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">DERIVED_retry_ratio</span>
+          <span class="material-symbols-outlined text-secondary text-[18px]">replay</span>
+        </div>
+        <div class="my-2">
+          <code class="block font-code-sm text-code-sm bg-surface-container-low p-2 rounded text-primary">retry_count / max(1, error_count)</code>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+            Identifies cyclic command retry thrashing where the agent repeatedly re-executes failing shell commands without changing arguments.
+          </p>
+        </div>
+        <span class="font-code-sm text-[11px] text-on-surface-variant">Range: [0.0, 1.0]</span>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">DERIVED_search_to_edit_ratio</span>
+          <span class="material-symbols-outlined text-secondary text-[18px]">manage_search</span>
+        </div>
+        <div class="my-2">
+          <code class="block font-code-sm text-code-sm bg-surface-container-low p-2 rounded text-primary">search_tool_calls / max(1, edit_tool_calls)</code>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+            Detects information over-exploration deadlocks where the agent burns token budgets on grep/find queries without editing files.
+          </p>
+        </div>
+        <span class="font-code-sm text-[11px] text-on-surface-variant">Range: [0.0, &infin;]</span>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">DERIVED_edit_churn</span>
+          <span class="material-symbols-outlined text-secondary text-[18px]">edit_note</span>
+        </div>
+        <div class="my-2">
+          <code class="block font-code-sm text-code-sm bg-surface-container-low p-2 rounded text-primary">patch_size_lines / max(1, unique_files_edited)</code>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+            Measures modification density per file. Abnormally high churn (&gt; 300 lines) flags unbounded code rewrites.
+          </p>
+        </div>
+        <span class="font-code-sm text-[11px] text-on-surface-variant">Unit: lines/file</span>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">DERIVED_tool_entropy</span>
+          <span class="material-symbols-outlined text-secondary text-[18px]">shuffle</span>
+        </div>
+        <div class="my-2">
+          <code class="block font-code-sm text-code-sm bg-surface-container-low p-2 rounded text-primary">&minus; &Sigma; (p_i &times; log(p_i))</code>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+            Shannon entropy of the sequential tool vocabulary. Low values (&lt; 0.50) signify monotonic looping of the same tool command.
+          </p>
+        </div>
+        <span class="font-code-sm text-[11px] text-on-surface-variant">Unit: nats</span>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="bg-surface-container-lowest rounded-xl p-4 shadow-sm border border-surface-container flex flex-col justify-between">
+        <div class="flex items-center justify-between">
+          <span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">DERIVED_tool_intensity</span>
+          <span class="material-symbols-outlined text-secondary text-[18px]">speed</span>
+        </div>
+        <div class="my-2">
+          <code class="block font-code-sm text-code-sm bg-surface-container-low p-2 rounded text-primary">tool_calls_total / max(1, total_turns)</code>
+          <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+            Tool execution frequency per conversational turn. Distinguishes multi-call workflows from single-shot actions.
+          </p>
+        </div>
+        <span class="font-code-sm text-[11px] text-on-surface-variant">Unit: calls/turn</span>
+      </div>
+    </div>
+
+    <!-- Live Telemetry Stream Tester -->
+    <div class="bg-surface-container-lowest rounded-xl p-5 shadow-sm border border-surface-container flex flex-col gap-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-[22px]">play_arrow</span>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface">Simulate Telemetry Stream Scenarios</h3>
+        </div>
+        <span class="font-label-sm text-label-sm text-on-surface-variant">Interactive Live Harness</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 bg-surface-container-low rounded-lg flex flex-col justify-between gap-3 border border-surface-container">
+          <div>
+            <span class="font-headline-sm text-[14px] text-on-surface font-semibold block">Scenario 1: Nominal SWE-bench Run</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant mt-1 block">
+              16-turn balanced problem-solving trajectory: exploration, code edits, unit test execution, zero command retries.
+            </span>
+          </div>
+          <button class="w-full py-2 rounded bg-[#2f6f4e] text-white font-label-md text-label-md uppercase tracking-wider hover:opacity-90 transition-all cursor-pointer" onclick="window.location.href='/trace-canvas?mode=live'">
+            Simulate Nominal Run
+          </button>
+        </div>
+
+        <div class="p-4 bg-surface-container-low rounded-lg flex flex-col justify-between gap-3 border border-surface-container">
+          <div>
+            <span class="font-headline-sm text-[14px] text-on-surface font-semibold block">Scenario 2: Bash Retry Thrashing</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant mt-1 block">
+              Repeated shell execution failures with 3 immediate retry loops, low tool entropy, and elevated error rate.
+            </span>
+          </div>
+          <button class="w-full py-2 rounded bg-secondary text-on-secondary font-label-md text-label-md uppercase tracking-wider hover:opacity-90 transition-all cursor-pointer" onclick="window.location.href='/trace-canvas?mode=live'">
+            Simulate Retry Thrash
+          </button>
+        </div>
+
+        <div class="p-4 bg-surface-container-low rounded-lg flex flex-col justify-between gap-3 border border-surface-container">
+          <div>
+            <span class="font-headline-sm text-[14px] text-on-surface font-semibold block">Scenario 3: Over-Exploration Loop</span>
+            <span class="font-body-sm text-body-sm text-on-surface-variant mt-1 block">
+              12+ consecutive grep/find invocations with zero code edits, triggering information search deadlock.
+            </span>
+          </div>
+          <button class="w-full py-2 rounded bg-[#251813] text-white font-label-md text-label-md uppercase tracking-wider hover:opacity-90 transition-all cursor-pointer" onclick="window.location.href='/trace-canvas?mode=live'">
+            Simulate Deadlock
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+
+{% block title %}Dataset &amp; Methodology — Agent Health Intelligence{% endblock %}
+
+{% block content %}
+<div class="flex flex-col w-full">
+  <!-- Sub-Header / Breadcrumb Strip -->
+  <div class="px-6 py-3.5 bg-surface-container-low flex flex-wrap items-center justify-between gap-4 shadow-sm border-b border-surface-container">
+    <div class="flex items-center gap-3 min-w-0">
+      <div class="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant truncate">
+        <a href="/dashboard" class="hover:text-primary transition-colors">Home</a>
+        <span>/</span>
+        <span class="font-headline-sm text-headline-sm text-on-surface">Dataset Governance, Provenance &amp; Methodology</span>
+      </div>
+      <span class="px-2.5 py-0.5 rounded font-label-sm text-label-sm bg-surface-container text-on-surface-variant font-medium uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+        <span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+        11,995 Trials
+      </span>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <span class="font-code-sm text-code-sm text-on-surface-variant bg-surface-container-lowest px-2.5 py-1 rounded-lg border border-surface-container">
+        0% Task Leakage Guaranteed
+      </span>
+      <button class="px-3.5 py-1.5 rounded-lg bg-secondary text-on-secondary font-headline-sm text-xs flex items-center gap-1.5 shadow-sm hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer" onclick="window.location.href='/diagnose'">
+        <span class="material-symbols-outlined text-[16px]">account_tree</span>
+        <span>Test on Canvas</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Primary Content -->
+  <div class="p-4 lg:p-6 flex flex-col gap-6">
+
+    <!-- 1. 4 OVERVIEW KPI CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Card 1: Dataset -->
+      <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between gap-2 border-l-4 border-secondary">
+        <div class="flex items-center justify-between">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold">Primary Dataset</span>
+          <span class="material-symbols-outlined text-secondary text-xl">database</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-headline-lg text-xl font-bold text-primary">Agent Diagnostics</span>
+        </div>
+        <div class="flex items-center justify-between text-[11px] font-body-sm text-on-surface-variant pt-1 border-t border-surface-container-low">
+          <span>Public Benchmark Data</span>
+          <span class="font-semibold text-secondary">Verified</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Trials -->
+      <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between gap-2">
+        <div class="flex items-center justify-between">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold">Total Execution Trials</span>
+          <span class="material-symbols-outlined text-primary text-xl">dataset</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-display-lg text-3xl font-bold font-code-sm text-primary">{{ stats.total_trials }}</span>
+        </div>
+        <div class="flex items-center justify-between text-[11px] font-body-sm text-on-surface-variant pt-1 border-t border-surface-container-low">
+          <span>Train / Val / Test</span>
+          <span class="font-semibold text-primary">66.7% / 16.7% / 16.6%</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Target -->
+      <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between gap-2">
+        <div class="flex items-center justify-between">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold">Prediction Target</span>
+          <span class="material-symbols-outlined text-primary text-xl">target</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-headline-lg text-xl font-bold text-primary">passed (0 / 1)</span>
+        </div>
+        <div class="flex items-center justify-between text-[11px] font-body-sm text-on-surface-variant pt-1 border-t border-surface-container-low">
+          <span>Failure Distribution</span>
+          <span class="font-semibold text-error">23.1% Fail Rate</span>
+        </div>
+      </div>
+
+      <!-- Card 4: Leakage Control -->
+      <div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm border border-surface-container flex flex-col justify-between gap-2 border-l-4 border-[#2f6f4e]">
+        <div class="flex items-center justify-between">
+          <span class="font-code-sm text-xs uppercase tracking-wider text-on-surface-variant font-semibold">Leakage Control</span>
+          <span class="material-symbols-outlined text-[#2f6f4e] text-xl">shield</span>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span class="font-headline-lg text-lg font-bold text-[#2f6f4e]">GroupShuffleSplit</span>
+        </div>
+        <div class="flex items-center justify-between text-[11px] font-body-sm text-on-surface-variant pt-1 border-t border-surface-container-low">
+          <span>By <code>task_id</code></span>
+          <span class="font-semibold text-[#2f6f4e]">0% Task Overlap</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. ABOUT THE DATASET & SCIENTIFIC RIGOR -->
+    <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container flex flex-col gap-4">
+      <div class="flex items-center gap-2 border-b border-surface-container pb-3">
+        <span class="material-symbols-outlined text-secondary text-xl">history_edu</span>
+        <h2 class="font-headline-md text-base sm:text-lg text-on-surface font-bold tracking-tight">
+          About the Dataset: Public Agent Benchmark Trajectories
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-2">
+          <span class="font-headline-sm text-xs font-bold text-primary">1. Multi-Benchmark Diversity</span>
+          <p class="font-body-sm text-xs text-on-surface-variant leading-relaxed">
+            Derived from rigorous agent execution suites across <strong>openhands</strong>, <strong>swe-bench</strong>, <strong>sdlc_fix</strong>, and <strong>org_migration</strong>. Captures diverse real-world software engineering failure patterns.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-2">
+          <span class="font-headline-sm text-xs font-bold text-primary">2. Heterogeneous Agent Frameworks</span>
+          <p class="font-body-sm text-xs text-on-surface-variant leading-relaxed">
+            Spans multiple LLM architectures (e.g. <code>claude-sonnet-4-6</code>, <code>claude-haiku-4-5</code>) and frameworks (<code>claude-code</code>, <code>openhands</code>), preventing backbone-specific diagnostic bias.
+          </p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-2 border-l-4 border-secondary">
+          <span class="font-headline-sm text-xs font-bold text-secondary">3. Complete Synthetic Isolation</span>
+          <p class="font-body-sm text-xs text-on-surface-variant leading-relaxed">
+            Curated synthetic demonstration traces (under <code>data/demo_traces/</code>) are <strong>strictly quarantined</strong> for user interactive UI inspection and viva demonstration. <strong>Zero synthetic data</strong> was utilized during model training or held-out test evaluation.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. DATASET SPLIT & DISTRIBUTION STATISTICS -->
+    <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container flex flex-col gap-4">
+      <div class="flex items-center justify-between border-b border-surface-container pb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-xl">analytics</span>
+          <h2 class="font-headline-md text-base sm:text-lg text-on-surface font-bold tracking-tight">
+            Partition Volumes &amp; Class Imbalance Mitigation
+          </h2>
+        </div>
+        <span class="font-code-sm text-xs text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded">
+          Class Weight Ratio: 3.34:1
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+        <!-- Visual Partition Breakdown -->
+        <div class="lg:col-span-2 flex flex-col gap-4">
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between text-xs font-code-sm">
+              <span class="text-on-surface font-semibold">Training Partition (7,999 trials • 66.7%)</span>
+              <span class="text-on-surface-variant">Model Optimization</span>
+            </div>
+            <div class="w-full bg-surface-container-low rounded-full h-3 overflow-hidden border border-surface-container">
+              <div class="h-full bg-primary rounded-full" style="width: 66.7%"></div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between text-xs font-code-sm">
+              <span class="text-on-surface font-semibold">Validation Partition (2,000 trials • 16.7%)</span>
+              <span class="text-on-surface-variant">Threshold Calibration (&tau; = 0.46)</span>
+            </div>
+            <div class="w-full bg-surface-container-low rounded-full h-3 overflow-hidden border border-surface-container">
+              <div class="h-full bg-secondary-container rounded-full" style="width: 16.7%"></div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <div class="flex items-center justify-between text-xs font-code-sm">
+              <span class="text-on-surface font-semibold">Held-Out Test Partition (1,996 trials • 16.6%)</span>
+              <span class="text-secondary font-bold">Scientific Benchmark Matrix</span>
+            </div>
+            <div class="w-full bg-surface-container-low rounded-full h-3.5 overflow-hidden border border-surface-container">
+              <div class="h-full bg-secondary rounded-full" style="width: 16.6%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Class Imbalance Mitigation Stat Card -->
+        <div class="bg-surface-container-low p-4 rounded-xl border border-surface-container flex flex-col gap-3">
+          <span class="font-headline-sm text-xs font-bold text-primary">Imbalance Mitigation Rationale</span>
+          <div class="flex flex-col gap-1.5 text-xs font-body-sm text-on-surface-variant">
+            <div class="flex items-center justify-between font-code-sm">
+              <span>Passed Trials (76.9%):</span>
+              <span class="font-bold text-[#2f6f4e]">9,224</span>
+            </div>
+            <div class="flex items-center justify-between font-code-sm">
+              <span>Failed Trials (23.1%):</span>
+              <span class="font-bold text-error">2,771</span>
+            </div>
+            <div class="flex items-center justify-between font-code-sm border-t border-surface-container pt-1">
+              <span>Loss Multiplier (pos_weight):</span>
+              <span class="font-bold text-secondary">3.34&times;</span>
+            </div>
+          </div>
+          <p class="font-body-sm text-[11px] text-on-surface-variant leading-relaxed">
+            To prevent models from collapsing into trivial majority-class prediction, a 3.34&times; loss penalty was enforced during training.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. VISUAL PREPROCESSING PIPELINE FLOWCHART -->
+    <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container flex flex-col gap-4">
+      <div class="flex items-center gap-2 border-b border-surface-container pb-3">
+        <span class="material-symbols-outlined text-secondary text-xl">linear_scale</span>
+        <h2 class="font-headline-md text-base sm:text-lg text-on-surface font-bold tracking-tight">
+          Feature Engineering &amp; Preprocessing Pipeline
+        </h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-center font-body-sm text-xs">
+        <!-- Step 1 -->
+        <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col items-center gap-2 relative">
+          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">1</div>
+          <span class="font-headline-sm text-xs font-bold text-primary">Raw Ingestion</span>
+          <p class="text-[11px] text-on-surface-variant">Trajectory JSON &amp; telemetry table parsing</p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col items-center gap-2 relative">
+          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">2</div>
+          <span class="font-headline-sm text-xs font-bold text-primary">Imputation</span>
+          <p class="text-[11px] text-on-surface-variant">Median for continuous, mode for categorical</p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col items-center gap-2 relative">
+          <div class="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-xs">3</div>
+          <span class="font-headline-sm text-xs font-bold text-secondary">Derived Features</span>
+          <p class="text-[11px] text-on-surface-variant">10 mathematical behavioral ratios computed</p>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col items-center gap-2 relative">
+          <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs">4</div>
+          <span class="font-headline-sm text-xs font-bold text-primary">Normalization</span>
+          <p class="text-[11px] text-on-surface-variant">StandardScaler + OneHotEncoder (88 features)</p>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col items-center gap-2 relative">
+          <div class="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-xs">5</div>
+          <span class="font-headline-sm text-xs font-bold text-secondary">Tokenization</span>
+          <p class="text-[11px] text-on-surface-variant">Vocab indexing (max_len = 50 tokens)</p>
+        </div>
+
+        <!-- Step 6 -->
+        <div class="p-3.5 rounded-xl bg-surface-container-low border border-surface-container flex flex-col items-center gap-2 relative border-l-2 border-secondary">
+          <div class="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center font-bold text-xs">6</div>
+          <span class="font-headline-sm text-xs font-bold text-secondary">Dual-Branch Tensor</span>
+          <p class="text-[11px] text-on-surface-variant">Tabular MLP + Recurrent BiLSTM Tensor</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 10 DOMAIN-SPECIFIC DERIVED FEATURES -->
+    <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container flex flex-col gap-4">
+      <div class="flex items-center justify-between border-b border-surface-container pb-3">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-secondary text-xl">functions</span>
+          <h2 class="font-headline-md text-base sm:text-lg text-on-surface font-bold tracking-tight">
+            10 Domain-Specific Derived Behavioral Features
+          </h2>
+        </div>
+        <span class="font-code-sm text-xs text-on-surface-variant bg-surface-container-low px-2 py-0.5 rounded">
+          Engineered for Fault Attribution
+        </span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left font-body-sm text-body-sm border-collapse">
+          <thead>
+            <tr class="border-b border-surface-container font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider bg-surface-container-low/60">
+              <th class="py-2.5 px-3">Derived Feature Name</th>
+              <th class="py-2.5 px-3">Exact Mathematical Formulation</th>
+              <th class="py-2.5 px-3">Diagnostic Significance</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-surface-container-low font-code-sm text-xs">
+            {% for f in derived_features %}
+            <tr class="hover:bg-surface-container-low/60 transition-colors">
+              <td class="py-2.5 px-3 font-semibold text-secondary">{{ f.name }}</td>
+              <td class="py-2.5 px-3 text-primary bg-surface-container-low/30 font-mono">{{ f.formula }}</td>
+              <td class="py-2.5 px-3 font-body-sm text-on-surface-variant">{{ f.description }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 6. END-TO-END APPLICATION ARCHITECTURE PIPELINE -->
+    <div class="bg-surface-container-lowest rounded-2xl p-6 shadow-sm border border-surface-container flex flex-col gap-4">
+      <div class="flex items-center gap-2 border-b border-surface-container pb-3">
+        <span class="material-symbols-outlined text-secondary text-xl">hub</span>
+        <h2 class="font-headline-md text-base sm:text-lg text-on-surface font-bold tracking-tight">
+          End-to-End Application Diagnostic Inference Architecture
+        </h2>
+      </div>
+
+      <div class="p-4 rounded-xl bg-surface-container-low border border-surface-container flex flex-col gap-3 font-body-sm text-xs text-on-surface-variant leading-relaxed">
+        <div class="flex items-center gap-2 font-headline-sm text-sm text-primary font-bold">
+          <span class="material-symbols-outlined text-secondary text-base">route</span>
+          <span>From Execution Trace to Actionable Diagnosis</span>
+        </div>
+        <p>
+          The platform bridges low-level telemetry with high-level root-cause reasoning:
+        </p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3 pt-2 text-center">
+          <div class="p-3 bg-surface-container-lowest rounded-xl border border-surface-container">
+            <span class="font-code-sm text-xs uppercase font-bold text-secondary block">Phase 1: Input</span>
+            <span class="font-headline-sm text-xs font-bold text-on-surface block mt-1">Trace Ingestion</span>
+            <span class="text-[11px] text-on-surface-variant mt-0.5 block">Custom JSON/CSV upload or live monitor</span>
+          </div>
+
+          <div class="p-3 bg-surface-container-lowest rounded-xl border border-surface-container">
+            <span class="font-code-sm text-xs uppercase font-bold text-secondary block">Phase 2: Modeling</span>
+            <span class="font-headline-sm text-xs font-bold text-on-surface block mt-1">Multi-View Fusion</span>
+            <span class="text-[11px] text-on-surface-variant mt-0.5 block">MLP + BiLSTM with calibrated &tau;=0.46</span>
+          </div>
+
+          <div class="p-3 bg-surface-container-lowest rounded-xl border border-surface-container">
+            <span class="font-code-sm text-xs uppercase font-bold text-secondary block">Phase 3: Novelty</span>
+            <span class="font-headline-sm text-xs font-bold text-on-surface block mt-1">Signature Attribution</span>
+            <span class="text-[11px] text-on-surface-variant mt-0.5 block">Evidence chain &amp; baseline deviation</span>
+          </div>
+
+          <div class="p-3 bg-surface-container-lowest rounded-xl border border-surface-container border-l-2 border-secondary">
+            <span class="font-code-sm text-xs uppercase font-bold text-secondary block">Phase 4: Output</span>
+            <span class="font-headline-sm text-xs font-bold text-on-surface block mt-1">Canvas Localization</span>
+            <span class="text-[11px] text-on-surface-variant mt-0.5 block">Pulsing failure step &amp; recommended fix</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
